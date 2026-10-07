@@ -1,0 +1,885 @@
+/*
+ * Crowdbeats Apple-Inspired Redesign Styles
+ * Scoped CSS Module — zero global leakage, 100% theme & motion compliant
+ */
+
+/* ── Common Section Foundation ─────────────────────────────────────────── */
+.section {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.darkSurface {
+  background-color: #000000;
+  color: #F5F5F7;
+}
+
+.lightSurface {
+  background-color: #F5F5F7;
+  color: #1D1D1F;
+}
+
+.whiteSurface {
+  background-color: #FFFFFF;
+  color: #1D1D1F;
+}
+
+.readableContainer {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Typography & Apple Pill Buttons ─────────────────────────────────────── */
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 12px 0;
+}
+
+.darkSurface .eyebrow {
+  color: #A1A1A6;
+}
+
+.lightSurface .eyebrow,
+.whiteSurface .eyebrow {
+  color: #6E6E73;
+}
+
+.headline {
+  font-family: var(--font-apple-display, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Manrope', sans-serif);
+  font-size: clamp(38px, 6vw, 68px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 16px 0;
+  text-wrap: balance;
+}
+
+.subheadline {
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: clamp(17px, 2.2vw, 22px);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  margin: 0 0 28px 0;
+  max-width: 640px;
+}
+
+.darkSurface .subheadline {
+  color: #A1A1A6;
+}
+
+.lightSurface .subheadline,
+.whiteSurface .subheadline {
+  color: #424245;
+}
+
+.buttonRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* Apple-style pill button */
+.pillButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  border-radius: 9999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 140ms ease, opacity 140ms ease, background-color 140ms ease, border-color 140ms ease;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.pillButton:hover {
+  transform: scale(1.02);
+  opacity: 0.94;
+}
+
+.pillButton:active {
+  transform: scale(0.98);
+}
+
+.pillButton:focus-visible {
+  outline: 2px solid #7C3AED;
+  outline-offset: 3px;
+}
+
+/* White button on dark surface */
+.btnWhite {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+}
+
+.btnWhite:hover {
+  background-color: #EBEBEB;
+}
+
+/* Black button on light surface */
+.btnBlack {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+}
+
+.btnBlack:hover {
+  background-color: #1D1D1F;
+}
+
+/* Outline button on dark surface */
+.btnOutlineWhite {
+  background-color: transparent;
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btnOutlineWhite:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Outline button on light surface */
+.btnOutlineBlack {
+  background-color: transparent;
+  color: #000000;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.btnOutlineBlack:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Apple text link with arrow */
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: #0071E3;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: opacity 140ms ease;
+}
+
+.textLink:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+/* ── 1. Hero Section (Cinematic Full-Bleed with Left Scrim) ───────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: #000000;
+  color: #F5F5F7;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  min-height: clamp(640px, 88vh, 880px);
+}
+
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.heroMediaImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  transform: translateX(10%);
+}
+
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Cinematic left-to-right scrim: solid black behind headline, soft fade to performer */
+  background:
+    linear-gradient(
+      90deg,
+      #000000 0%,
+      rgba(0, 0, 0, 0.98) 28%,
+      rgba(0, 0, 0, 0.92) 40%,
+      rgba(0, 0, 0, 0.50) 54%,
+      rgba(0, 0, 0, 0.08) 70%,
+      rgba(0, 0, 0, 0) 82%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0) 22%,
+      rgba(0, 0, 0, 0) 68%,
+      rgba(0, 0, 0, 0.70) 100%
+    );
+}
+
+.heroContainer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 72px);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  max-width: clamp(320px, 31vw, 410px);
+  padding: clamp(64px, 11vh, 130px) 0;
+}
+
+.heroHeadline {
+  font-family: var(--font-apple-display, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif);
+  font-size: clamp(34px, 3.8vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  margin: 0 0 18px 0;
+  color: #FFFFFF;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.85);
+}
+
+.heroSubheadline {
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: clamp(15px, 1.35vw, 18px);
+  font-weight: 400;
+  color: #D1D1D6;
+  max-width: 390px;
+  margin: 0 0 24px 0;
+  line-height: 1.45;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+}
+
+.heroButtonRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 18px 0;
+}
+
+.heroReassure {
+  margin: 0;
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: 13px;
+  line-height: 1.45;
+  color: #A1A1A6;
+  max-width: 390px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .hero {
+    min-height: auto;
+    align-items: flex-end;
+    padding-top: clamp(240px, 48vh, 390px);
+  }
+
+  .heroMediaImg {
+    object-position: 50% 12%;
+    transform: none;
+  }
+
+  .heroScrim {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.45) 30%,
+        rgba(0, 0, 0, 0.92) 58%,
+        #000000 100%
+      );
+  }
+
+  .heroContainer {
+    padding: 0 20px;
+  }
+
+  .heroContent {
+    max-width: 100%;
+    padding: 0 0 44px 0;
+  }
+
+  .heroHeadline {
+    font-size: clamp(34px, 9vw, 46px);
+  }
+
+  .heroSubheadline {
+    max-width: 100%;
+  }
+
+  .heroButtonRow {
+    width: 100%;
+  }
+
+  .heroButtonRow .pillButton {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .heroReassure {
+    max-width: 100%;
+  }
+}
+
+/* ── 3. Connection Feature Section ───────────────────────────────────────── */
+.connectionSection {
+  padding-top: clamp(64px, 8vw, 100px);
+  padding-bottom: clamp(64px, 8vw, 100px);
+  background-color: #FFFFFF;
+}
+
+.connectionInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.connectionImageFrame {
+  position: relative;
+  width: 100%;
+  max-width: 1320px;
+  aspect-ratio: 16 / 9;
+  margin-top: clamp(32px, 5vw, 56px);
+  border-radius: clamp(16px, 2vw, 24px);
+  overflow: hidden;
+  background: #12141F;
+}
+
+.connectionImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  display: block;
+}
+
+/* ── 4, 5, 6. Two-Column Grid (Exactly 6 Tiles) ─────────────────────────── */
+.gridSection {
+  padding-top: 12px;
+  padding-bottom: clamp(48px, 6vw, 72px);
+  background-color: #000000;
+}
+
+.gridContainer {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 clamp(12px, 2vw, 24px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 520px;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+@media (hover: hover) {
+  .tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.tileDark {
+  background-color: #12141F;
+  color: #F5F5F7;
+}
+
+.tileLight {
+  background-color: #F5F5F7;
+  color: #1D1D1F;
+}
+
+.tileWhite {
+  background-color: #FFFFFF;
+  color: #1D1D1F;
+}
+
+.tileContent {
+  padding: clamp(28px, 4vw, 44px) clamp(24px, 3.5vw, 40px);
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.tileTitle {
+  font-family: var(--font-apple-display, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Manrope', sans-serif);
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0 0 10px 0;
+  text-wrap: balance;
+}
+
+.tileSubline {
+  font-family: var(--font-apple-text, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif);
+  font-size: clamp(14px, 1.4vw, 17px);
+  line-height: 1.45;
+  margin: 0 0 22px 0;
+  max-width: 440px;
+}
+
+.tileDark .tileSubline {
+  color: #A1A1A6;
+}
+
+.tileLight .tileSubline,
+.tileWhite .tileSubline {
+  color: #6E6E73;
+}
+
+.tileVisualContainer {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 280px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.tileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* Composited Simple Tipping Interactive Mockup Tile */
+.tippingMockupCard {
+  width: calc(100% - 48px);
+  max-width: 380px;
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 22px 24px;
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.tippingHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tippingAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #E5E5EA;
+}
+
+.tippingArtistName {
+  font-weight: 600;
+  font-size: 15px;
+  color: #1D1D1F;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(45, 212, 191, 0.15);
+  color: #0F766E;
+  text-transform: uppercase;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2DD4BF;
+}
+
+.presetRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.presetChip {
+  padding: 10px 0;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #F5F5F7;
+  color: #1D1D1F;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.presetChipSelected {
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+}
+
+.feeNotice {
+  font-size: 12px;
+  color: #6E6E73;
+  line-height: 1.35;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 10px;
+}
+
+.applePayButton {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  background: #000000;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+/* ── 7. Large Editorial Carousel ─────────────────────────────────────────── */
+.carouselSection {
+  padding-top: clamp(64px, 8vw, 96px);
+  padding-bottom: clamp(48px, 6vw, 72px);
+  background-color: #000000;
+  color: #F5F5F7;
+  overflow: hidden;
+}
+
+.carouselHeader {
+  max-width: 1240px;
+  margin: 0 auto 36px auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.carouselTitle {
+  font-family: var(--font-apple-display, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Manrope', sans-serif);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.carouselNavButtons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navCircleButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.navCircleButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.navCircleButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.carouselViewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carouselTrack {
+  display: flex;
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.carouselSlide {
+  flex: 0 0 clamp(320px, 75vw, 1080px);
+  margin: 0 clamp(8px, 1.5vw, 16px);
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #12141F;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  opacity: 0.55;
+  transform: scale(0.96);
+  transition: opacity 350ms ease, transform 350ms ease;
+}
+
+.carouselSlideActive {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.carouselSlideImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.carouselSlideOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(24px, 4vw, 48px);
+  box-sizing: border-box;
+}
+
+.carouselPerformerName {
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.carouselPerformerBio {
+  font-size: clamp(14px, 1.4vw, 17px);
+  color: #D1D1D6;
+  margin: 0 0 18px 0;
+  max-width: 580px;
+  line-height: 1.4;
+}
+
+.carouselIndicators {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.carouselDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.carouselDotActive {
+  width: 24px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+}
+
+/* ── 8. Smaller Horizontal Media Rail ────────────────────────────────────── */
+.mediaRailSection {
+  padding-top: 16px;
+  padding-bottom: clamp(64px, 8vw, 96px);
+  background-color: #000000;
+  color: #F5F5F7;
+}
+
+.mediaRailHeader {
+  max-width: 1240px;
+  margin: 0 auto 20px auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+}
+
+.mediaRailTitle {
+  font-family: var(--font-apple-display, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Manrope', sans-serif);
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.mediaRailScroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 8px clamp(20px, 4vw, 48px) 24px clamp(20px, 4vw, 48px);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mediaRailScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.railCard {
+  flex: 0 0 280px;
+  height: 160px;
+  border-radius: 14px;
+  background: #161618;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: #FFFFFF;
+  box-sizing: border-box;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.railCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.railCardBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  transition: opacity 160ms ease, transform 300ms ease;
+}
+
+.railCard:hover .railCardBg {
+  opacity: 0.55;
+  transform: scale(1.05);
+}
+
+.railCardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+}
+
+.railCardContent {
+  position: relative;
+  z-index: 2;
+}
+
+.railCardTag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2DD4BF;
+  margin: 0 0 4px 0;
+}
+
+.railCardName {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.25;
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pillButton,
+  .tile,
+  .carouselTrack,
+  .carouselSlide,
+  .railCard,
+  .railCardBg {
+    transition: none !important;
+    transform: none !important;
+  }
+}
