@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+/lib/
+
+# Environment — secrets never in source control
+.env
+.env.*
+*.local
+
+# Build artifacts
+*.js.map

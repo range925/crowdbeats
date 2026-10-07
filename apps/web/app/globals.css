@@ -1,0 +1,305 @@
+/* Crowdbeats V2 — Global CSS reset (Phase 4)
+ * tokens.css is imported in layout.tsx before this file.
+ * This file handles only minimal layout reset and imports component styles.
+ */
+
+@import './components.css';
+
+html {
+  height: 100%;
+}
+
+html,
+body {
+  max-width:  100vw;
+  overflow-x: hidden;
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  background-color: var(--cb-bg-app, #000000);
+  color: var(--cb-text-primary, #F5F5F7);
+}
+
+h1, .apple-h1 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -0.028em;
+  line-height: 1.06;
+}
+
+h2, .apple-h2 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+}
+
+h3, .apple-h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+p {
+  letter-spacing: -0.014em;
+}
+
+a {
+  color:           inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  max-width:  100%;
+  height:     auto;
+  display:    block;
+}
+
+/* ── Modern Web Ergonomics & Anti-Slop Rules ── */
+.cb-touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.cb-hero-viewport {
+  min-height: 100dvh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cb-purple-main, #7C3AED);
+  outline-offset: 2px;
+}
+
+/* ── Hero Cinematic Background & Bioluminescent Fireflies ── */
+@keyframes cbHeroImageSlowDrift {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.055) translate3d(-1%, -0.8%, 0);
+  }
+  100% {
+    transform: scale(1.09) translate3d(0.8%, 0.5%, 0);
+  }
+}
+
+.cb-hero-bg-layer {
+  position: absolute;
+  inset: -6%;
+  width: 112%;
+  height: 112%;
+  background-image: url('/stitch/hero_blonde_artist_bg.jpg');
+  background-size: cover;
+  background-position: center 18%;
+  opacity: 0.85;
+  filter: contrast(106%) saturate(110%);
+  animation: cbHeroImageSlowDrift 28s ease-in-out infinite alternate;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ── Firefly Floating & Bioluminescent Glow Animations ── */
+@keyframes cbFireflyFloat1 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(26px, -32px, 0);
+  }
+  50% {
+    transform: translate3d(-18px, -70px, 0);
+  }
+  75% {
+    transform: translate3d(20px, -110px, 0);
+  }
+  100% {
+    transform: translate3d(-10px, -150px, 0);
+  }
+}
+
+@keyframes cbFireflyFloat2 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  30% {
+    transform: translate3d(-24px, -40px, 0);
+  }
+  60% {
+    transform: translate3d(22px, -85px, 0);
+  }
+  85% {
+    transform: translate3d(-14px, -125px, 0);
+  }
+  100% {
+    transform: translate3d(18px, -165px, 0);
+  }
+}
+
+@keyframes cbFireflyFloat3 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(18px, -25px, 0);
+  }
+  45% {
+    transform: translate3d(-20px, -60px, 0);
+  }
+  70% {
+    transform: translate3d(24px, -100px, 0);
+  }
+  100% {
+    transform: translate3d(-8px, -140px, 0);
+  }
+}
+
+@keyframes cbFireflyFloat4 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  35% {
+    transform: translate3d(-22px, -48px, 0);
+  }
+  70% {
+    transform: translate3d(16px, -92px, 0);
+  }
+  100% {
+    transform: translate3d(-12px, -155px, 0);
+  }
+}
+
+@keyframes cbFireflyGlowGold {
+  0%, 100% {
+    opacity: 0.08;
+    transform: scale(0.65);
+    box-shadow: 0 0 3px #FDE047, 0 0 6px rgba(251, 191, 36, 0.35);
+  }
+  35% {
+    opacity: 0.95;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px #FEF08A, 0 0 16px rgba(253, 224, 71, 0.85), 0 0 28px rgba(245, 158, 11, 0.5);
+  }
+  55% {
+    opacity: 0.3;
+    transform: scale(0.85);
+    box-shadow: 0 0 5px #FDE047, 0 0 10px rgba(251, 191, 36, 0.45);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.25);
+    box-shadow: 0 0 9px #FEF08A, 0 0 18px rgba(253, 224, 71, 0.9), 0 0 32px rgba(245, 158, 11, 0.55);
+  }
+  90% {
+    opacity: 0.18;
+    transform: scale(0.75);
+  }
+}
+
+@keyframes cbFireflyGlowTeal {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(0.65);
+    box-shadow: 0 0 3px #2DD4BF, 0 0 6px rgba(45, 212, 191, 0.35);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px #5EEAD4, 0 0 16px rgba(45, 212, 191, 0.85), 0 0 28px rgba(20, 184, 166, 0.5);
+  }
+  60% {
+    opacity: 0.3;
+    transform: scale(0.85);
+    box-shadow: 0 0 5px #2DD4BF, 0 0 10px rgba(45, 212, 191, 0.45);
+  }
+  80% {
+    opacity: 0.9;
+    transform: scale(1.15);
+    box-shadow: 0 0 9px #5EEAD4, 0 0 18px rgba(45, 212, 191, 0.9), 0 0 30px rgba(20, 184, 166, 0.5);
+  }
+  92% {
+    opacity: 0.15;
+    transform: scale(0.75);
+  }
+}
+
+.cb-firefly-node {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  will-change: transform;
+}
+
+.cb-firefly-core {
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity, box-shadow;
+}
+
+.cb-firefly-gold {
+  background-color: #FEF08A;
+}
+
+.cb-firefly-teal {
+  background-color: #5EEAD4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Hero Artist Animations — flicker-free two-element approach ── */
+
+/* Wrapper: fades in once (opacity only — no transform conflict) */
+@keyframes cbArtistFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Img: continuous gentle float (transform only — no opacity conflict) */
+@keyframes cbArtistFloat {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-10px); }
+}
+
+/* Wrapper div that owns the fade-in */
+.cb-hero-artist-wrap {
+  animation: cbArtistFadeIn 1.4s ease-out both;
+  will-change: opacity;
+}
+
+/* Img inside wrapper that owns the float — starts after fade-in */
+.cb-hero-artist {
+  animation: cbArtistFloat 5s ease-in-out 1.4s infinite;
+  will-change: transform;
+  display: block;
+}
+
+/* ── Landing Map Search Bar — remove browser focus ring ── */
+.cb-landing-search *:focus,
+.cb-landing-search *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* Mobile (<768px): show hamburger, hide desktop nav links & theme toggle & sign-in */
+@media (max-width: 767px) {
+  .md-nav-cluster        { display: none   !important; }
+  .md-mobile-menu-btn    { display: flex   !important; }
+  .md-desktop-only       { display: none   !important; }
+}
+
+/* Desktop (≥768px): show nav, hide hamburger */
+@media (min-width: 768px) {
+  .md-nav-cluster        { display: flex   !important; }
+  .md-mobile-menu-btn    { display: none   !important; }
+  .md-desktop-only       { display: flex   !important; }
+}

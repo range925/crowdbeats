@@ -1,0 +1,45 @@
+{
+  "name": "@crowdbeats/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Crowdbeats V2 — Responsive web client for all personas (Next.js App Router)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:prod": "cross-env NEXT_PUBLIC_FIREBASE_PROJECT_ID=crowdbeats-01 NEXT_PUBLIC_FIREBASE_APP_ID=1:568766536855:web:d087ee74ba8a69ac7e5dd2 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=crowdbeats-01.firebasestorage.app NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDZvp0yBlkTiqoJwqeCAbH4AM1CprxzZZ4 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=crowdbeats.ai NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=568766536855 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-WK1N5YD25E NEXT_PUBLIC_USE_FIREBASE_EMULATOR=false NEXT_PUBLIC_APP_ENV=production NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_51U7jVULZUnAXe5WTl7xknygqktoyeh712Jge9Bm0gmQLhuU1OWl8zkYYcHRXTBEKxxM5q8LDIhoX1GfV8ksmdvSW00WJ3AWWP6 GOOGLE_MAPS_API_KEY=AIzaSyBmxMMx5bktgjykssmQnciHtcK0OYFVcQA NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyBmxMMx5bktgjykssmQnciHtcK0OYFVcQA NEXT_PUBLIC_STRIPE_SECRET_CONFIGURED=true NEXT_PUBLIC_STRIPE_WEBHOOK_CONFIGURED=true next build",
+    "start": "next start",
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@crowdbeats/contracts": "file:../../packages/contracts",
+    "@stripe/react-stripe-js": "^6.10.0",
+    "@stripe/stripe-js": "^9.14.0",
+    "@types/qrcode": "^1.5.6",
+    "firebase": "^12.18.0",
+    "firebase-admin": "^13.10.0",
+    "maplibre-gl": "^6.10.0",
+    "next": "16.3.3",
+    "qrcode": "^1.5.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "stripe": "^17.7.0"
+  },
+  "devDependencies": {
+    "@types/google.maps": "^3.66.2",
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.3",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5"
+  }
+}

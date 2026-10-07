@@ -1,0 +1,78 @@
+{
+  "name": "projects/5326179813018056505",
+  "projectId": "5326179813018056505",
+  "title": "Crowdbeats V2 — Vivid Resonance Landing Page",
+  "visibility": "PRIVATE",
+  "createTime": "2026-08-25T17:29:00.516727Z",
+  "updateTime": "2026-09-02T21:09:00Z",
+  "projectType": "TEXT_TO_UI_PRO",
+  "origin": "STITCH",
+  "deviceType": "DESKTOP",
+  "designTheme": {
+    "colorMode": "DARK",
+    "font": "MONTSERRAT",
+    "headlineFont": "MONTSERRAT",
+    "bodyFont": "INTER",
+    "labelFont": "INTER",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#6200ee",
+    "namedColors": {
+      "background": "#07080D",
+      "surface": "#12141F",
+      "primary": "#7C3AED",
+      "secondary": "#A855F7",
+      "tertiary": "#06B6D4",
+      "accent_cyan": "#14F195",
+      "live": "#10B981"
+    }
+  },
+  "screens": {
+    "landing": {
+      "id": "landing_million_dollar",
+      "sourceScreen": "projects/5326179813018056505/screens/landing_million_dollar",
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 3800
+    },
+    "variation_pro_minimal": {
+      "id": "var_pro_minimal",
+      "sourceScreen": "projects/5326179813018056505/screens/var_pro_minimal",
+      "x": 1500,
+      "y": 0,
+      "width": 1440,
+      "height": 3400
+    },
+    "variation_resonance_keynote": {
+      "id": "var_resonance_keynote",
+      "sourceScreen": "projects/5326179813018056505/screens/var_resonance_keynote",
+      "x": 3000,
+      "y": 0,
+      "width": 1440,
+      "height": 3400
+    },
+    "variation_studio_console": {
+      "id": "var_studio_console",
+      "sourceScreen": "projects/5326179813018056505/screens/var_studio_console",
+      "x": 4500,
+      "y": 0,
+      "width": 1440,
+      "height": 3400
+    },
+    "variation_dynamic_hub": {
+      "id": "var_dynamic_hub",
+      "sourceScreen": "projects/5326179813018056505/screens/var_dynamic_hub",
+      "x": 6000,
+      "y": 0,
+      "width": 1440,
+      "height": 3000
+    }
+  },
+  "metadata": {
+    "userRole": "OWNER",
+    "iteration": 2,
+    "target": "localhost",
+    "activeVariations": 4,
+    "defaultTheme": "DARK"
+  }
+}

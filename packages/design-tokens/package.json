@@ -1,0 +1,21 @@
+{
+  "name": "@crowdbeats/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Crowdbeats V2 — Canonical design token source. Generates Flutter ThemeData, web CSS custom properties, and TypeScript token constants.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && node scripts/generate-tokens.js",
+    "type-check": "tsc --noEmit",
+    "generate:flutter": "node scripts/generate-flutter-tokens.js",
+    "generate:web": "node scripts/generate-web-tokens.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.9.3"
+  }
+}

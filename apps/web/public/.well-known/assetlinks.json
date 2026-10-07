@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.crowdbeats.app",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7D:0F:52:AB:E6:EC:60:5F:B3:9D:68:57:3E:FD:6D:1A:05:43:82:13:96:A2:DB:BE:85:6A:E7:EF:7E"
+      ]
+    }
+  }
+]

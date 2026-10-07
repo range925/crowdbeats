@@ -1,0 +1,50 @@
+{
+  "name": "crowdbeats-v2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Crowdbeats V2 — Cross-platform live music technology platform (clean-room rebuild)",
+  "workspaces": [
+    "apps/web",
+    "apps/functions",
+    "packages/contracts",
+    "packages/design-tokens",
+    "packages/web-sdk",
+    "packages/config"
+  ],
+  "scripts": {
+    "web": "npm run dev --workspace=apps/web",
+    "web:build": "npm run build --workspace=apps/web",
+    "web:build:prod": "npm run build:prod --workspace=apps/web",
+    "web:typecheck": "npm run type-check --workspace=apps/web",
+    "web:lint": "npm run lint --workspace=apps/web",
+    "web:test": "npm run test --workspace=apps/web",
+    "functions:build": "npm run build --workspace=@crowdbeats/functions",
+    "functions:typecheck": "npm run type-check --workspace=@crowdbeats/functions",
+    "functions:test": "npm run test --workspace=@crowdbeats/functions",
+    "contracts:build": "npm run build --workspace=@crowdbeats/contracts",
+    "contracts:typecheck": "npm run type-check --workspace=@crowdbeats/contracts",
+    "mobile:analyze": "flutter analyze",
+    "mobile:test": "flutter test",
+    "mobile:build:ios": "flutter build ios --no-codesign",
+    "mobile:build:android": "flutter build apk",
+    "mobile:build:ios:prod": "cd apps/mobile && flutter build ios --release --no-codesign --dart-define=STRIPE_PUBLISHABLE_KEY=pk_live_51U7jVULZUnAXe5WTl7xknygqktoyeh712Jge9Bm0gmQLhuU1OWl8zkYYcHRXTBEKxxM5q8LDIhoX1GfV8ksmdvSW00WJ3AWWP6 --dart-define=USE_EMULATOR=false",
+    "mobile:build:android:prod": "cd apps/mobile && flutter build apk --release --dart-define=STRIPE_PUBLISHABLE_KEY=pk_live_51U7jVULZUnAXe5WTl7xknygqktoyeh712Jge9Bm0gmQLhuU1OWl8zkYYcHRXTBEKxxM5q8LDIhoX1GfV8ksmdvSW00WJ3AWWP6 --dart-define=USE_EMULATOR=false",
+    "typecheck": "npm run web:typecheck && npm run functions:typecheck && npm run contracts:typecheck",
+    "lint": "npm run web:lint && npm run functions:lint",
+    "test": "npm run web:test && npm run functions:test",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\" --ignore-path .gitignore",
+    "format:write": "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .gitignore",
+    "secrets:scan": "echo 'Run: npx gitleaks detect --source . --verbose'",
+    "sync:instagram": "node scripts/sync_instagram_reposts.mjs",
+    "sync:instagram:daemon": "node scripts/sync_instagram_reposts.mjs --daemon",
+    "deploy:prod": "npm run web:build:prod && node scripts/sync_dist.js && npx firebase-tools deploy --only hosting --project crowdbeats-01"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

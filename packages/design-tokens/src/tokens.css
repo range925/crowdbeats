@@ -1,0 +1,228 @@
+/**
+ * Crowdbeats V2 — Design Tokens CSS Custom Properties (Phase 4)
+ *
+ * Generated from packages/design-tokens/src/tokens.ts
+ * Import this file once in apps/web/app/layout.tsx
+ *
+ * All component styles MUST use these variables — never raw hex values.
+ * Reduced-motion queries are included for animation tokens.
+ */
+
+:root {
+  /* ── Surface ──────────────────────────────────────────────────────────── */
+  --surface-base:      #131315;
+  --surface-raised:    #1C1C1F;
+  --surface-overlay:   #222226;
+  --surface-card:      #27272A;
+  --surface-pressed:   #2E2E32;
+  --surface-inverted:  #FFFFFF;
+
+  /* ── Border ───────────────────────────────────────────────────────────── */
+  --border-subtle:     #3F3F46;
+  --border-default:    #52525B;
+  --border-focus:      #FF97BA;
+  --border-error:      #F87171;
+
+  /* ── Text ─────────────────────────────────────────────────────────────── */
+  --text-primary:      #F4F4F5;   /* 17.8:1 on surface-base ✅ AAA */
+  --text-secondary:    #A1A1AA;   /* 5.4:1 on surface-base  ✅ AA  */
+  --text-tertiary:     #71717A;   /* 3.2:1 — large text only       */
+  --text-disabled:     #52525B;
+  --text-inverted:     #131315;
+  --text-on-primary:   #131315;   /* 5.2:1 on pink-400      ✅ AA  */
+  --text-on-accent:    #131315;
+
+  /* ── Brand Accent ─────────────────────────────────────────────────────── */
+  --accent-primary:          #FF97BA;   /* 5.2:1 on surface-base ✅ AA  */
+  --accent-primary-hover:    #D94E77;   /* 5.8:1 on surface-base ✅ AA  */
+  --accent-primary-active:   #B83761;
+  --accent-primary-subtle:   #2A1B20;
+  --accent-secondary:        #A78BFA;   /* 4.8:1 on surface-base ✅ AA  */
+  --accent-secondary-large:  #8B5CF6;   /* 2.5:1 — large UI only        */
+  --accent-secondary-hover:  #C4B5FD;   /* 8.2:1 on surface-base ✅ AAA */
+  --accent-secondary-subtle: #1A1727;
+
+  /* ── Status ───────────────────────────────────────────────────────────── */
+  --status-success:    #4ADE80;   /* 8.4:1 ✅ AAA */
+  --status-warning:    #FBBF24;   /* 10.4:1 ✅ AAA */
+  --status-error:      #F87171;   /* 5.1:1 ✅ AA  */
+  --status-info:       #60A5FA;   /* 6.5:1 ✅ AA  */
+  --status-live:       #FF97BA;
+
+  /* ── Live Stage ───────────────────────────────────────────────────────── */
+  --live-glow:         rgba(255, 151, 186, 0.20);
+  --live-pulse:        #FF97BA;
+  --live-surface:      #1E1318;
+  --live-text:         #FFB0CE;
+
+  /* ── Data Visualization ───────────────────────────────────────────────── */
+  --dataviz-1:         #FF97BA;
+  --dataviz-2:         #A78BFA;
+  --dataviz-3:         #60A5FA;
+  --dataviz-4:         #4ADE80;
+  --dataviz-5:         #FBBF24;
+  --dataviz-bg:        #27272A;
+
+  /* ── Typography ───────────────────────────────────────────────────────── */
+  --font-display:  "DM Sans", "SF Pro Display", system-ui, sans-serif;
+  --font-body:     "DM Sans", "SF Pro Text", system-ui, sans-serif;
+  --font-mono:     "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+  --text-5xl-size: 3rem;      --text-5xl-lh: 1.1;  --text-5xl-ls: -0.03em;
+  --text-4xl-size: 2.25rem;   --text-4xl-lh: 1.1;  --text-4xl-ls: -0.02em;
+  --text-3xl-size: 1.875rem;  --text-3xl-lh: 1.2;  --text-3xl-ls: -0.02em;
+  --text-2xl-size: 1.5rem;    --text-2xl-lh: 1.25; --text-2xl-ls: -0.01em;
+  --text-xl-size:  1.25rem;   --text-xl-lh:  1.3;  --text-xl-ls:  -0.01em;
+  --text-lg-size:  1.125rem;  --text-lg-lh:  1.5;  --text-lg-ls:  0;
+  --text-md-size:  1rem;      --text-md-lh:  1.5;  --text-md-ls:  0;
+  --text-sm-size:  0.875rem;  --text-sm-lh:  1.5;  --text-sm-ls:  0.01em;
+  --text-xs-size:  0.75rem;   --text-xs-lh:  1.5;  --text-xs-ls:  0.02em;
+  --text-2xs-size: 0.6875rem; --text-2xs-lh: 1.4;  --text-2xs-ls: 0.03em;
+
+  /* ── Spacing ──────────────────────────────────────────────────────────── */
+  --space-0:   0;
+  --space-0-5: 2px;
+  --space-1:   4px;
+  --space-1-5: 6px;
+  --space-2:   8px;
+  --space-2-5: 10px;
+  --space-3:   12px;
+  --space-3-5: 14px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   28px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-14:  56px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-32:  128px;
+
+  /* ── Radius ───────────────────────────────────────────────────────────── */
+  --radius-none: 0;
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
+  --radius-full: 9999px;
+
+  /* ── Shadow / Elevation ───────────────────────────────────────────────── */
+  --shadow-none:      none;
+  --shadow-xs:        0 1px 2px rgba(0,0,0,0.4);
+  --shadow-sm:        0 2px 4px rgba(0,0,0,0.5);
+  --shadow-md:        0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg:        0 8px 24px rgba(0,0,0,0.6);
+  --shadow-xl:        0 16px 40px rgba(0,0,0,0.7);
+  --shadow-pink-glow: 0 0 24px rgba(255,151,186,0.30);
+  --shadow-focus:     0 0 0 3px rgba(255,151,186,0.60);
+
+  /* ── Motion ───────────────────────────────────────────────────────────── */
+  --duration-instant: 0ms;
+  --duration-fast:    100ms;
+  --duration-normal:  200ms;
+  --duration-slow:    350ms;
+  --duration-xslow:   500ms;
+
+  --ease-out:     cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in:      cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-in-out:  cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-Index ──────────────────────────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+  --z-tooltip:  600;
+
+  /* ── Focus ────────────────────────────────────────────────────────────── */
+  --focus-ring-width:  3px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color:  #FF97BA;
+
+  /* ── Touch Targets ────────────────────────────────────────────────────── */
+  --touch-min: 44px;       /* Web minimum (WCAG 2.5.8) */
+  --touch-comfortable: 56px;
+}
+
+/* ── Reduced Motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast:   0ms;
+    --duration-normal: 0ms;
+    --duration-slow:   0ms;
+    --duration-xslow:  0ms;
+    --ease-spring:     linear;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:       0.001ms !important;
+    scroll-behavior:           auto !important;
+  }
+}
+
+/* ── Responsive Grid Helpers ─────────────────────────────────────────────── */
+.cb-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+  max-width: 1440px;
+}
+
+@media (min-width: 768px) {
+  .cb-container { padding-inline: var(--space-6); }
+}
+
+@media (min-width: 1024px) {
+  .cb-container { padding-inline: var(--space-8); }
+}
+
+@media (min-width: 1280px) {
+  .cb-container { padding-inline: var(--space-12); }
+}
+
+/* ── Base / Reset ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--surface-base);
+  color:            var(--text-primary);
+  font-family:      var(--font-body);
+  font-size:        var(--text-md-size);
+  line-height:      var(--text-md-lh);
+  -webkit-font-smoothing: antialiased;
+  text-size-adjust: 100%;
+}
+
+/* ── Global Focus Visible ─────────────────────────────────────────────────── */
+:focus-visible {
+  outline:        var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius:  var(--radius-xs);
+}
+
+/* ── Selection ────────────────────────────────────────────────────────────── */
+::selection {
+  background-color: rgba(255, 151, 186, 0.25);
+  color:            var(--text-primary);
+}
+
+/* ── Scrollbar (dark) ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface-base); }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--border-default); }

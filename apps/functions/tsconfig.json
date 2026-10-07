@@ -1,0 +1,23 @@
+﻿{
+    "compileOnSave":  true,
+    "include":  [
+                    "src"
+                ],
+    "exclude":  [
+                    "node_modules"
+                ],
+    "compilerOptions":  {
+                            "target":  "ES2022",
+                            "outDir":  "lib",
+                            "lib":  [
+                                        "ES2022"
+                                    ],
+                            "moduleResolution":  "node16",
+                            "noUnusedLocals":  true,
+                            "noImplicitReturns":  true,
+                            "strict":  true,
+                            "module":  "node16",
+                            "skipLibCheck":  true,
+                            "sourceMap":  true
+                        }
+}

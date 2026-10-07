@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "dev": "crowdbeats-v2-dev",
+    "staging": "crowdbeats-v2-staging",
+    "production": "crowdbeats-v2-prod"
+  }
+}

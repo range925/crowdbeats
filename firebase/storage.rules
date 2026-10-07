@@ -1,0 +1,174 @@
+rules_version = '2';
+
+// Crowdbeats V2 — Cloud Storage Security Rules (Phase 3 — Trust Foundation)
+//
+// Bucket: crowdbeats-v2-dev.firebasestorage.app
+//
+// Path structure:
+// - /profile-media/{uid}/avatar/{filename}        — Owner write; public read
+// - /profile-media/{uid}/cover/{filename}         — Owner write; public read
+// - /band-media/{bandId}/avatar/{filename}        — Band admin write; public read
+// - /band-media/{bandId}/cover/{filename}         — Band admin write; public read
+// - /venue-media/{venueId}/photos/{filename}      — Venue manager write; public read
+// - /sponsor-media/{orgId}/logo/{filename}        — Sponsor admin write; public read
+// - /campaign-media/{campaignId}/{filename}       — Creator write; public read
+// - /private-documents/{uid}/{filename}           — Owner write/read; SERVER_ONLY
+// - /stripe-documents/{recipientId}/{filename}    — SERVER_ONLY
+// - /report-attachments/{reportId}/{filename}     — Reporter write; moderation read
+//
+// INVARIANTS:
+// - Max file size: 10MB for images, 50MB for documents
+// - Allowed image types: image/jpeg, image/png, image/webp, image/gif
+// - Server-only paths: /stripe-documents, /audit-exports
+// - No PAN, card data, or secret keys in any Storage path
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Helper functions ──────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function isOwner(resourceUid) {
+      return isSignedIn() && uid() == resourceUid;
+    }
+
+    function platformRole() {
+      return request.auth.token.get('platformRole', null);
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && platformRole() == 'SUPER_ADMIN';
+    }
+
+    function isModerationStaff() {
+      return isSignedIn() && platformRole() in [
+        'SUPER_ADMIN', 'CONTENT_MODERATOR', 'TRUST_SAFETY'
+      ];
+    }
+
+    function isImageType() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
+    }
+
+    function isDocumentType() {
+      return request.resource.contentType.matches('application/(pdf|msword|vnd\\.openxmlformats.*)');
+    }
+
+    function maxSize(mb) {
+      return request.resource.size <= mb * 1024 * 1024;
+    }
+
+    function validImageUpload(maxMb) {
+      return isImageType() && maxSize(maxMb);
+    }
+
+    function validDocumentUpload() {
+      return isDocumentType() && maxSize(50);
+    }
+
+    function safeFilename(name) {
+      return name.size() <= 100 && !name.matches('.*\\.\\..*');
+    }
+
+    // ── Profile Media (public read / owner write) ─────────────────────────────
+
+    match /profile-media/{userUid}/avatar/{filename} {
+      allow read: if true; // Public
+      allow write: if isOwner(userUid) && validImageUpload(10) && safeFilename(filename);
+      allow delete: if isOwner(userUid) || isSuperAdmin();
+    }
+
+    match /profile-media/{userUid}/cover/{filename} {
+      allow read: if true; // Public
+      allow write: if isOwner(userUid) && validImageUpload(10) && safeFilename(filename);
+      allow delete: if isOwner(userUid) || isSuperAdmin();
+    }
+
+    // ── Band Media ────────────────────────────────────────────────────────────
+    // NOTE: Band admin check cannot use Firestore in Storage rules (different service).
+    // Authorization is enforced at the callable level; Storage rules check auth only.
+    // The callable issues a short-lived signed upload URL after verifying band role.
+    // Direct client uploads to band paths are blocked.
+
+    match /band-media/{bandId}/{allPaths=**} {
+      allow read: if true; // Public
+      allow write: if false; // Must use signed upload URL from callable
+    }
+
+    // ── Venue Media ───────────────────────────────────────────────────────────
+
+    match /venue-media/{venueId}/{allPaths=**} {
+      allow read: if true; // Public
+      allow write: if false; // Must use signed upload URL from callable
+    }
+
+    // ── Sponsor Media ─────────────────────────────────────────────────────────
+
+    match /sponsor-media/{orgId}/{allPaths=**} {
+      allow read: if true; // Public
+      allow write: if false; // Must use signed upload URL from callable
+    }
+
+    // ── Campaign Media ────────────────────────────────────────────────────────
+
+    match /campaign-media/{campaignId}/{allPaths=**} {
+      allow read: if true; // Public
+      allow write: if false; // Must use signed upload URL from callable
+    }
+
+    // ── Private Documents (owner read/write; e.g., W-9, ID verification) ─────
+
+    match /private-documents/{userUid}/{filename} {
+      allow read: if isOwner(userUid) || isSuperAdmin();
+      allow write: if isOwner(userUid) && validDocumentUpload();
+      allow delete: if isOwner(userUid) || isSuperAdmin();
+    }
+
+    // ── Stripe Identity Documents — SERVER_ONLY ───────────────────────────────
+
+    match /stripe-documents/{recipientId}/{allPaths=**} {
+      allow read, write: if false; // Server-managed signed URLs only
+    }
+
+    // ── Audit Exports — SERVER_ONLY ───────────────────────────────────────────
+
+    match /audit-exports/{allPaths=**} {
+      allow read, write: if false; // Generated by Cloud Functions, accessed via signed URL
+    }
+
+    // ── Report Attachments ────────────────────────────────────────────────────
+
+    match /report-attachments/{reportId}/{filename} {
+      allow read: if isModerationStaff();
+      // Reporters upload via callable which validates the report ownership
+      allow write: if false;
+    }
+
+    // ── Dispute Evidence Attachments (Phase 11 / Phase 12) ───────────────────
+
+    match /dispute-evidence/{disputeId}/{filename} {
+      allow read: if isModerationStaff() || isSuperAdmin();
+      allow write: if false; // Uploaded via server signed URLs only
+    }
+
+    // ── Emulator Seed Data (dev only) ─────────────────────────────────────────
+
+    match /emulator-seed/{allPaths=**} {
+      // Only accessible in emulator context — blocked in production by project isolation
+      allow read, write: if false; // Managed via emulator import/export
+    }
+
+    // ── DEFAULT DENY ──────────────────────────────────────────────────────────
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# STRIPE PRODUCTION READINESS CHECKLIST
+
+- [x] Stripe Connect Express implementation verified
+- [x] Canonical creator URLs verified
+- [x] Webhook signatures verified using raw request body
+- [x] Idempotency keys enforced on payments and webhooks
+- [x] Creator monetization eligibility server-enforced (`assertCreatorMayMonetize`)
+- [x] Prohibited-content policies authored and published
+- [x] Automated moderation pipeline operational
+- [x] Human moderation queue operational
+- [x] In-app user reporting operational
+- [x] Public DMCA copyright complaint intake operational
+- [x] Repeat offender strike system operational
+- [x] Independent demonetization operational
+- [x] Payout hold state machine operational
+- [x] Audit logs operational
+- [x] Firebase security rules hardened and tested
+- [x] Payment unit tests passing
+- [x] Moderation unit tests passing
+- [x] Stripe questionnaire control matrix verified
+- [x] Legal review markers in place on all draft policies

@@ -1,0 +1,310 @@
+{
+  "indexes": [
+    {
+      "_comment": "Activity tab: fan's tips ordered by newest first",
+      "collectionGroup": "tips",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fanUid", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Artist activity: tips received by a creator ordered by newest first",
+      "collectionGroup": "tips",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recipientId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Fan following list ordered by newest first",
+      "collectionGroup": "follows",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fanUid", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Active stage sessions for Nearby tab: status + startedAt",
+      "collectionGroup": "stageSessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Active campaigns for discovery feed",
+      "collectionGroup": "campaigns",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "endsAt", "order": "ASCENDING" }
+      ]
+    },
+
+    {
+      "_comment": "Tip status filter for refund eligibility check",
+      "collectionGroup": "tips",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fanUid", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 6b: Active sessions for Nearby tab (replaces stageSessions)",
+      "collectionGroup": "sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 6b: Sessions by performer — enforce 1-active-session rule",
+      "collectionGroup": "sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "performerId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase B: Live session TTL expiry query — WHERE status='live' AND endsAt < now()",
+      "collectionGroup": "sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "endsAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 7: Active campaigns by deadline for discovery",
+      "collectionGroup": "campaigns",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "deadline", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 7: Creator's campaigns by status",
+      "collectionGroup": "campaigns",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "creatorId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 7: Payouts by recipient, newest first",
+      "collectionGroup": "payouts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recipientId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 7: Tips received by performer (tip stream)",
+      "collectionGroup": "tips",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recipientId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 8: Band invitations for user by email",
+      "collectionGroup": "invitations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "inviteeEmail", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 8: Band members active filter",
+      "collectionGroup": "members",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "role", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Public Discovery: Active artists ordered by popularity",
+      "collectionGroup": "artistProfiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "popularityScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Public Discovery: Active artists ordered by trending",
+      "collectionGroup": "artistProfiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "trendingScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Public Discovery: Active bands for directory listing",
+      "collectionGroup": "bands",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Public Discovery: Active venues by city",
+      "collectionGroup": "venueProfiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "city", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Geospatial — live sessions within geohash-5 prefix range (false-positive filter in trusted code)",
+      "collectionGroup": "sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "geohash5", "order": "ASCENDING" },
+        { "fieldPath": "endsAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Audience zones — creator reads their own active zones, newest first",
+      "collectionGroup": "audienceZones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "performerId", "order": "ASCENDING" },
+        { "fieldPath": "expiresAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Audience zones — geohash range query for zone aggregation pipeline",
+      "collectionGroup": "audienceZones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sessionId", "order": "ASCENDING" },
+        { "fieldPath": "geohash5", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Audience grants — creator reads all active grants for a session",
+      "collectionGroup": "audienceGrants",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "performerId", "order": "ASCENDING" },
+        { "fieldPath": "expiresAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Location audit events — admin query by performer, newest first",
+      "collectionGroup": "locationAuditEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "performerId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Location audit events — session-scoped query for incident review",
+      "collectionGroup": "locationAuditEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sessionId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 2: Venue geohash range query — live sessions near a venue (bounding-box false-positive filter in trusted code)",
+      "collectionGroup": "venues",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "geohash5", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "_comment": "Social Graph: Followers list ordered by newest first",
+      "collectionGroup": "follows",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "targetId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Social Graph: Following list ordered by newest first",
+      "collectionGroup": "follows",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sourceId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Messaging: Conversations for participant ordered by last activity",
+      "collectionGroup": "conversations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participantIds", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "lastMessageTimestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Messaging: Conversations by status (accepted vs pending requests)",
+      "collectionGroup": "conversations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participantIds", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "lastMessageTimestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Messaging: Messages in conversation ordered by timestamp",
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "conversationId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Safety: Active blocks by blocker ordered by newest first",
+      "collectionGroup": "socialBlocks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "blockerId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Safety: Active restrictions by restricter ordered by newest first",
+      "collectionGroup": "socialRestrictions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "restricterId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+

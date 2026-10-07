@@ -1,0 +1,139 @@
+/* Crowdbeats V2 — Button Styles (Phase 4) */
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+.base {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-2);
+  font-family:     var(--font-body);
+  font-weight:     600;
+  letter-spacing:  0.01em;
+  border:          1.5px solid transparent;
+  border-radius:   var(--radius-sm);
+  cursor:          pointer;
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color     var(--duration-fast) var(--ease-out),
+    color            var(--duration-fast) var(--ease-out),
+    box-shadow       var(--duration-fast) var(--ease-out);
+  min-height:      var(--touch-min);      /* 44px */
+  min-width:       var(--touch-min);
+  position:        relative;
+  user-select:     none;
+}
+
+.base:focus-visible {
+  outline:        var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.base:disabled,
+.base[aria-disabled='true'] {
+  cursor:  not-allowed;
+  opacity: 0.45;
+}
+
+.fullWidth { width: 100%; }
+
+/* ── Sizes ─────────────────────────────────────────────────────────────────── */
+.sm {
+  height:      36px;
+  min-height:  44px;   /* maintain tap target */
+  padding:     0 var(--space-4);
+  font-size:   var(--text-sm-size);
+}
+
+.md {
+  height:      44px;
+  padding:     0 var(--space-5);
+  font-size:   var(--text-md-size);
+}
+
+.lg {
+  height:      56px;
+  padding:     0 var(--space-6);
+  font-size:   var(--text-lg-size);
+}
+
+/* ── Variants ──────────────────────────────────────────────────────────────── */
+
+/* Primary */
+.primary {
+  background-color: var(--accent-primary);      /* #FF97BA */
+  color:            var(--text-on-primary);      /* #131315 — 5.2:1 ✅ */
+  border-color:     transparent;
+}
+.primary:not(:disabled):not([aria-disabled='true']):hover {
+  background-color: var(--accent-primary-hover);
+}
+.primary:not(:disabled):not([aria-disabled='true']):active {
+  background-color: var(--accent-primary-active);
+}
+
+/* Secondary */
+.secondary {
+  background-color: transparent;
+  color:            var(--accent-primary);       /* 5.2:1 on dark ✅ */
+  border-color:     var(--accent-primary);
+}
+.secondary:not(:disabled):not([aria-disabled='true']):hover {
+  background-color: var(--accent-primary-subtle);
+  border-color:     var(--accent-primary-hover);
+}
+
+/* Ghost */
+.ghost {
+  background-color: transparent;
+  color:            var(--accent-secondary);     /* #A78BFA — 4.8:1 ✅ */
+  border-color:     transparent;
+}
+.ghost:not(:disabled):not([aria-disabled='true']):hover {
+  background-color: var(--accent-secondary-subtle);
+}
+
+/* Destructive */
+.destructive {
+  background-color: transparent;
+  color:            var(--status-error);         /* #F87171 — 5.1:1 ✅ */
+  border-color:     var(--status-error);
+}
+.destructive:not(:disabled):not([aria-disabled='true']):hover {
+  background-color: rgba(248, 113, 113, 0.12);
+}
+
+/* ── Spinner ───────────────────────────────────────────────────────────────── */
+.spinner {
+  display:       inline-block;
+  width:         1em;
+  height:        1em;
+  border:        2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+  animation:     cb-spin 700ms linear infinite;
+  flex-shrink:   0;
+}
+
+@keyframes cb-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: currentColor; opacity: 0.5; }
+}
+
+/* ── Icon slot ─────────────────────────────────────────────────────────────── */
+.icon {
+  display:     flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size:   1.125em;
+}
+
+.label {
+  display:   flex;
+  gap:       inherit;
+  align-items: center;
+}

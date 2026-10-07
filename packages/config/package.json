@@ -1,0 +1,10 @@
+{
+  "name": "@crowdbeats/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Crowdbeats V2 — Shared lint, format, TypeScript, and test configuration for all JS/TS packages.",
+  "main": "index.js",
+  "scripts": {
+    "typecheck": "echo 'Config package — no types to check'"
+  }
+}

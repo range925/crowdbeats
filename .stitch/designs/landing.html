@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Crowdbeats — Where Fans Fuel The Music</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#8B5CF6",
+            "background-light": "#FBFBFD",
+            "background-dark": "#07070A",
+          },
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+          },
+          boxShadow: {
+            'glow-purple': '0 0 40px -10px rgba(139, 92, 246, 0.35)',
+            'glow-cyan': '0 0 40px -10px rgba(6, 182, 212, 0.25)',
+            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+            'apple-card': '0 4px 24px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Apple-Clean Gradient Text - High Contrast Light & Dark */
+    .text-gradient-purple {
+      background: linear-gradient(135deg, #7C3AED 0%, #9333EA 50%, #4F46E5 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      display: inline-block;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+    .dark .text-gradient-purple {
+      background: linear-gradient(135deg, #C084FC 0%, #A855F7 50%, #818CF8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .text-gradient-accent {
+      background: linear-gradient(135deg, #0284C7 0%, #6366F1 50%, #7C3AED 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      display: inline-block;
+    }
+    .dark .text-gradient-accent {
+      background: linear-gradient(135deg, #38BDF8 0%, #818CF8 50%, #C084FC 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .glass-panel {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Range slider light & dark calibration */
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #8B5CF6;
+      box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+    .dark input[type=range]::-webkit-slider-thumb {
+      background: #A855F7;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #E2E8F0;
+      border-radius: 9999px;
+      transition: background-color 0.25s ease;
+    }
+    .dark input[type=range]::-webkit-slider-runnable-track {
+      background: #27272A;
+    }
+
+    /* Tactile theme transitions */
+    .theme-transition {
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-zinc-100 antialiased selection:bg-purple-500 selection:text-white min-h-screen relative overflow-x-hidden theme-transition">
+
+  <!-- Ambient background glow (calibrated for delicate light and luminous dark) -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-purple-600/8 dark:bg-purple-600/20 blur-[140px] rounded-full transition-opacity"></div>
+    <div class="absolute top-[35%] -left-48 w-[600px] h-[600px] bg-indigo-600/5 dark:bg-indigo-600/15 blur-[140px] rounded-full transition-opacity"></div>
+    <div class="absolute top-[65%] -right-48 w-[600px] h-[600px] bg-cyan-600/5 dark:bg-cyan-600/15 blur-[140px] rounded-full transition-opacity"></div>
+  </div>
+
+  <!-- HEADER NAVIGATION -->
+  <header class="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-white/10 glass-panel bg-white/80 dark:bg-[#07070A]/80 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-5">
+        <a class="flex items-center gap-2.5 group" href="#">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform duration-200">
+            <span class="material-symbols-outlined text-2xl font-bold">graphic_eq</span>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white uppercase flex items-center gap-1.5">
+            Crowdbeats
+          </span>
+        </a>
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 border border-emerald-500/20 dark:border-emerald-400/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold tracking-wide">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span>142 STAGES LIVE</span>
+        </div>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-zinc-300">
+        <a class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" href="#radar">Live Radar</a>
+        <a class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" href="#economics">Economics</a>
+        <a class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" href="#band-splits">Band Splits</a>
+        <a class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" href="#creators">For Artists</a>
+        <a class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" href="#venues">Venues</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- Interactive Dark/Light Theme Toggle -->
+        <button id="themeToggleBtn" onclick="toggleTheme()" type="button" aria-label="Toggle light or dark theme" class="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-200 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-500/40 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-xl" id="themeToggleIcon">dark_mode</span>
+        </button>
+
+        <a class="hidden md:inline-flex items-center text-sm font-semibold text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white px-3 py-2 transition-colors" href="#radar">
+          Explore Stages
+        </a>
+        <a class="text-sm font-semibold text-slate-700 dark:text-zinc-200 hover:text-slate-900 dark:hover:text-white px-3.5 py-2 transition-colors" href="#login">
+          Sign In
+        </a>
+        <a class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-95 shadow-md shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200" href="#creators">
+          Take The Stage
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+    <!-- HERO SECTION -->
+    <section class="relative pt-16 pb-20 sm:pt-24 sm:pb-28 overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/20 bg-purple-500/10 dark:bg-purple-500/10 text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-300 backdrop-blur-md mb-8 shadow-sm">
+          <span>✨</span>
+          <span>Next-Generation Live Music Economics • 0% Subscription Fees</span>
+        </div>
+
+        <!-- Crisp Headline without black box bug -->
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-[1.1] mb-6">
+          Where Fans Fuel <span class="text-gradient-purple">The Music.</span>
+        </h1>
+
+        <!-- High-Contrast Subtitle -->
+        <p class="text-base sm:text-xl text-slate-600 dark:text-zinc-300 max-w-3xl font-normal leading-relaxed mb-10">
+          Direct artist tipping with 2 taps. Real-time venue check-ins. Automated band splits. Transparent direct payouts. Flat 6% Crowdbeats platform fee + standard Stripe.com processing (2.9% + 30¢). Zero monthly subscriptions.
+        </p>
+
+        <!-- Search Bar with Apple Clean Glass Styling -->
+        <div class="w-full max-w-3xl glass-panel bg-white/95 dark:bg-zinc-900/90 border border-slate-200 dark:border-white/10 rounded-2xl sm:rounded-full p-2 sm:p-2.5 shadow-xl shadow-slate-200/50 dark:shadow-purple-500/10 mb-6">
+          <form class="flex flex-col sm:flex-row items-center gap-2" onsubmit="event.preventDefault();">
+            <div class="flex items-center gap-3 w-full px-4 py-2 text-slate-400 dark:text-zinc-400">
+              <span class="material-symbols-outlined text-purple-600 dark:text-purple-400">search</span>
+              <input class="w-full bg-transparent border-0 focus:ring-0 text-sm sm:text-base text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 p-0" placeholder="Search city or venue (e.g. San Diego, Austin, Torrance)..." type="text"/>
+            </div>
+            <button class="w-full sm:w-auto shrink-0 px-6 py-3 rounded-xl sm:rounded-full bg-primary text-white text-sm font-semibold hover:bg-purple-600 flex items-center justify-center gap-2 transition-all shadow-md shadow-purple-500/20" type="submit">
+              <span>Explore Stages</span>
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Trending City Chips -->
+        <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-400 mb-16">
+          <span class="uppercase tracking-wider text-[11px] font-semibold text-slate-400 dark:text-zinc-500 mr-1">Trending Cities:</span>
+          <a class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all" href="#">San Diego, CA</a>
+          <a class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all" href="#">Austin, TX</a>
+          <a class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all" href="#">Nashville, TN</a>
+          <a class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all" href="#">Los Angeles</a>
+          <a class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all" href="#">London</a>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-left">
+          <div class="glass-panel p-6 rounded-2xl bg-white/90 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-white/10 shadow-sm hover:shadow-md hover:border-purple-500/40 transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Total Volume</span>
+              <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 material-symbols-outlined text-lg">payments</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">$284,500+</div>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1 font-medium">Instant payouts via Stripe</p>
+          </div>
+
+          <div class="glass-panel p-6 rounded-2xl bg-white/90 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-white/10 shadow-sm hover:shadow-md hover:border-purple-500/40 transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Transparent Cut</span>
+              <span class="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 material-symbols-outlined text-lg">verified_user</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">6% + Stripe</div>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1 font-medium">0% Monthly. No hidden fees</p>
+          </div>
+
+          <div class="glass-panel p-6 rounded-2xl bg-white/90 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-white/10 shadow-sm hover:shadow-md hover:border-purple-500/40 transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Live Footprint</span>
+              <span class="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 material-symbols-outlined text-lg">location_on</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">1,280+ Stages</div>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1 font-medium">Across 24 curated music cities</p>
+          </div>
+
+          <div class="glass-panel p-6 rounded-2xl bg-white/90 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-white/10 shadow-sm hover:shadow-md hover:border-purple-500/40 transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Fan Speed</span>
+              <span class="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 material-symbols-outlined text-lg">bolt</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">&lt; 3 Seconds</div>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1 font-medium">Instant Apple &amp; Google Pay</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE STAGE RADAR SECTION -->
+    <section class="py-20 border-t border-slate-200/80 dark:border-white/5 relative" id="radar">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-xs tracking-widest uppercase mb-2">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Live Stage Radar
+            </div>
+            <div class="flex items-center gap-3">
+              <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+                Performances in
+              </h2>
+              <div class="relative inline-block">
+                <select aria-label="Select City" class="appearance-none bg-slate-100 dark:bg-zinc-800 text-purple-600 dark:text-purple-400 font-extrabold text-2xl sm:text-3xl border-0 rounded-xl pr-9 pl-3 py-0.5 focus:ring-2 focus:ring-purple-500 cursor-pointer">
+                  <option>San Diego</option>
+                  <option>Austin</option>
+                  <option>Nashville</option>
+                  <option>Los Angeles</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-purple-500 text-lg">expand_more</span>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-zinc-400 mt-1.5">
+              Verified artists currently checked into stages. Tap any card to test the instant direct tip flow.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button class="px-4 py-2 rounded-full bg-primary text-white text-xs font-semibold shadow-md shadow-purple-500/20">All</button>
+            <button class="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 text-xs font-medium hover:border-purple-500 transition flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live Now
+            </button>
+            <button class="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 text-xs font-medium hover:border-purple-500 transition">Acoustic</button>
+            <button class="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 text-xs font-medium hover:border-purple-500 transition">Indie Rock</button>
+            <button class="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 text-xs font-medium hover:border-purple-500 transition">Jazz &amp; Soul</button>
+            <button class="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 text-xs font-medium hover:border-purple-500 transition">Electronic</button>
+          </div>
+        </div>
+
+        <!-- Performer Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Card 1: Jake Rios -->
+          <div class="glass-panel rounded-2xl bg-white dark:bg-zinc-900/80 border border-slate-200/90 dark:border-white/10 p-6 flex flex-col justify-between shadow-apple-card hover:border-purple-500/50 hover:shadow-glow-purple transition-all duration-300 group">
+            <div>
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-600 text-white font-bold flex items-center justify-center text-lg shadow-md">
+                    J
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <h3 class="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Jake Rios</h3>
+                      <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-base">verified</span>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Acoustic • Indie Folk • Pop</span>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> LIVE
+                </span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 space-y-1.5 mb-4">
+                <div class="flex items-center justify-between text-xs font-semibold">
+                  <span class="flex items-center gap-1 text-slate-800 dark:text-zinc-200">
+                    <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-sm">nightlife</span>
+                    The Holding Company
+                  </span>
+                  <span class="text-slate-500 dark:text-zinc-400 font-normal">0.8 mi away</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-2">
+                  Acoustic indie folk artist performing live original songs at Ocean Beach coastal stages.
+                </p>
+              </div>
+              <div class="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 pb-2">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 1,420 followers</span>
+                <span class="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium"><span class="material-symbols-outlined text-sm">star</span> Top Performer</span>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-2 mt-4">
+              <button class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-200/60 dark:border-transparent text-xs font-semibold text-slate-700 dark:text-zinc-300 transition">
+                View Profile
+              </button>
+              <button class="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-95 shadow-md shadow-purple-500/20 flex items-center justify-center gap-1 transition">
+                <span>Tip Now</span>
+                <span class="material-symbols-outlined text-sm">bolt</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Maya Lin -->
+          <div class="glass-panel rounded-2xl bg-white dark:bg-zinc-900/80 border border-slate-200/90 dark:border-white/10 p-6 flex flex-col justify-between shadow-apple-card hover:border-purple-500/50 hover:shadow-glow-purple transition-all duration-300 group">
+            <div>
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white font-bold flex items-center justify-center text-lg shadow-md">
+                    M
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <h3 class="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Maya Lin</h3>
+                      <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-base">verified</span>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Electronic • Ambient • Pop</span>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> LIVE
+                </span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 space-y-1.5 mb-4">
+                <div class="flex items-center justify-between text-xs font-semibold">
+                  <span class="flex items-center gap-1 text-slate-800 dark:text-zinc-200">
+                    <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-sm">nightlife</span>
+                    Ocean Acoustic Club
+                  </span>
+                  <span class="text-slate-500 dark:text-zinc-400 font-normal">1.2 mi away</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-2">
+                  Electronic ambient artist blending synthesizers and live vocal loops for deep immersive shows.
+                </p>
+              </div>
+              <div class="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 pb-2">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 980 followers</span>
+                <span class="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium"><span class="material-symbols-outlined text-sm">star</span> Top Performer</span>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-2 mt-4">
+              <button class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-200/60 dark:border-transparent text-xs font-semibold text-slate-700 dark:text-zinc-300 transition">
+                View Profile
+              </button>
+              <button class="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-95 shadow-md shadow-purple-500/20 flex items-center justify-center gap-1 transition">
+                <span>Tip Now</span>
+                <span class="material-symbols-outlined text-sm">bolt</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: The Sunsets -->
+          <div class="glass-panel rounded-2xl bg-white dark:bg-zinc-900/80 border border-slate-200/90 dark:border-white/10 p-6 flex flex-col justify-between shadow-apple-card hover:border-purple-500/50 hover:shadow-glow-purple transition-all duration-300 group">
+            <div>
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-600 text-white font-bold flex items-center justify-center text-lg shadow-md">
+                    S
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <h3 class="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">The Sunsets</h3>
+                      <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-base">verified</span>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Rock • Indie Rock • Alternative</span>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> LIVE
+                </span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 space-y-1.5 mb-4">
+                <div class="flex items-center justify-between text-xs font-semibold">
+                  <span class="flex items-center gap-1 text-slate-800 dark:text-zinc-200">
+                    <span class="material-symbols-outlined text-pink-600 dark:text-pink-400 text-sm">nightlife</span>
+                    The Main Stage SD
+                  </span>
+                  <span class="text-slate-500 dark:text-zinc-400 font-normal">2.4 mi away</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-2">
+                  High-energy 4-piece indie rock band with explosive brass hooks performing all-original anthems live.
+                </p>
+              </div>
+              <div class="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 pb-2">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 2,350 followers</span>
+                <span class="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium"><span class="material-symbols-outlined text-sm">star</span> Top Performer</span>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-2 mt-4">
+              <button class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-200/60 dark:border-transparent text-xs font-semibold text-slate-700 dark:text-zinc-300 transition">
+                View Profile
+              </button>
+              <button class="flex-1 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-95 shadow-md shadow-purple-500/20 flex items-center justify-center gap-1 transition">
+                <span>Tip Now</span>
+                <span class="material-symbols-outlined text-sm">bolt</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAIR ECONOMICS TIP CALCULATOR -->
+    <section class="py-24 border-t border-slate-200/80 dark:border-white/5 relative bg-slate-50/70 dark:bg-[#09090D]/50" id="economics">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Radical Financial Transparency</span>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-2 mb-4 tracking-tight">
+            We Only Win When Artists Win.
+          </h2>
+          <p class="text-base sm:text-lg text-slate-600 dark:text-zinc-300">
+            No monthly subscriptions. Crowdbeats charges a transparent <strong class="text-slate-900 dark:text-white">6% platform fee</strong>, and Stripe processes payments at standard rates (2.9% + 30¢), with the entire net balance deposited directly into the artist's bank account.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <!-- Interactive Simulator -->
+          <div class="lg:col-span-7 glass-panel rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-white/10 p-6 sm:p-8 flex flex-col justify-between shadow-xl">
+            <div>
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Test The Tip Breakdown</h3>
+                  <p class="text-xs text-slate-500 dark:text-zinc-400">Choose or slide any tip amount to see how much the musician keeps.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20">
+                  Instant Simulation
+                </span>
+              </div>
+
+              <div class="grid grid-cols-5 gap-2 mb-6">
+                <button class="tip-pill py-2 text-center rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer" onclick="setTip(10)">$10</button>
+                <button class="tip-pill py-2 text-center rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer" onclick="setTip(25)">$25</button>
+                <button class="tip-pill py-2 text-center rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer" onclick="setTip(50)">$50</button>
+                <button class="tip-pill py-2 text-center rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer" onclick="setTip(100)">$100</button>
+                <button class="tip-pill py-2 text-center rounded-xl font-bold text-sm bg-primary text-white border border-transparent shadow-md shadow-purple-500/20 transition cursor-pointer" onclick="setTip(460)">$460</button>
+              </div>
+
+              <div class="mb-8">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-zinc-400 mb-2">
+                  <span>Audience Tip Volume</span>
+                  <span class="text-base text-purple-600 dark:text-purple-400 font-extrabold" id="sliderDisplay">$460.00</span>
+                </div>
+                <input aria-label="Tip volume slider" class="w-full accent-purple-600 bg-slate-200 dark:bg-zinc-800 rounded-lg cursor-pointer" id="tipSlider" max="1000" min="5" oninput="updateCalc(this.value)" step="5" type="range" value="460"/>
+              </div>
+
+              <div class="space-y-3.5 border-t border-slate-200 dark:border-white/10 pt-6 text-sm">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600 dark:text-zinc-400">Gross Fan Tip:</span>
+                  <span class="font-bold text-slate-900 dark:text-white" id="grossTip">$460.00</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-500 dark:text-zinc-400">
+                  <span class="flex items-center gap-1.5">
+                    Crowdbeats Platform Fee (6%):
+                    <span class="material-symbols-outlined text-xs text-purple-600 dark:text-purple-400">info</span>
+                  </span>
+                  <span class="font-semibold text-purple-700 dark:text-rose-400" id="platformFee">-$27.60</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-500 dark:text-zinc-400">
+                  <span class="flex items-center gap-1.5">
+                    Stripe Processing Fee (2.9% + 30¢):
+                    <span class="material-symbols-outlined text-xs text-blue-600 dark:text-blue-400">lock</span>
+                  </span>
+                  <span class="font-semibold text-blue-700 dark:text-rose-400" id="stripeFee">-$13.64</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Payout Box -->
+            <div class="mt-8 p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span class="text-xs uppercase tracking-wider font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-base">check_circle</span>
+                  Artist Net Payout (~91.0%)
+                </span>
+                <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5">Directly transferred to bank account via Stripe Connect</p>
+              </div>
+              <div class="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400" id="netPayout">
+                $418.76
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparison Sidecards -->
+          <div class="lg:col-span-5 flex flex-col gap-6 justify-between">
+            <div class="glass-panel p-6 rounded-3xl bg-white dark:bg-zinc-900/90 border border-emerald-500/30 dark:border-emerald-500/30 shadow-lg relative overflow-hidden flex-1">
+              <div class="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+              <div class="flex items-center gap-2.5 mb-3">
+                <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold material-symbols-outlined text-xl">workspace_premium</span>
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-lg">Crowdbeats Model</h4>
+              </div>
+              <ul class="space-y-2.5 text-sm text-slate-600 dark:text-zinc-300">
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-500 text-lg shrink-0">done</span>
+                  <span><strong>0% Monthly Subscriptions.</strong> Only pay when tips are collected.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-500 text-lg shrink-0">done</span>
+                  <span><strong>Automated band splits</strong> distributed directly into each personal bank.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-500 text-lg shrink-0">done</span>
+                  <span><strong>Direct payouts</strong> via standard Stripe Connect infrastructure.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl bg-white dark:bg-zinc-900/50 border border-rose-500/20 dark:border-rose-500/20 relative overflow-hidden flex-1">
+              <div class="flex items-center gap-2.5 mb-3">
+                <span class="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold material-symbols-outlined text-xl">cancel</span>
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-lg">Traditional Merch &amp; Venues</h4>
+              </div>
+              <ul class="space-y-2.5 text-sm text-slate-600 dark:text-zinc-400">
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-rose-500 text-lg shrink-0">close</span>
+                  <span>Venues &amp; promoters taking <strong>15%–30% merch cuts</strong>.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-rose-500 text-lg shrink-0">close</span>
+                  <span>Physical tip jars suffer from <strong>cash scarcity</strong> (fans carry cards/phones).</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-rose-500 text-lg shrink-0">close</span>
+                  <span>Post-show awkward cash counting and manual Venmo math.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BAND SPLITS SECTION -->
+    <section class="py-24 border-t border-slate-200/80 dark:border-white/5 relative" id="band-splits">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Multi-Member Contract Engine</span>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mt-2 mb-4 tracking-tight">
+            Zero-Drama Band Revenue Splits.
+          </h2>
+          <p class="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
+            When a fan tips a band on Crowdbeats, our subledger engine automatically divides and deposits each member's agreed percentage into their bank account.
+          </p>
+        </div>
+
+        <div class="glass-panel rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-white/10 p-6 sm:p-10 shadow-xl dark:shadow-2xl relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-8 border-b border-slate-200 dark:border-white/10">
+            <div>
+              <span class="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Simulated Live Band:</span>
+              <h3 class="text-2xl font-black text-slate-900 dark:text-white">The Neon Soundwave (4 Members)</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 dark:text-zinc-400 font-semibold mr-1">Live Fan Tip:</span>
+              <button class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer" id="btnBand50" onclick="updateBandTip(50)">$50</button>
+              <button class="px-4 py-2 rounded-xl text-xs font-bold bg-primary text-white border border-transparent shadow-sm transition cursor-pointer" id="btnBand100" onclick="updateBandTip(100)">$100</button>
+              <button class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer" id="btnBand250" onclick="updateBandTip(250)">$250</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
+            <div class="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 relative shadow-sm dark:shadow-none">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Jake Vance</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-400">40%</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-zinc-400 mb-4">Lead Vocals &amp; Guitar</p>
+              <div class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Instant Member Deposit:</div>
+              <div class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="split1">$36.32</div>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 relative shadow-sm dark:shadow-none">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Maya Lin</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-400">25%</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-zinc-400 mb-4">Keyboards &amp; Synth</p>
+              <div class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Instant Member Deposit:</div>
+              <div class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="split2">$22.70</div>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 relative shadow-sm dark:shadow-none">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Devon Cole</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-400">20%</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-zinc-400 mb-4">Drums &amp; Percussion</p>
+              <div class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Instant Member Deposit:</div>
+              <div class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="split3">$18.16</div>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-white/5 relative shadow-sm dark:shadow-none">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Leo Gomez</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-400">15%</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-zinc-400 mb-4">Bass Guitar</p>
+              <div class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Instant Member Deposit:</div>
+              <div class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="split4">$13.62</div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-zinc-400">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500 text-base">bolt</span>
+              <span><strong>100% Automated:</strong> Subledger resolves instantly via Stripe. On $100: Crowdbeats fee is $6.00 (6%), Stripe fee is $3.20, and $90.80 is distributed directly to member bank accounts.</span>
+            </div>
+            <a class="text-purple-600 dark:text-purple-400 hover:underline font-bold shrink-0" href="#creators">Create Band Roster →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUILT FOR EVERY ROLE IN LIVE MUSIC -->
+    <section class="py-24 border-t border-slate-200/80 dark:border-white/5 relative bg-slate-50/70 dark:bg-[#09090D]/50" id="creators">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Built for Every Side of Live Music.
+          </h2>
+          <p class="text-base sm:text-lg text-slate-600 dark:text-zinc-300 mt-3">
+            Whether you are holding the guitar, raising a glass, mixing sound, or booking the room.
+          </p>
+          <div class="inline-flex p-1.5 rounded-full bg-slate-200/80 dark:bg-zinc-800/80 border border-slate-300/80 dark:border-white/5 mt-8 max-w-full overflow-x-auto">
+            <button class="px-5 py-2 rounded-full bg-primary text-white text-xs font-bold shadow-sm whitespace-nowrap">Solo Musicians</button>
+            <button class="px-5 py-2 rounded-full text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold whitespace-nowrap">Bands &amp; Crews</button>
+            <button class="px-5 py-2 rounded-full text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold whitespace-nowrap">Venues &amp; Bars</button>
+            <button class="px-5 py-2 rounded-full text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold whitespace-nowrap">Music Fans</button>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-white/10 p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center shadow-xl">
+          <div class="lg:col-span-7 space-y-5">
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-widest">
+              <span>For Solo Creators</span>
+            </div>
+            <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
+              Turn Audience Applause into Direct Digital Income.
+            </h3>
+            <p class="text-slate-600 dark:text-zinc-300 text-sm sm:text-base leading-relaxed">
+              Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Apple Pay and Google Pay without downloading an app.
+            </p>
+            <div class="pt-2">
+              <a class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-95 shadow-md shadow-purple-600/30 transition" href="#join">
+                <span>Claim Artist Stage</span>
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Dynamic Stage QR Token Card (Perfected Light & Dark) -->
+          <div class="lg:col-span-5 flex justify-center">
+            <div class="w-full max-w-sm rounded-2xl bg-gradient-to-b from-white to-slate-100 dark:from-zinc-800 dark:to-zinc-950 p-6 border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl text-center relative overflow-hidden group">
+              <div class="absolute -right-10 -top-10 w-28 h-28 bg-purple-500/20 rounded-full blur-2xl"></div>
+              <div class="flex items-center justify-between text-xs text-slate-600 dark:text-zinc-400 mb-6">
+                <span class="font-bold flex items-center gap-1 text-purple-700 dark:text-purple-400">
+                  <span class="material-symbols-outlined text-sm">qr_code_scanner</span>
+                  Dynamic Stage QR Token
+                </span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-[10px]">ACTIVE</span>
+              </div>
+              <div class="bg-white p-6 rounded-2xl inline-block shadow-md border border-slate-200 dark:border-transparent mb-4">
+                <div class="w-44 h-44 border-4 border-slate-900 rounded-xl p-2 flex flex-col justify-between items-center relative">
+                  <div class="flex justify-between w-full">
+                    <div class="w-9 h-9 bg-slate-950 rounded-lg p-1.5"><div class="w-full h-full bg-white rounded"></div></div>
+                    <div class="w-9 h-9 bg-slate-950 rounded-lg p-1.5"><div class="w-full h-full bg-white rounded"></div></div>
+                  </div>
+                  <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white shadow-md">
+                    <span class="material-symbols-outlined text-2xl font-bold">graphic_eq</span>
+                  </div>
+                  <div class="flex justify-between w-full">
+                    <div class="w-9 h-9 bg-slate-950 rounded-lg p-1.5"><div class="w-full h-full bg-white rounded"></div></div>
+                    <div class="w-9 h-9 bg-zinc-400 rounded-sm grid grid-cols-2 gap-1 p-1">
+                      <div class="bg-slate-950"></div><div class="bg-white"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-slate-900 dark:text-white font-black tracking-widest text-sm uppercase">CROWDBEATS QR</div>
+              <p class="text-slate-500 dark:text-zinc-400 text-xs mt-1 font-medium">Print, save to phone lock screen, or project onto stage monitors.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- READY TO TAKE THE STAGE CTA -->
+    <section class="py-24 relative overflow-hidden">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 class="text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-6">
+          Ready to Take The Stage?
+        </h2>
+        <p class="text-lg sm:text-xl text-slate-600 dark:text-zinc-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Join thousands of independent musicians, passionate bands, vibrant venues, and music lovers across the nation. Zero monthly costs. Transparent 6% platform fee + standard Stripe.com processing.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a class="w-full sm:w-auto px-8 py-4 rounded-full bg-primary text-white text-base font-bold hover:opacity-95 shadow-xl shadow-purple-600/30 hover:scale-105 transition-all duration-200" href="#creators">
+            Launch Artist Studio →
+          </a>
+          <a class="w-full sm:w-auto px-8 py-4 rounded-full bg-white hover:bg-slate-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-900 dark:text-white text-base font-semibold border border-slate-200 dark:border-white/10 shadow-sm transition-all" href="#radar">
+            Explore as Guest
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUR WHY BANNER (Fixed for Light & Dark Mode) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <div class="glass-panel rounded-2xl bg-white/95 dark:bg-zinc-900/80 border border-slate-200/90 dark:border-white/10 p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm dark:shadow-none">
+        <div class="flex items-center gap-3">
+          <span class="p-2.5 rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-400 material-symbols-outlined text-2xl">campaign</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm">Our Why: Empowering Live Music — 100% Free</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 uppercase">Free to join &amp; explore</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5">
+              Discover live concerts, broadcast sessions, and support artists with zero subscription dues. When voluntary tips move, Crowdbeats takes a transparent 6% technology fee plus direct Stripe processing costs to power the community.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 shadow-sm" href="#creators">Join Crowdbeats →</a>
+          <a class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 text-xs font-semibold border border-slate-200/60 dark:border-transparent transition" href="#help">Help &amp; Support</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER (Fully corrected Light & Dark mode - no pitch-black void in light mode) -->
+  <footer class="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/90 dark:bg-[#050508] text-xs text-slate-600 dark:text-zinc-400 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Live Platform</h5>
+          <ul class="space-y-2.5">
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Live Concert Discovery</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1" href="#"><span class="material-symbols-outlined text-xs text-purple-500">palette</span> Persona Previews (5 Roles)</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Nearby Music Stages</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Featured Solo Artists</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Live Stages &amp; Venues</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Mobile Dual Simulator (iOS / Android)</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Help &amp; Support</h5>
+          <ul class="space-y-2.5">
+            <li><a class="text-purple-600 dark:text-purple-400 font-semibold hover:underline" href="#">Help &amp; Support Center ↗</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Frequently Asked Questions</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Open Support Ticket</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Refund &amp; Tip Dispute Policy</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="mailto:contact@crowdbeats.ai">Contact: support@crowdbeats.ai</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Legal &amp; Governance</h5>
+          <ul class="space-y-2.5">
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Terms of Service (CA Law)</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Privacy Policy (CCPA / GDPR)</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">DMCA &amp; Copyright Policy</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Acceptable Use Policy</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Creator Monetization &amp; Splits</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Trust &amp; Reporting</h5>
+          <ul class="space-y-2.5">
+            <li><a class="text-rose-600 dark:text-rose-500 hover:underline font-semibold" href="#">Submit DMCA Notice Form →</a></li>
+            <li><a class="text-rose-600 dark:text-rose-500 hover:underline font-semibold" href="#">Report Abuse &amp; Safety →</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="mailto:dmca@crowdbeats.ai">dmca@crowdbeats.ai</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="mailto:legal@crowdbeats.ai">legal@crowdbeats.ai</a></li>
+            <li><a class="hover:text-purple-600 dark:hover:text-purple-400 transition" href="#">Law Enforcement Guidelines</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-slate-200/80 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] leading-relaxed">
+        <div>
+          <p><strong class="text-slate-800 dark:text-zinc-300">Crowdbeats LLC</strong> • San Francisco, California, USA • Governing Law: State of California</p>
+          <p class="text-slate-500 dark:text-zinc-500 mt-1 max-w-3xl">
+            © 2026 Crowdbeats LLC. All rights reserved. 100% Free platform for solo musicians, bands, and fans with zero subscription dues. On voluntary live tips and campaign contributions, Crowdbeats charges a transparent 6% technology fee; Stripe payment-processing and Stripe Connect fees are separate and additional. Voluntary tips are disbursed in real time and non-refundable except where mandated by law. Exclusive venue and jurisdiction: San Francisco County, California.
+          </p>
+        </div>
+        <div class="flex items-center gap-4 shrink-0 font-medium text-slate-600 dark:text-zinc-400">
+          <a class="hover:underline" href="#">Terms</a>
+          <a class="hover:underline" href="#">Privacy</a>
+          <a class="hover:underline" href="#">DMCA</a>
+          <a class="hover:underline" href="#">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Privacy Badge -->
+  <a class="fixed bottom-4 left-4 z-40 px-3 py-1.5 rounded-full bg-white/95 dark:bg-zinc-900/90 text-[11px] font-semibold text-slate-700 dark:text-zinc-400 border border-slate-200 dark:border-white/10 shadow-md flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white transition" href="#">
+    <span class="material-symbols-outlined text-sm text-purple-600 dark:text-purple-400">lock</span>
+    <span>Privacy &amp; CCPA</span>
+  </a>
+
+  <!-- INTERACTIVE SCRIPTS (Calculator, Band Splits, and Dark/Light Mode Theme Toggle) -->
+  <script>
+    // Theme Engine: Defaults to dark mode first (per user requirement)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('crowdbeats_theme');
+      const isDark = savedTheme ? savedTheme === 'dark' : true; // Default darkmode first primary
+      setThemeMode(isDark);
+    }
+
+    function setThemeMode(isDark) {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeToggleIcon');
+      if (isDark) {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        if (icon) icon.innerText = 'light_mode';
+        localStorage.setItem('crowdbeats_theme', 'dark');
+      } else {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (icon) icon.innerText = 'dark_mode';
+        localStorage.setItem('crowdbeats_theme', 'light');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      setThemeMode(!isDark);
+    }
+
+    // Tip Calculator
+    function updateCalc(val) {
+      const gross = parseFloat(val);
+      const crowdbeatsFee = gross * 0.06;
+      const stripeFee = (gross * 0.029) + 0.30;
+      const net = gross - crowdbeatsFee - stripeFee;
+      document.getElementById('sliderDisplay').innerText = '$' + gross.toFixed(2);
+      document.getElementById('grossTip').innerText = '$' + gross.toFixed(2);
+      document.getElementById('platformFee').innerText = '-$' + crowdbeatsFee.toFixed(2);
+      document.getElementById('stripeFee').innerText = '-$' + stripeFee.toFixed(2);
+      document.getElementById('netPayout').innerText = '$' + Math.max(0, net).toFixed(2);
+    }
+
+    function setTip(amt) {
+      const slider = document.getElementById('tipSlider');
+      slider.value = amt;
+      updateCalc(amt);
+    }
+
+    // Band Splits
+    function updateBandTip(tip) {
+      const platformFee = tip * 0.06;
+      const stripeFee = (tip * 0.029) + 0.30;
+      const netPool = tip - platformFee - stripeFee;
+      const p1 = (netPool * 0.40).toFixed(2);
+      const p2 = (netPool * 0.25).toFixed(2);
+      const p3 = (netPool * 0.20).toFixed(2);
+      const p4 = (netPool * 0.15).toFixed(2);
+      document.getElementById('split1').innerText = '$' + p1;
+      document.getElementById('split2').innerText = '$' + p2;
+      document.getElementById('split3').innerText = '$' + p3;
+      document.getElementById('split4').innerText = '$' + p4;
+
+      ['btnBand50', 'btnBand100', 'btnBand250'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (id === 'btnBand' + tip) {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-primary text-white border border-transparent shadow-sm transition cursor-pointer';
+        } else {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-transparent transition cursor-pointer';
+        }
+      });
+    }
+
+    // Initialize on page load
+    initTheme();
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+name: Crowdbeats V2 — Local CI
+# IMPORTANT: This CI workflow is LOCAL-ONLY in Phase 1.
+# It does NOT deploy to Firebase, Stripe, App Store, or any cloud service.
+# Deployment is prohibited until Phase 13 (staging) with explicit approval.
+
+on:
+  push:
+    branches: [main, 'feature/**', 'fix/**']
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  FLUTTER_VERSION: '3.47.1'
+
+jobs:
+  # ─── Step 1: Secret Scanning ────────────────────────────────────────
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Step 2: Dependency Review ──────────────────────────────────────
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  # ─── Step 3: JS/TS Lint and Type-Check ─────────────────────────────
+  js-quality:
+    name: JS/TS Quality Gates
+    runs-on: ubuntu-latest
+    needs: [secret-scan]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --workspaces --if-present
+      - name: Prettier check
+        run: npm run format:check
+      - name: Type-check (web)
+        run: npm run web:typecheck
+      - name: Type-check (functions)
+        run: npm run functions:typecheck
+      - name: Type-check (contracts)
+        run: npm run contracts:typecheck
+
+  # ─── Step 4: Next.js Build ──────────────────────────────────────────
+  web-build:
+    name: Next.js Production Build
+    runs-on: ubuntu-latest
+    needs: [js-quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci --workspace=apps/web
+      - name: Build Next.js
+        run: npm run web:build
+        env:
+          # CI build uses placeholder values — no real Firebase project connected yet
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: crowdbeats-v2-placeholder
+          NEXT_PUBLIC_USE_FIREBASE_EMULATOR: 'true'
+          NEXT_PUBLIC_APP_ENV: ci
+
+  # ─── Step 5: Functions Build ─────────────────────────────────────────
+  functions-build:
+    name: Functions TypeScript Build
+    runs-on: ubuntu-latest
+    needs: [js-quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci --workspace=apps/functions
+      - name: Build Functions
+        run: npm run functions:build
+
+  # ─── Step 6: Flutter Analysis ────────────────────────────────────────
+  flutter-analysis:
+    name: Flutter Static Analysis
+    runs-on: ubuntu-latest
+    needs: [secret-scan]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - name: Flutter pub get
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Flutter analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Flutter test
+        working-directory: apps/mobile
+        run: flutter test
+
+  # ─── Step 7: JS/TS Tests (against emulators in Phase 2+) ───────────
+  # NOTE: Phase 1 tests are minimal stubs. Firebase emulator tests are added in Phase 3.
+  js-tests:
+    name: JS/TS Unit Tests
+    runs-on: ubuntu-latest
+    needs: [js-quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci --workspaces --if-present
+      - name: Run tests (web)
+        run: npm run web:test --if-present
+      - name: Run tests (functions)
+        run: npm run functions:test --if-present
+      - name: Run tests (contracts)
+        run: npm run contracts:typecheck --if-present
+
+  # ─── BLOCKED: No deployment steps in Phase 1 ─────────────────────────
+  # All deployment jobs are intentionally absent.
+  # Phase 13 adds: staging deploy (after explicit David approval)
+  # Phase 14 adds: production deploy (after separate explicit David authorization)

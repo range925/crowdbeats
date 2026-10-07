@@ -1,0 +1,39 @@
+{
+    "scripts": {
+        "test:watch": "jest --watch",
+        "predeploy": "npm run build",
+        "build": "tsc",
+        "serve": "npm run build && firebase emulators:start --only functions",
+        "lint": "eslint src/**/*.ts",
+        "test": "jest --passWithNoTests",
+        "type-check": "tsc --noEmit",
+        "test:coverage": "jest --coverage",
+        "build:watch": "tsc --watch"
+    },
+    "description": "Crowdbeats V2 - Firebase Cloud Functions Gen 2",
+    "devDependencies": {
+        "@types/jest": "^29.0.0",
+        "@types/node": "^22.0.0",
+        "@types/stripe": "^8.0.416",
+        "@types/uuid": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^8.0.0",
+        "@typescript-eslint/parser": "^8.0.0",
+        "eslint": "^9.0.0",
+        "jest": "^29.0.0",
+        "ts-jest": "^29.0.0",
+        "typescript": "^5.5.0"
+    },
+    "version": "0.1.0",
+    "engines": {
+        "node": "22"
+    },
+    "name": "@crowdbeats/functions",
+    "private": true,
+    "main": "lib/apps/functions/src/index.js",
+    "dependencies": {
+        "@crowdbeats/contracts": "file:./crowdbeats-contracts-0.1.0.tgz",
+        "firebase-admin": "^13.10.0",
+        "firebase-functions": "^7.4.0",
+        "stripe": "^17.7.0"
+    }
+}

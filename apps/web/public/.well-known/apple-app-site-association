@@ -1,0 +1,25 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAMID.com.crowdbeats.app",
+        "paths": [
+          "/artist/*",
+          "/band/*",
+          "/venue/*",
+          "/stage/*",
+          "/campaign/*",
+          "/invite/*",
+          "/fan/*",
+          "/creator/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAMID.com.crowdbeats.app"
+    ]
+  }
+}

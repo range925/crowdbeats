@@ -1,0 +1,109 @@
+{
+  "firestore": {
+    "rules": "firebase/firestore.rules",
+    "indexes": "firebase/firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "firebase/storage.rules"
+  },
+  "hosting": {
+    "public": "apps/web/dist",
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/auth",                        "destination": "/auth.html" },
+      { "source": "/auth/**",                     "destination": "/auth.html" },
+      { "source": "/onboarding/persona",          "destination": "/onboarding/persona.html" },
+      { "source": "/onboarding/artist",           "destination": "/onboarding/artist.html" },
+      { "source": "/onboarding/band",             "destination": "/onboarding/band.html" },
+      { "source": "/onboarding/fan",              "destination": "/onboarding/fan.html" },
+      { "source": "/onboarding/venue",            "destination": "/onboarding/venue.html" },
+      { "source": "/onboarding/sponsor",          "destination": "/onboarding/sponsor.html" },
+      { "source": "/onboarding",                  "destination": "/onboarding.html" },
+      { "source": "/creator",                     "destination": "/creator/dashboard.html" },
+      { "source": "/creator/**",                  "destination": "/creator/dashboard.html" },
+      { "source": "/fan",                         "destination": "/fan.html" },
+      { "source": "/fan/**",                      "destination": "/fan.html" },
+      { "source": "/sponsor",                     "destination": "/sponsor/dashboard.html" },
+      { "source": "/sponsor/**",                  "destination": "/sponsor/dashboard.html" },
+      { "source": "/venue",                       "destination": "/venue/dashboard.html" },
+      { "source": "/venue/**",                    "destination": "/venue/dashboard.html" },
+      { "source": "/band",                        "destination": "/band/dashboard.html" },
+      { "source": "/band/**",                     "destination": "/band/dashboard.html" },
+      { "source": "/account",                     "destination": "/account.html" },
+      { "source": "/account/**",                  "destination": "/account.html" },
+      { "source": "/preview",                     "destination": "/preview.html" },
+      { "source": "/gallery",                     "destination": "/gallery.html" },
+      { "source": "/support",                     "destination": "/support.html" },
+      { "source": "/legal/terms",                 "destination": "/legal/terms.html" },
+      { "source": "/legal/privacy",               "destination": "/legal/privacy.html" },
+      { "source": "/legal/dmca",                  "destination": "/legal/dmca.html" },
+      { "source": "/legal/aup",                   "destination": "/legal/aup.html" },
+      { "source": "/legal/refunds",               "destination": "/legal/refunds.html" },
+      { "source": "/legal/creator-monetization",  "destination": "/legal/creator-monetization.html" },
+      { "source": "/legal/report-abuse",          "destination": "/legal/report-abuse.html" },
+      { "source": "/legal/law-enforcement",       "destination": "/legal/law-enforcement.html" },
+      { "source": "/legal/copyright-report",      "destination": "/legal/copyright-report.html" },
+      { "source": "/legal/support",               "destination": "/legal/support.html" },
+      { "source": "/legal",                       "destination": "/legal.html" },
+      { "source": "/discover",                    "destination": "/discover.html" },
+      { "source": "/discover/**",                 "destination": "/discover.html" },
+      { "source": "/tip",                         "destination": "/index.html" },
+      { "source": "/tip/**",                      "destination": "/index.html" },
+      { "source": "/admin",                      "destination": "/admin/dashboard.html" },
+      { "source": "/admin/**",                    "destination": "/admin/dashboard.html" },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": "apps/functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix apps/functions run build"
+      ]
+    }
+  ],
+  "apphosting": {
+    "_disabled_reason": "Billing not enabled on crowdbeats-01 — activate billing + run firebase apphosting:backends:create to enable SSR",
+    "_backendId": "crowdbeats-web",
+    "_rootDir": "apps/web"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080,
+      "websocketPort": 9150
+    },
+    "storage": {
+      "port": 9199
+    },
+    "hosting": {
+      "port": 5002
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    },
+    "singleProjectMode": true
+  }
+}

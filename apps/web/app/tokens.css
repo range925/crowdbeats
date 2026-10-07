@@ -1,0 +1,791 @@
+/**
+ * Crowdbeats V2 — Stitch Authoritative Design Tokens (Project 5326179813018056505)
+ *
+ * All components reference these variables — maintaining 100% fidelity with the
+ * Gemini 3.1 Pro & Nano Banana Pro visual design language.
+ */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* ── Apple-Clean Canvas & Surfaces (Light: Apple Minimal Gray/White) ────── */
+  --cb-bg-app:            #FBFBFD;   /* Apple clean canvas */
+  --cb-surface-canvas:    #FBFBFD;
+  --cb-surface-1:         #FFFFFF;   /* Standard card & container */
+  --cb-surface-primary:   #FFFFFF;
+  --cb-surface-2:         #F4F4F6;   /* Elevated card, inputs, chips */
+  --cb-surface-secondary: #F4F4F6;
+  --cb-surface-3:         #E8E8ED;   /* Hovered / pressed state */
+  --cb-surface-elevated:  #FFFFFF;   /* Elevated modal / sheet */
+  --cb-surface-glass:     rgba(255, 255, 255, 0.82); /* Frosted light glass */
+  --cb-surface-glass-hi:  rgba(255, 255, 255, 0.94);
+
+  /* ── Borders & Glass Highlights ────────────────────────────────────────── */
+  --cb-border-subtle:     rgba(0, 0, 0, 0.08); /* Apple crisp hairline */
+  --cb-border-medium:     rgba(0, 0, 0, 0.14);
+  --cb-border-focus:      #0071E3;
+  --cb-border-glass:      rgba(0, 0, 0, 0.07);
+  --cb-border-error:      #DC2626;
+
+  /* ── Apple Primary & Brand Accents ─────────────────────────────────────── */
+  --cb-apple-blue:        #000000;   /* Apple primary action black */
+  --cb-apple-blue-hover:  #1D1D1F;
+  --cb-apple-link:        #000000;   /* Apple hyperlinked text */
+  --cb-purple-light:      #C084FC;
+  --cb-accent-secondary:  #A855F7;
+  --cb-purple-main:       #7C3AED;   /* Crowdbeats signature purple */
+  --cb-accent-primary:    #7C3AED;
+  --cb-purple-dark:       #6D28D9;
+  --cb-purple-dim:        rgba(124, 58, 237, 0.08);
+  --cb-purple-glow:       0 8px 24px -4px rgba(124, 58, 237, 0.20);
+
+  /* ── Semantic & Status Accents ─────────────────────────────────────────── */
+  --cb-live-green:        #059669;   /* Accessible emerald */
+  --cb-live:              #059669;
+  --cb-reticle-green:     #059669;
+  --cb-heart-orange:      #EA580C;
+  --cb-heart-pink:        #DB2777;
+  --cb-verified-blue:     #0284C7;
+  --cb-verified:          #0284C7;
+  --cb-gps-blue:          #2563EB;
+  --cb-rank-gold:         #D97706;
+  --cb-rank-silver:       #64748B;
+  --cb-rank-bronze:       #92400E;
+  --cb-error-red:         #DC2626;
+
+  /* ── Apple Typography Tokens (Crisp High-Contrast Dark on Light) ───────── */
+  --cb-text-primary:      #1D1D1F;   /* Apple Pro dark typography */
+  --cb-text-secondary:    #6E6E73;   /* Apple secondary gray */
+  --cb-text-muted:        #86868B;   /* Apple tertiary caption */
+  --cb-text-tertiary:     #86868B;
+
+  /* ── Stitch Project 14673587965252723053 (Sonic Precision + Apple Polish) ── */
+  --cb-stitch-primary: #7C3AED;
+  --cb-stitch-primary-hover: #630ED4;
+  --cb-stitch-secondary: #0071E3;
+  --cb-stitch-aqua: #006B5F;
+  --cb-stitch-aqua-dim: rgba(0, 107, 95, 0.12);
+  --cb-stitch-obsidian: #000000;
+  --cb-stitch-obsidian-sub: #161617;
+  --cb-stitch-obsidian-card: #FFFFFF;
+  --cb-stitch-obsidian-elevated: #F5F5F7;
+  --cb-stitch-obsidian-border: rgba(0, 0, 0, 0.08);
+  --cb-stitch-surface-light: #FBFBFD;
+  --cb-stitch-surface-container-low: #F5F5F7;
+  --cb-stitch-surface-container: #FFFFFF;
+  --cb-stitch-surface-container-high: #E8E8ED;
+  --cb-stitch-surface-lowest: #FFFFFF;
+  --cb-stitch-on-surface: #1D1D1F;
+  --cb-stitch-on-surface-variant: #6E6E73;
+
+  /* ── Apple Native System Font Stack ────────────────────────────────────── */
+  --cb-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --cb-font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --cb-font-mono: "SF Mono", Monaco, Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --cb-card-shadow:       0 8px 24px -4px rgba(0, 0, 0, 0.07);
+  --cb-toggle-bg:         rgba(0, 0, 0, 0.06);
+
+  /* ── Admin Enterprise Operations Console Tokens (Light Mode) ──────────── */
+  --admin-bg-base:           #F8FAFC;   /* Soft cool off-white canvas */
+  --admin-surface-card:      #FFFFFF;   /* Clean white card surface */
+  --admin-surface-raised:    #F1F5F9;   /* Slate-100 container / elevated chip */
+  --admin-surface-hover:     #F1F5F9;   /* Slate-100 interactive row hover */
+  --admin-border-subtle:     #E2E8F0;   /* Hairline slate border */
+  --admin-border-focus:      #7C3AED;   /* Crowdbeats violet focus ring */
+  --admin-text-primary:      #0F172A;   /* Deep charcoal slate-900 */
+  --admin-text-secondary:    #475569;   /* Readable secondary slate-600 */
+  --admin-text-tertiary:     #64748B;   /* Muted captions slate-500 */
+  --admin-accent-primary:    #7C3AED;   /* Crowdbeats violet active/CTA */
+  --admin-accent-subtle:     rgba(124, 58, 237, 0.08); /* Violet tint */
+  --admin-status-success:    #10B981;   /* Emerald healthy/active/reconciled */
+  --admin-status-success-bg: rgba(16, 185, 129, 0.10);
+  --admin-status-warning:    #F59E0B;   /* Amber pending/warning */
+  --admin-status-warning-bg: rgba(245, 158, 11, 0.10);
+  --admin-status-error:      #EF4444;   /* Rose/Red error/suspended/urgent */
+  --admin-status-error-bg:   rgba(239, 68, 68, 0.10);
+  --admin-status-info:       #3B82F6;   /* Blue informational */
+  --admin-status-info-bg:    rgba(59, 130, 246, 0.10);
+  --admin-shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --admin-shadow-md:         0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"],
+.dark,
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* ── Apple-Clean Canvas & Surfaces (Dark: Pure Obsidian & Apple Space Gray) ─ */
+  --cb-bg-app:            #000000;   /* Apple pure deep black canvas */
+  --cb-surface-canvas:    #000000;
+  --cb-surface-1:         #161617;   /* Apple primary card surface */
+  --cb-surface-primary:   #161617;
+  --cb-surface-2:         #1D1D1F;   /* Apple secondary elevated container / chip */
+  --cb-surface-secondary: #1D1D1F;
+  --cb-surface-3:         #2C2C2E;   /* Apple pressed / tertiary surface */
+  --cb-surface-elevated:  #242426;   /* Apple modal / floating sheet */
+  --cb-surface-glass:     rgba(22, 22, 23, 0.80); /* Apple frosted glass */
+  --cb-surface-glass-hi:  rgba(29, 29, 31, 0.90);
+
+  /* ── Borders & Glass Highlights ────────────────────────────────────────── */
+  --cb-border-subtle:     rgba(255, 255, 255, 0.08); /* Apple crisp hairline */
+  --cb-border-medium:     rgba(255, 255, 255, 0.14);
+  --cb-border-focus:      #0071E3;
+  --cb-border-glass:      rgba(255, 255, 255, 0.10);
+  --cb-border-error:      #FF453A;
+
+  /* ── Apple Primary & Brand Accents ─────────────────────────────────────── */
+  --cb-apple-blue:        #000000;   /* Apple primary action black */
+  --cb-apple-blue-hover:  #1D1D1F;
+  --cb-apple-link:        #F5F5F7;   /* Apple hyperlinked text */
+  --cb-purple-light:      #C084FC;
+  --cb-accent-secondary:  #A855F7;
+  --cb-purple-main:       #7C3AED;   /* Crowdbeats signature purple */
+  --cb-accent-primary:    #7C3AED;
+  --cb-purple-dark:       #6D28D9;
+  --cb-purple-dim:        rgba(124, 58, 237, 0.16);
+  --cb-purple-glow:       0 8px 28px -4px rgba(124, 58, 237, 0.40);
+
+  /* ── Semantic & Status Accents ─────────────────────────────────────────── */
+  --cb-live-green:        #30D158;   /* Apple system green */
+  --cb-live:              #30D158;
+  --cb-reticle-green:     #2DD4BF;
+  --cb-heart-orange:      #FF9F0A;   /* Apple system orange */
+  --cb-heart-pink:        #FF375F;   /* Apple system pink */
+  --cb-verified-blue:     #0A84FF;   /* Apple system blue */
+  --cb-verified:          #0A84FF;
+  --cb-gps-blue:          #0071E3;
+  --cb-rank-gold:         #FFD60A;   /* Apple system yellow */
+  --cb-rank-silver:       #98989D;
+  --cb-rank-bronze:       #AC8E68;
+  --cb-error-red:         #FF453A;
+
+  /* ── Apple Typography Tokens (Crisp High-Contrast) ─────────────────────── */
+  --cb-text-primary:      #F5F5F7;   /* Apple off-white (prevents harsh glare, AAA contrast) */
+  --cb-text-secondary:    #86868B;   /* Apple signature secondary gray */
+  --cb-text-muted:        #6E6E73;   /* Apple tertiary / captions */
+  --cb-text-tertiary:     #6E6E73;
+
+  /* ── Stitch Project 14673587965252723053 (Sonic Precision + Apple Polish) ── */
+  --cb-stitch-primary: #7C3AED;
+  --cb-stitch-primary-hover: #630ED4;
+  --cb-stitch-secondary: #0071E3;
+  --cb-stitch-aqua: #2DD4BF;
+  --cb-stitch-aqua-dim: rgba(45, 212, 191, 0.15);
+  --cb-stitch-obsidian: #000000;
+  --cb-stitch-obsidian-sub: #161617;
+  --cb-stitch-obsidian-card: #161617;
+  --cb-stitch-obsidian-elevated: #1D1D1F;
+  --cb-stitch-obsidian-border: rgba(255, 255, 255, 0.08);
+  --cb-stitch-surface-light: #FBFBFD;
+  --cb-stitch-surface-container-low: #F5F5F7;
+  --cb-stitch-surface-container: #FFFFFF;
+  --cb-stitch-surface-container-high: #E8E8ED;
+  --cb-stitch-surface-lowest: #FFFFFF;
+  --cb-stitch-on-surface: #1D1D1F;
+  --cb-stitch-on-surface-variant: #6E6E73;
+
+  /* ── Apple Native System Font Stack ────────────────────────────────────── */
+  --cb-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --cb-font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --cb-font-mono: "SF Mono", Monaco, Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --cb-card-shadow:       0 12px 36px -8px rgba(0, 0, 0, 0.75);
+  --cb-toggle-bg:         rgba(255, 255, 255, 0.08);
+
+  /* ── Admin Enterprise Operations Console Tokens (Dark Mode) ───────────── */
+  --admin-bg-base:           #0B0F19;   /* Deep slate canvas */
+  --admin-surface-card:      #162032;   /* Elevated card surface */
+  --admin-surface-raised:    #1E293B;   /* Slate-800 container / elevated chip */
+  --admin-surface-hover:     #253248;   /* Slate-750 interactive row hover */
+  --admin-border-subtle:     rgba(255, 255, 255, 0.08); /* Hairline border */
+  --admin-border-focus:      #8B5CF6;   /* Crowdbeats violet focus ring */
+  --admin-text-primary:      #F8FAFC;   /* Light text slate-50 */
+  --admin-text-secondary:    #94A3B8;   /* Slate-400 secondary text */
+  --admin-text-tertiary:     #64748B;   /* Muted captions slate-500 */
+  --admin-accent-primary:    #8B5CF6;   /* Crowdbeats violet active/CTA */
+  --admin-accent-subtle:     rgba(139, 92, 246, 0.15); /* Violet tint */
+  --admin-status-success:    #10B981;   /* Emerald healthy/active/reconciled */
+  --admin-status-success-bg: rgba(16, 185, 129, 0.15);
+  --admin-status-warning:    #F59E0B;   /* Amber pending/warning */
+  --admin-status-warning-bg: rgba(245, 158, 11, 0.15);
+  --admin-status-error:      #EF4444;   /* Rose/Red error/suspended/urgent */
+  --admin-status-error-bg:   rgba(239, 68, 68, 0.15);
+  --admin-status-info:       #3B82F6;   /* Blue informational */
+  --admin-status-info-bg:    rgba(59, 130, 246, 0.15);
+  --admin-shadow-sm:         0 1px 3px rgba(0, 0, 0, 0.35);
+  --admin-shadow-md:         0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.30);
+}
+
+/* ── Legacy Backward-Compatible Aliases ──────────────────────────────────── */
+:root {
+  --surface-base:         var(--cb-bg-app);
+  --surface-raised:       var(--cb-surface-1);
+  --surface-overlay:      var(--cb-surface-2);
+  --surface-card:         var(--cb-surface-2);
+  --surface-pressed:      var(--cb-surface-3);
+  --surface-inverted:     var(--cb-text-primary);
+
+  --border-subtle:        var(--cb-border-subtle);
+  --border-default:       var(--cb-border-subtle);
+  --border-focus:         var(--cb-purple-main);
+  --border-error:         var(--cb-error-red);
+
+  --text-primary:         var(--cb-text-primary);
+  --text-secondary:       var(--cb-text-secondary);
+  --text-tertiary:        var(--cb-text-muted);
+  --text-disabled:        var(--cb-text-muted);
+  --text-on-primary:      #FFFFFF;
+  --text-on-accent:       #FFFFFF;
+
+  --accent-primary:       var(--cb-purple-main);
+  --accent-primary-hover: var(--cb-purple-light);
+  --accent-secondary:     var(--cb-purple-light);
+  --accent-primary-subtle: var(--cb-purple-dim);
+
+  --status-success:       var(--cb-live-green);
+  --status-warning:       var(--cb-heart-orange);
+  --status-error:         var(--cb-error-red);
+  --status-info:          var(--cb-gps-blue);
+  --status-live:          var(--cb-live-green);
+
+  --live-glow:            rgba(16, 185, 129, 0.40);
+  --live-pulse:           var(--cb-live-green);
+  --live-surface:         var(--cb-surface-2);
+  --live-text:            var(--cb-live-green);
+
+  /* ── Spacing Tokens ──────────────────────────────────────────────────────── */
+  --space-0:    0px;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:    12px;
+  --space-4:    16px;
+  --space-5:    20px;
+  --space-6:    24px;
+  --space-8:    32px;
+  --space-10:   40px;
+  --space-12:   48px;
+  --space-16:   64px;
+
+  /* ── Radii Tokens ────────────────────────────────────────────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+}
+
+/* Glassmorphism and Glow Utilities */
+.cb-glass {
+  background: var(--cb-surface-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--cb-border-subtle);
+}
+
+/* ── Admin Enterprise Operations Console Utilities ───────────────────────── */
+.admin-tabular-nums {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+.admin-card-surface {
+  background: var(--admin-surface-card);
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--admin-shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-card-surface:hover {
+  border-color: rgba(124, 58, 237, 0.25);
+  box-shadow: var(--admin-shadow-md);
+}
+
+/* ── Apple.com Typographic Scale & Component System ──────────────────────── */
+.apple-headline {
+  font-family: var(--cb-font-display);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.06;
+  color: var(--cb-text-primary);
+}
+
+.apple-title {
+  font-family: var(--cb-font-display);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+  color: var(--cb-text-primary);
+}
+
+.apple-eyebrow {
+  font-family: var(--cb-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cb-text-secondary);
+}
+
+.apple-lead {
+  font-family: var(--cb-font-body);
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.45;
+  color: var(--cb-text-secondary);
+}
+
+.apple-body {
+  font-family: var(--cb-font-body);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -0.016em;
+  line-height: 1.48;
+}
+
+/* Apple Bento Card */
+.apple-card-bento {
+  background: var(--cb-surface-1);
+  border: 1px solid var(--cb-border-subtle);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-card-bento:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.10), 0 20px 48px -10px rgba(0, 0, 0, 0.7);
+}
+
+/* Apple Pill Buttons */
+.apple-pill-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 24px;
+  min-height: 44px;
+  border-radius: 9999px;
+  font-family: var(--cb-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+  color: #FFFFFF;
+  background-color: var(--cb-apple-blue);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.apple-pill-primary:hover {
+  background-color: var(--cb-apple-blue-hover);
+  transform: scale(1.02);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.apple-pill-primary:active {
+  transform: scale(0.98);
+}
+
+.apple-pill-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 24px;
+  min-height: 44px;
+  border-radius: 9999px;
+  font-family: var(--cb-font-body);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  color: var(--cb-text-primary);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.apple-pill-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: scale(1.02);
+}
+
+.apple-pill-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Apple Link with Chevron */
+.apple-link-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--cb-font-body);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -0.016em;
+  color: var(--cb-apple-link);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.apple-link-cta:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.cb-glow-purple {
+  box-shadow: var(--cb-purple-glow);
+}
+
+.cb-glow-live {
+  box-shadow: 0 0 16px 2px rgba(48, 209, 88, 0.4);
+}
+
+/* Apple-style smooth transitions */
+.cb-theme-transition,
+.cb-theme-transition * {
+  transition: background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Light Mode — Full Landing Page Overrides ────────────────────────────── */
+
+/* Base body */
+[data-theme="light"] body {
+  background-color: var(--cb-bg-app) !important;
+  color: var(--cb-text-primary) !important;
+}
+
+/* Landing page root */
+[data-theme="light"] .cb-landing {
+  background-color: #F6F6FA !important;
+  color: #1D1D1F !important;
+}
+
+/* ── Section backgrounds with hardcoded dark hex ── */
+
+/* Hero section — clean image, no gradient overlay */
+[data-theme="light"] .cb-landing > section:first-of-type {
+  background-image: url('/crowdbeats_hero_light.webp') !important;
+}
+
+/* Dark section backgrounds -> light equivalents */
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#0B0D14'"],
+[data-theme="light"] .cb-landing [style*="background-color: #0B0D14"] {
+  background-color: #EDEDF2 !important;
+}
+
+/* Fee calculator & personas sections (hardcoded via style prop on section tag) */
+[data-theme="light"] .cb-landing section[id="fee-calculator"],
+[data-theme="light"] .cb-landing section[id="personas"] {
+  background-color: #EDEDF2 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Cinematic closing banner — clean Apple neutral */
+[data-theme="light"] .cb-landing section:last-of-type {
+  background: #F6F6FA !important;
+}
+
+/* ── Cards & surfaces with hardcoded #12141F / #07080D / etc ── */
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#12141F'"],
+[data-theme="light"] .cb-landing [style*="background-color: #12141F"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#07080D'"],
+[data-theme="light"] .cb-landing [style*="background-color: #07080D"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#151722'"],
+[data-theme="light"] .cb-landing [style*="background-color: #151722"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#0B0D14'"],
+[data-theme="light"] .cb-landing [style*="background-color: #0B0D14"] {
+  background-color: #FFFFFF !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* rgba dark overlays */
+[data-theme="light"] .cb-landing [style*="background-color: rgba(18, 20, 31"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: rgba(18, 20, 31"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(21, 23, 34"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: rgba(21, 23, 34"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(0, 0, 0, 0.3)"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: rgba(0, 0, 0, 0.3)"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(7, 8, 13"],
+[data-theme="light"] .cb-landing [style*="backgroundColor: rgba(7, 8, 13"] {
+  background-color: #F0F0F6 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Very subtle dark overlays (rgba(255,255,255, 0.02-0.06)) → light card tint */
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.02)"],
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.03)"],
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.04)"],
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.05)"],
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.06)"],
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.07)"],
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.08)"] {
+  background-color: #F8F8FC !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+/* ── Typography: all hardcoded white text ── */
+[data-theme="light"] .cb-landing [style*="color: '#FFFFFF'"],
+[data-theme="light"] .cb-landing [style*="color: #FFFFFF"] {
+  color: #1D1D1F !important;
+}
+
+/* Muted gray text */
+[data-theme="light"] .cb-landing [style*="color: '#94A3B8'"],
+[data-theme="light"] .cb-landing [style*="color: #94A3B8"],
+[data-theme="light"] .cb-landing [style*="color: '#CBD5E1'"],
+[data-theme="light"] .cb-landing [style*="color: #CBD5E1"],
+[data-theme="light"] .cb-landing [style*="color: '#E2E8F0'"],
+[data-theme="light"] .cb-landing [style*="color: #E2E8F0"] {
+  color: #55555C !important;
+}
+
+/* Even more muted */
+[data-theme="light"] .cb-landing [style*="color: '#64748B'"],
+[data-theme="light"] .cb-landing [style*="color: #64748B"] {
+  color: #86868B !important;
+}
+
+/* Headings */
+[data-theme="light"] .cb-landing h1,
+[data-theme="light"] .cb-landing h2,
+[data-theme="light"] .cb-landing h3,
+[data-theme="light"] .cb-landing h4 {
+  color: #1D1D1F !important;
+}
+
+/* p tags with hardcoded colors */
+[data-theme="light"] .cb-landing p[style*="color: #94A3B8"],
+[data-theme="light"] .cb-landing p[style*="color: #CBD5E1"],
+[data-theme="light"] .cb-landing p[style*="color: #E2E8F0"] {
+  color: #55555C !important;
+}
+
+/* ── Borders: rgba white hairlines → subtle dark hairlines ── */
+[data-theme="light"] .cb-landing [style*="border: '1px solid rgba(255, 255, 255, 0."],
+[data-theme="light"] .cb-landing [style*="border: 1px solid rgba(255, 255, 255, 0."],
+[data-theme="light"] .cb-landing [style*="borderBottom: '1px solid rgba(255, 255, 255"],
+[data-theme="light"] .cb-landing [style*="borderTop: '1px solid rgba(255, 255, 255"],
+[data-theme="light"] .cb-landing [style*="border-bottom: 1px solid rgba(255, 255, 255"],
+[data-theme="light"] .cb-landing [style*="border-top: 1px solid rgba(255, 255, 255"] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ── Specific UI elements ── */
+
+/* Metrics bar cards */
+[data-theme="light"] .cb-landing [style*="backgroundColor: 'rgba(18, 20, 31, 0.80)'"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(18, 20, 31, 0.80)"] {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Tab row container (#12141F inline) */
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#12141F'"],
+[data-theme="light"] .cb-landing [style*="background-color: #12141F"] {
+  background-color: #E8E8EE !important;
+}
+
+/* Genre pills inactive (#12141F) */
+[data-theme="light"] .cb-landing button[style*="backgroundColor: '#12141F'"],
+[data-theme="light"] .cb-landing button[style*="background-color: #12141F"] {
+  background-color: #E8E8EE !important;
+  color: #55555C !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Performer cards header row */
+[data-theme="light"] .cb-landing [style*="backgroundColor: 'rgba(255, 255, 255, 0.02)'"] {
+  background-color: #F4F4F8 !important;
+}
+
+/* "View Profile" ghost button on performer cards */
+[data-theme="light"] .cb-landing a[style*="rgba(255, 255, 255, 0.06)"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(255, 255, 255, 0.06)"] {
+  background-color: #EBEBF0 !important;
+  color: #1D1D1F !important;
+}
+
+/* Search bar */
+[data-theme="light"] .cb-landing [style*="rgba(18, 20, 31, 0.92)"] {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.12), 0 0 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Search input text */
+[data-theme="light"] .cb-landing input[style*="color: '#FFFFFF'"],
+[data-theme="light"] .cb-landing input[style*="color: #FFFFFF"] {
+  color: #1D1D1F !important;
+}
+[data-theme="light"] .cb-landing input::placeholder {
+  color: #86868B !important;
+}
+
+/* Autocomplete dropdown */
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#151722'"],
+[data-theme="light"] .cb-landing [style*="background-color: #151722"] {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14) !important;
+}
+
+/* Autocomplete item text */
+[data-theme="light"] .cb-landing [style*="fontWeight: 600"][style*="color: '#FFFFFF'"] {
+  color: #1D1D1F !important;
+}
+
+/* Hero badge pill */
+[data-theme="light"] .cb-landing [style*="rgba(21, 23, 34, 0.85)"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+[data-theme="light"] .cb-landing [style*="color: '#E2E8F0'"],
+[data-theme="light"] .cb-landing [style*="color: #E2E8F0"] {
+  color: #3D3D43 !important;
+}
+
+/* Fee calculator inner breakdown container */
+[data-theme="light"] .cb-landing [style*="rgba(0, 0, 0, 0.3)"] {
+  background-color: #F0F0F6 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Band split member cards */
+[data-theme="light"] .cb-landing [style*="rgba(255, 255, 255, 0.03)"] {
+  background-color: #F4F4F8 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Closing CTA ghost button */
+[data-theme="light"] .cb-landing a[style*="rgba(255, 255, 255, 0.08)"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(255, 255, 255, 0.08)"] {
+  background-color: #EAEAEF !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #1D1D1F !important;
+}
+
+/* Closing CTA sign-in link */
+[data-theme="light"] .cb-landing a[style*="rgba(255, 255, 255, 0.08)"][style*="color: '#94A3B8'"] {
+  color: #55555C !important;
+}
+
+/* Map/list toggle button */
+[data-theme="light"] .cb-landing [style*="rgba(255,255,255,0.06)"] {
+  background-color: #E8E8EE !important;
+  border-color: rgba(0, 0, 0, 0.10) !important;
+  color: #55555C !important;
+}
+
+/* Sign In button in header */
+[data-theme="light"] .cb-landing a[style*="rgba(255, 255, 255, 0.05)"] {
+  background-color: #EBEBF0 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #1D1D1F !important;
+}
+
+/* Persona tab buttons (inactive) */
+[data-theme="light"] .cb-landing button[style*="backgroundColor: '#12141F'"][style*="color: '#FFFFFF'"] {
+  background-color: #EBEBF0 !important;
+  color: #1D1D1F !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* QR mockup box — black border instead of purple */
+[data-theme="light"] .cb-landing [style*="backgroundColor: '#07080D'"] {
+  background-color: #E8E8EE !important;
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Performer card footer actions */
+[data-theme="light"] .cb-landing [style*="backgroundColor: 'rgba(255, 255, 255, 0.02)'"],
+[data-theme="light"] .cb-landing [style*="background-color: rgba(255, 255, 255, 0.02)"] {
+  background-color: #F2F2F6 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Mobile drawer */
+[data-theme="light"] .cb-landing [style*="backgroundColor: 'var(--cb-surface-1)"] {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ── Onboarding Wizard — Light Mode Overrides ─────────────────────────────── */
+/* FanOnboardingWizard uses hardcoded dark Tailwind classes — override for light theme */
+
+/* Wizard card containers */
+[data-theme="light"] .bg-\[\#151722\] {
+  background-color: #FFFFFF !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+[data-theme="light"] .bg-\[\#1E2032\] {
+  background-color: #F5F5FA !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="light"] .bg-\[\#282A42\] {
+  background-color: #EBEBF0 !important;
+}
+[data-theme="light"] .bg-\[\#0B0C10\] {
+  background-color: var(--bg-app, #F6F6FA) !important;
+}
+
+/* Wizard border colors */
+[data-theme="light"] .border-\[\#2B2D44\] {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Wizard text: white text → dark text */
+[data-theme="light"] .text-white {
+  color: #1D1D1F !important;
+}
+[data-theme="light"] .text-\[\#94A3B8\] {
+  color: #6B7280 !important;
+}
+[data-theme="light"] .text-\[\#64748B\] {
+  color: #9CA3AF !important;
+}
+
+/* Genre/interest chip unselected state */
+[data-theme="light"] .bg-\[\#1E2032\].text-\[\#94A3B8\] {
+  background-color: #F0F0F5 !important;
+  color: #6B7280 !important;
+}
+
+/* "Back" outline button */
+[data-theme="light"] .bg-\[\#1E2032\].border-\[\#2B2D44\] {
+  background-color: #F5F5FA !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}

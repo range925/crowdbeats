@@ -1,0 +1,38 @@
+# Crowdbeats V2 — CODEOWNERS
+# Architecture protection proposal — requires David's review before merging to main.
+#
+# IMPORTANT: This file becomes effective only after the GitHub repository is created
+# and branch protection rules are configured (Phase 1 follow-up: OD-01).
+#
+# Rules:
+# - Protected architecture files require review from @crowdbeats/architecture-owners
+# - Security-critical files require review from @crowdbeats/security-owners
+# - Financial logic requires review from @crowdbeats/finance-owners
+# - All other files: standard PR review
+
+# ─── Default: all files require at least one review ─────────────────
+*                                   @crowdbeats/maintainers
+
+# ─── Architecture-protected files ────────────────────────────────────
+# These files may not be modified without formal ADR and David's approval.
+# Equivalent to the protected files policy from the Clean-Room Architecture Contract.
+docs/clean-room/                    @crowdbeats/architecture-owners
+docs/decisions/                     @crowdbeats/architecture-owners
+docs/architecture/                  @crowdbeats/architecture-owners
+packages/contracts/src/             @crowdbeats/architecture-owners
+packages/contracts/src/rbac*.ts     @crowdbeats/architecture-owners @crowdbeats/security-owners
+packages/contracts/src/domain*.ts   @crowdbeats/architecture-owners @crowdbeats/security-owners
+
+# ─── Security-critical files ──────────────────────────────────────────
+firebase/firestore.rules            @crowdbeats/security-owners @crowdbeats/architecture-owners
+firebase/storage.rules              @crowdbeats/security-owners @crowdbeats/architecture-owners
+apps/functions/src/                 @crowdbeats/security-owners
+.github/workflows/                  @crowdbeats/security-owners @crowdbeats/maintainers
+
+# ─── Financial logic ──────────────────────────────────────────────────
+apps/functions/src/callable/        @crowdbeats/finance-owners @crowdbeats/security-owners
+apps/functions/src/http/            @crowdbeats/finance-owners @crowdbeats/security-owners
+apps/functions/src/scheduled/       @crowdbeats/finance-owners @crowdbeats/security-owners
+
+# ─── CI/CD ────────────────────────────────────────────────────────────
+.github/                            @crowdbeats/maintainers @crowdbeats/security-owners

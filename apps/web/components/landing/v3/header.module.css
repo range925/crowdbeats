@@ -1,0 +1,429 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@800;900&display=swap');
+/*
+ * Landing v3 — Header and Navigation styling.
+ */
+
+.spacer {
+  height: var(--l-header-h, 72px);
+  width: 100%;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--l-header-h, 72px);
+  z-index: 80;
+  background: #ffffff;
+  color: #0a0a0b;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+:global(html[data-theme='dark']) .header {
+  background: #0a0a0b;
+  color: #f5f5f7;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.inner {
+  max-width: 1240px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+/* ── Brand ─────────────────────────────────────────────────────────────── */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+  background: transparent;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: opacity 140ms ease;
+  flex: none;
+}
+
+.brand:hover {
+  opacity: 0.85;
+}
+
+.brand:focus-visible {
+  outline: 2px solid #00F5FA;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background-color: #7c3aed;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+  flex: none;
+}
+
+.wordmark {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 900;
+  font-size: 21px;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  text-shadow:
+    -2.5px -0.8px 0 #00F2FE,
+     2.5px  0.8px 0 #FE2C55;
+  line-height: 1;
+  display: inline-block;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Desktop Nav ───────────────────────────────────────────────────────── */
+.nav {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .nav {
+    display: block;
+  }
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.navLink {
+  color: inherit;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 6px 0;
+  transition: opacity 150ms ease;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  opacity: 0.7;
+}
+
+.navLink:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Musician Menu & Dropdown ───────────────────────────────────────────── */
+.hasMenu {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.menuToggle {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 6px 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: opacity 150ms ease;
+}
+
+.menuToggle:hover {
+  opacity: 0.7;
+}
+
+.menuToggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.chevron {
+  transition: transform 160ms ease;
+}
+
+.menuToggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 240px;
+  background: #ffffff;
+  color: #0a0a0b;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+}
+
+:global(html[data-theme='dark']) .dropdown {
+  background: #141416;
+  color: #f5f5f7;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+.dropdownList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dropdownItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 150ms ease;
+}
+
+.dropdownItem:hover,
+.dropdownItem:focus-visible {
+  background: rgba(0, 0, 0, 0.06);
+  outline: none;
+}
+
+:global(html[data-theme='dark']) .dropdownItem:hover,
+:global(html[data-theme='dark']) .dropdownItem:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dropdownTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.dropdownDesc {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+:global(html[data-theme='dark']) .dropdownDesc {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Actions (Sign In + Join) ───────────────────────────────────────────── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.signIn {
+  color: inherit;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 12px;
+  white-space: nowrap;
+  transition: opacity 150ms ease;
+}
+
+.signIn:hover {
+  opacity: 0.7;
+}
+
+.signIn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.join {
+  display: none;
+  height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  .join {
+    display: inline-flex;
+  }
+}
+
+.burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+:global(html[data-theme='dark']) .burger {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.burger:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:global(html[data-theme='dark']) .burger:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.burger:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (min-width: 960px) {
+  .burger {
+    display: none;
+  }
+}
+
+/* ── Mobile Drawer ─────────────────────────────────────────────────────── */
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10050;
+  background: #ffffff;
+  color: #0a0a0b;
+  display: flex;
+  flex-direction: column;
+  padding: 20px clamp(20px, 4vw, 36px) 32px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+:global(html[data-theme='dark']) .drawer {
+  background: #0a0a0b;
+  color: #f5f5f7;
+}
+
+.drawerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  margin-bottom: 24px;
+}
+
+.drawerNav {
+  flex: 1;
+  margin-bottom: 32px;
+}
+
+.drawerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.drawerLink {
+  color: inherit;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 600;
+  display: block;
+  padding: 6px 0;
+  letter-spacing: -0.015em;
+}
+
+.drawerLink:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.drawerSubList {
+  list-style: none;
+  margin: 8px 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 2px solid rgba(0, 0, 0, 0.1);
+  padding-left: 14px;
+}
+
+:global(html[data-theme='dark']) .drawerSubList {
+  border-left-color: rgba(255, 255, 255, 0.12);
+}
+
+.drawerSubLink {
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawerSubDesc {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+:global(html[data-theme='dark']) .drawerSubDesc {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.drawerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:global(html[data-theme='dark']) .drawerActions {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.drawerBtn {
+  width: 100%;
+}
