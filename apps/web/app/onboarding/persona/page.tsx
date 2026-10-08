@@ -11,43 +11,56 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { getSessionCookie } from '@/lib/session';
 import { ROLE_TO_PERSONA, SIGNUP_INTENT_KEY, isSignupRole } from '@/components/landing/v3/signupIntent';
+
+import { RoleCard } from '@/components/onboarding/OnboardingSharedComponents';
 
 const PERSONAS = [
   {
     id:          'fan',
     icon:        '❤️',
     title:       'Fan',
-    description: 'Discover live music, tip your favourite artists, and follow their journeys.',
-    color:       'var(--accent-primary)',
+    badge:       'Popular',
+    description: 'Discover live music, tip your favorite artists, and follow their journeys.',
+    color:       '#7C3AED', // Brand Violet
+    benefits:    ['Nearby live stage discovery', 'Instant 2-tap tips with Apple/Google Pay', 'Follow favorite artists & get show alerts'],
   },
   {
     id:          'artist',
     icon:        '🎤',
-    title:       'Artist (Solo)',
-    description: 'Receive tips, manage your profile, and connect with fans at your shows.',
-    color:       'var(--accent-secondary)',
+    title:       'Solo Musician',
+    badge:       'Creator',
+    description: 'Receive direct tips, grow your local following, and broadcast live shows.',
+    color:       '#D97706', // Creator Amber
+    benefits:    ['100% free profile — no monthly subscription', 'Direct Stripe Connect payouts into your bank', 'Live stage radar broadcasting when performing'],
   },
   {
     id:          'band_member',
     icon:        '🎸',
     title:       'Band / Group',
-    description: 'Create a band, manage members, and split tips automatically.',
-    color:       'var(--dataviz-3)',
-  },
-  {
-    id:          'venue_manager',
-    icon:        '🏟️',
-    title:       'Venue',
-    description: 'Host shows, manage stages, and support the artists performing at your space.',
-    color:       'var(--dataviz-4)',
+    badge:       'Team',
+    description: 'Create a group profile, manage members, and split tips automatically.',
+    color:       '#2563EB', // Community Blue
+    benefits:    ['Group profile with dedicated Band QR code', 'Automated 100% split engine to member bank accounts', 'Multi-member management (Founder, Manager, Member)'],
   },
   {
     id:          'sponsor_rep',
     icon:        '💼',
     title:       'Sponsor / Brand',
-    description: 'Discover talent, sponsor shows, and measure audience engagement.',
-    color:       'var(--dataviz-5)',
+    badge:       'Partner',
+    description: 'Discover local talent, sponsor shows, and support live music scenes.',
+    color:       '#0891B2', // Discovery Cyan
+    benefits:    ['Discover performing local artists', 'Direct stage sponsorship opportunities'],
+  },
+  {
+    id:          'venue_manager',
+    icon:        '🏟️',
+    title:       'Venue',
+    badge:       'Host',
+    description: 'Host shows, manage stages, and support artists performing at your space.',
+    color:       '#DB2777', // Supporting Pink
+    benefits:    ['Stage check-in radar for your venue', 'Support resident & touring musicians'],
   },
 ] as const;
 
@@ -59,9 +72,16 @@ export default function PersonaPickerPage() {
   const [selected, setSelected] = useState<PersonaId | null>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'true') {
+      return;
+    }
     if (status === 'loading') return;
-    if (status === 'unauthenticated') router.replace('/auth');
-    if (status === 'unverified')      router.replace('/auth/verify-email');
+    if (status === 'unauthenticated') {
+      const cookie = getSessionCookie();
+      if (cookie?.uid) return; // wait for hydration
+      router.replace('/auth');
+      return;
+    }
   }, [status, router]);
 
   // Preselect from landing signup intent (?intent= or localStorage). User still confirms.
@@ -143,88 +163,22 @@ export default function PersonaPickerPage() {
         <div
           role="radiogroup"
           aria-label="Choose your persona"
-          style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+          style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
         >
-          {PERSONAS.map((p) => {
-            const isSelected = selected === p.id;
-            return (
-              <button
-                key={p.id}
-                role="radio"
-                aria-checked={isSelected}
-                onClick={() => setSelected(p.id)}
-                style={{
-                  display:      'flex',
-                  alignItems:   'center',
-                  gap:          16,
-                  padding:      '18px 22px',
-                  borderRadius: 18,
-                  border:       `1px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)'}`,
-                  background:   isSelected ? 'rgba(255, 255, 255, 0.08)' : '#161617',
-                  boxShadow:    isSelected
-                    ? '0 0 0 1px #FFFFFF, 0 8px 24px rgba(0, 0, 0, 0.4)'
-                    : '0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.06)',
-                  cursor:       'pointer',
-                  textAlign:    'left',
-                  width:        '100%',
-                  transition:   'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  outline:      'none',
-                }}
-                onMouseEnter={e => {
-                  if (!isSelected) (e.currentTarget as HTMLElement).style.background = '#1D1D1F';
-                }}
-                onMouseLeave={e => {
-                  if (!isSelected) (e.currentTarget as HTMLElement).style.background = '#161617';
-                }}
-              >
-                <span
-                  style={{
-                    fontSize:     26,
-                    width:        48,
-                    height:       48,
-                    display:      'flex',
-                    alignItems:   'center',
-                    justifyContent:'center',
-                    background:   'rgba(255, 255, 255, 0.06)',
-                    borderRadius: 14,
-                    flexShrink:   0,
-                  }}
-                  aria-hidden="true"
-                >
-                  {p.icon}
-                </span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'var(--cb-font-display)', fontSize: 16, fontWeight: 600, color: '#F5F5F7', marginBottom: 3, letterSpacing: '-0.016em' }}>
-                    {p.title}
-                  </div>
-                  <div style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: '#86868B', lineHeight: 1.45, letterSpacing: '-0.012em' }}>
-                    {p.description}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: '50%',
-                    border: `1.5px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'}`,
-                    backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    transition: 'all 0.15s ease',
-                  }}
-                  aria-hidden="true"
-                >
-                  {isSelected && (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 13L9 17L19 7" stroke="#000000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+          {PERSONAS.map((p) => (
+            <RoleCard
+              key={p.id}
+              roleId={p.id}
+              title={p.title}
+              badge={p.badge}
+              description={p.description}
+              icon={p.icon}
+              accentColor={p.color}
+              isSelected={selected === p.id}
+              onClick={() => setSelected(p.id)}
+              benefits={[...p.benefits]}
+            />
+          ))}
         </div>
 
         <div style={{ marginTop: 32 }}>

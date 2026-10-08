@@ -43,7 +43,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             // Logo
             const CbLogo(
               variant: CbLogoVariant.horizontal,
-              surface: CbLogoSurface.dark,
+              surface: CbLogoSurface.auto,
               height: 36,
             ),
             const SizedBox(height: CbSpacing.s6),
@@ -98,7 +98,12 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
       _email.text.trim(),
       _password.text,
     );
-    if (mounted) setState(() => _loading = false);
+    if (mounted) {
+      final authState = ref.read(authStateProvider);
+      if (authState.errorMessage != null) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override
@@ -194,7 +199,12 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
     }
     ref.read(authNotifierProvider.notifier).clearError();
     await ref.read(authNotifierProvider.notifier).register(_email.text.trim(), _pass.text);
-    if (mounted) setState(() => _loading = false);
+    if (mounted) {
+      final authState = ref.read(authStateProvider);
+      if (authState.errorMessage != null) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override

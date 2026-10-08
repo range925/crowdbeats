@@ -122,6 +122,7 @@ export function computeRouteGuard(
 
 function _toDashboardSlug(personaType: string): string {
   switch (personaType) {
+    case 'staff':         return 'admin/dashboard';
     case 'fan':           return 'fan';
     case 'artist':        return 'creator/dashboard';
     case 'venue_manager': return 'venue';

@@ -16,8 +16,9 @@
       "**/node_modules/**"
     ],
     "rewrites": [
+      { "source": "/auth/verify-email",           "destination": "/auth/verify-email.html" },
+      { "source": "/auth/forgot-password",        "destination": "/auth/forgot-password.html" },
       { "source": "/auth",                        "destination": "/auth.html" },
-      { "source": "/auth/**",                     "destination": "/auth.html" },
       { "source": "/onboarding/persona",          "destination": "/onboarding/persona.html" },
       { "source": "/onboarding/artist",           "destination": "/onboarding/artist.html" },
       { "source": "/onboarding/band",             "destination": "/onboarding/band.html" },

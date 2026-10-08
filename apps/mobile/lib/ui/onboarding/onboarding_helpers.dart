@@ -18,6 +18,7 @@ Future<void> completeOnboarding({
   required String displayName,
   Map<String, dynamic>? profileData,
   required void Function(String) onError,
+  bool navigateOnSuccess = true,
 }) async {
   final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
   // Connect to emulator
@@ -37,7 +38,9 @@ Future<void> completeOnboarding({
     await AuthService.instance.getIdTokenResult(forceRefresh: true);
     await ref.read(authNotifierProvider.notifier).reloadUser();
 
-    if (context.mounted) context.go('/$personaType');
+    if (navigateOnSuccess && context.mounted) {
+      context.go('/$personaType');
+    }
   } on FirebaseFunctionsException catch (e) {
     onError(e.message ?? 'Setup failed. Please try again.');
   } catch (_) {

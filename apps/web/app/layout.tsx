@@ -132,10 +132,17 @@ export default function RootLayout({ children }: Props) {
             __html: `
               (function() {
                 try {
-                  var resolved = 'light';
+                  var stored = localStorage.getItem('crowdbeats-theme-preference');
+                  var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                  var resolved = (stored === 'dark' || (!stored && darkQuery.matches) || (stored === 'system' && darkQuery.matches)) ? 'dark' : 'light';
                   document.documentElement.setAttribute('data-theme', resolved);
+                  document.documentElement.dataset.theme = resolved;
                   document.documentElement.style.colorScheme = resolved;
-                  document.documentElement.classList.remove('dark');
+                  if (resolved === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
                 } catch(e) {}
               })();
             `,

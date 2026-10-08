@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Crowdbeats V2 — Universal Onboarding Cloud Callables
  *
  * Implements server-authoritative draft persistence, race-safe handle reservation,
@@ -89,12 +89,22 @@ export const completeUniversalOnboarding = onCall<{
     if (!termsAcceptedVersion || !privacyAcceptedVersion) {
       throw new HttpsError('invalid-argument', 'Terms and Privacy Policy version acceptances are mandatory.');
     }
+    const userRef = _db().collection('users').doc(uid);
+    const existingSnap = await userRef.get?.();
+    if (existingSnap?.exists) {
+      const existingPersona = existingSnap.data?.()?.['personaType'];
+      if (existingPersona === 'fan' && primaryPersona !== 'fan') {
+        throw new HttpsError(
+          'failed-precondition',
+          'Fan accounts cannot switch to creator or performer roles. Please register a dedicated performer account.',
+        );
+      }
+    }
 
     const now = admin.firestore.FieldValue.serverTimestamp();
     const batch = _db().batch();
 
     // 1. Update Core User Document
-    const userRef = _db().collection('users').doc(uid);
     batch.set(
       userRef,
       {

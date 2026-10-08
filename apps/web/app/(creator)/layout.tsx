@@ -19,6 +19,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
+import { getSessionCookie } from '@/lib/session';
 
 const NAV_SECTIONS = [
   { label: 'Dashboard',     icon: '🏠', href: '/creator/dashboard' },
@@ -79,17 +80,27 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
     }
     if (status === 'loading') return; // keep waiting
 
+    const cookiePersona = getSessionPersona();
     if (status === 'unauthenticated') {
+      if (cookiePersona && ALLOWED_PERSONAS.has(cookiePersona)) {
+        // Session cookie exists for creator — give Firebase auth listener a moment to hydrate
+        return;
+      }
+      const cookie = getSessionCookie();
+      if (cookie?.uid) {
+        // Session cookie exists with uid — give Firebase auth a moment to hydrate
+        return;
+      }
       window.location.replace('/auth');
       return;
     }
 
     // Check React auth state first, then fall back to session cookie
-    const cookiePersona = getSessionPersona();
     const effectivePersona = personaType ?? cookiePersona;
     const allowed =
       (status === 'authenticated' && !!effectivePersona && ALLOWED_PERSONAS.has(effectivePersona)) ||
-      (status === 'unonboarded' && !!cookiePersona && ALLOWED_PERSONAS.has(cookiePersona));
+      (status === 'unonboarded' && !!cookiePersona && ALLOWED_PERSONAS.has(cookiePersona)) ||
+      (status === 'unverified' && !!cookiePersona && ALLOWED_PERSONAS.has(cookiePersona));
 
     setAccessDecision(allowed);
   }, [status, personaType, isDev]);

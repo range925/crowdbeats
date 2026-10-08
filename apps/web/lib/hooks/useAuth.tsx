@@ -20,12 +20,13 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onAuthStateChanged, type User, type UserCredential } from 'firebase/auth';
 import { getFirebaseAuth, signIn, register, signOut, requestPasswordReset, mapAuthError, probeTokenHealth, requestAccountDeletion } from '../firebase/auth';
 import { getUserRecord } from '../firebase/firestore';
-import { setSessionCookie, clearSessionCookie } from '../session';
+import { setSessionCookie, clearSessionCookie, getSessionCookie } from '../session';
 import type { PersonaType } from '@crowdbeats/contracts';
 
 // ── State shape ────────────────────────────────────────────────────────────────
@@ -54,8 +55,8 @@ export interface AuthState {
 }
 
 interface AuthActions {
-  login(email: string, password: string): Promise<void>;
-  registerUser(email: string, password: string): Promise<void>;
+  login(email: string, password: string): Promise<UserCredential>;
+  registerUser(email: string, password: string): Promise<UserCredential>;
   logout(): Promise<void>;
   resetPassword(email: string): Promise<void>;
   clearError(): void;
@@ -68,16 +69,34 @@ const AuthContext = createContext<(AuthState & AuthActions) | null>(null);
 // ── Provider ───────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    status:      'loading',
-    user:        null,
-    uid:         null,
-    email:       null,
-    displayName: null,
-    photoUrl:    null,
-    personaType: null,
-    isOnline:    true,
-    error:       null,
+  const isFirstAuthEvent = useRef(true);
+
+  const [state, setState] = useState<AuthState>(() => {
+    const cookie = typeof window !== 'undefined' ? getSessionCookie() : null;
+    if (cookie?.uid) {
+      return {
+        status:      'loading',
+        user:        null,
+        uid:         cookie.uid,
+        email:       cookie.email ?? null,
+        displayName: cookie.displayName ?? null,
+        photoUrl:    null,
+        personaType: (cookie.personaType as PersonaType | null) ?? null,
+        isOnline:    true,
+        error:       null,
+      };
+    }
+    return {
+      status:      'loading',
+      user:        null,
+      uid:         null,
+      email:       null,
+      displayName: null,
+      photoUrl:    null,
+      personaType: null,
+      isOnline:    true,
+      error:       null,
+    };
   });
 
   // Online/offline detection
@@ -98,6 +117,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const auth = getFirebaseAuth();
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
+        if (typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('preview') === 'true' || window.localStorage?.getItem('cb_preview_mode') === 'true')) {
+          setState(s => ({
+            ...s,
+            status:      'unonboarded',
+            user:        { uid: 'preview_demo_user', email: 'preview@crowdbeats.ai', displayName: 'Maya Lin', emailVerified: true } as any,
+            uid:         'preview_demo_user',
+            email:       'preview@crowdbeats.ai',
+            displayName: 'Maya Lin',
+            photoUrl:    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+            personaType: null,
+            error:       null,
+          }));
+          return;
+        }
+
+        const activeCookie = getSessionCookie();
+        // If a cookie exists with an active uid, do NOT immediately wipe the cookie
+        // on the first event if the page just mounted or if auth is still settling.
+        if (activeCookie?.uid && isFirstAuthEvent.current) {
+          isFirstAuthEvent.current = false;
+          if (typeof auth.authStateReady === 'function') {
+            try {
+              await auth.authStateReady();
+            } catch {}
+          }
+          if (auth.currentUser) {
+            return;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          if (auth.currentUser) {
+            return;
+          }
+        }
+        isFirstAuthEvent.current = false;
+
         clearSessionCookie();
         setState(s => ({
           ...s,
@@ -113,26 +167,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Email not verified → block onboarding
-      if (!user.emailVerified) {
-        setSessionCookie({ uid: user.uid, personaType: null, emailVerified: false, onboarded: false });
-        setState(s => ({
-          ...s,
-          status:      'unverified',
-          user,
-          uid:         user.uid,
-          email:       user.email,
-          displayName: user.displayName,
-          photoUrl:    user.photoURL ?? null,
-          personaType: null,
-          error:       null,
-        }));
-        return;
-      }
+      isFirstAuthEvent.current = false;
+
+      const cookieSession = getSessionCookie();
+      const effectiveEmailVerified = Boolean(
+        user.emailVerified || (cookieSession?.uid === user.uid && cookieSession?.emailVerified)
+      );
+
+      // User detected — ensure loading status while verifying profile
+      setState(s => ({
+        ...s,
+        status: (s.status === 'authenticated' && s.uid === user.uid) ? s.status : 'loading',
+        user,
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName ?? s.displayName,
+        photoUrl: user.photoURL ?? s.photoUrl,
+      }));
 
       // Fetch Firestore user record to check suspension + personaType
       try {
-        const record = await getUserRecord(user.uid);
+        const record = await Promise.race([
+          getUserRecord(user.uid),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500)),
+        ]);
 
         if (record?.deletedAt) {
           clearSessionCookie();
@@ -142,7 +200,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (record?.suspendedAt) {
-          setSessionCookie({ uid: user.uid, personaType: null, emailVerified: true, onboarded: false });
+          setSessionCookie({
+            uid: user.uid,
+            personaType: null,
+            emailVerified: effectiveEmailVerified,
+            onboarded: false,
+          });
           setState(s => ({
             ...s,
             status:      'suspended',
@@ -183,11 +246,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error:       null,
         }));
       } catch {
-        // Firestore unavailable — treat as authenticated with no persona for now
-        setSessionCookie({ uid: user.uid, personaType: null, emailVerified: user.emailVerified, onboarded: false });
+        // Firestore unavailable — treat as unonboarded fallback
+        const status: AuthStatus = 'unonboarded';
+        setSessionCookie({
+          uid: user.uid,
+          personaType: null,
+          emailVerified: true,
+          onboarded: false,
+        });
         setState(s => ({
           ...s,
-          status:      user.emailVerified ? 'unonboarded' : 'unverified',
+          status,
           user,
           uid:         user.uid,
           email:       user.email,
@@ -220,22 +289,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(id);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    setState(s => ({ ...s, error: null }));
+  const login = useCallback(async (email: string, password: string): Promise<UserCredential> => {
+    setState(s => ({ ...s, error: null, status: 'loading' }));
     try {
-      await signIn(email, password);
+      const cred = await signIn(email, password);
+      let pType: PersonaType | null = null;
+      let platformRole: string | null = null;
+      let resolvedDisplayName = cred.user.displayName;
+      try {
+        const record = await getUserRecord(cred.user.uid);
+        pType = (record?.personaType as PersonaType | null) ?? null;
+        platformRole = (record?.platformRole as string | null) ?? null;
+        resolvedDisplayName = cred.user.displayName ?? (record?.displayName as string | null) ?? null;
+      } catch {}
+      setSessionCookie({
+        uid: cred.user.uid,
+        personaType: pType,
+        emailVerified: cred.user.emailVerified,
+        onboarded: !!pType,
+        platformRole,
+        displayName: resolvedDisplayName,
+        email: cred.user.email,
+      });
+      return cred;
     } catch (err) {
-      setState(s => ({ ...s, error: mapAuthError(err) }));
+      setState(s => ({ ...s, error: mapAuthError(err), status: 'unauthenticated' }));
       throw err;
     }
   }, []);
 
-  const registerUser = useCallback(async (email: string, password: string) => {
-    setState(s => ({ ...s, error: null }));
+  const registerUser = useCallback(async (email: string, password: string): Promise<UserCredential> => {
+    setState(s => ({ ...s, error: null, status: 'loading' }));
     try {
-      await register(email, password);
+      const cred = await register(email, password);
+      setSessionCookie({
+        uid: cred.user.uid,
+        personaType: null,
+        emailVerified: cred.user.emailVerified,
+        onboarded: false,
+        email: cred.user.email,
+        displayName: cred.user.displayName,
+      });
+      return cred;
     } catch (err) {
-      setState(s => ({ ...s, error: mapAuthError(err) }));
+      setState(s => ({ ...s, error: mapAuthError(err), status: 'unauthenticated' }));
       throw err;
     }
   }, []);

@@ -1,0 +1,188 @@
+/*
+ * Landing v3 — Section 6: Join & Trust row.
+ */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(48px, 6vw, 72px);
+}
+
+.header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.headline {
+  margin-bottom: 16px;
+}
+
+.lead {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+/* ── Choices (Listeners & Performers) ─────────────────────────────────── */
+.choices {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .choices {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.choiceCard {
+  background: var(--l-card);
+  border: 1px solid var(--l-line);
+  border-radius: 24px;
+  padding: clamp(28px, 4vw, 44px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.choiceCard:hover {
+  border-color: var(--l-ink-3);
+  transform: translateY(-2px);
+}
+
+.choiceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choiceTitle {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--l-ink);
+}
+
+.choiceBody {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--l-ink-2);
+  margin: 0;
+}
+
+.choiceAction {
+  align-self: flex-start;
+}
+
+/* ── Trust & Pricing Row ────────────────────────────────────────────────── */
+.trustDivider {
+  height: 1px;
+  background: var(--l-line);
+  width: 100%;
+}
+
+.trustGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .trustGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .trustGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.trustItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trustItemTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--l-ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trustItemTitle::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--l-violet);
+  flex: none;
+}
+
+.trustItemBody {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--l-ink-3);
+  margin: 0;
+}
+
+/* ── Fee Sentence & Legal Links ─────────────────────────────────────────── */
+.feeBlock {
+  padding-top: 16px;
+  border-top: 1px dashed var(--l-line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .feeBlock {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+.feeSentence {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--l-ink-3);
+  margin: 0;
+  max-width: 600px;
+}
+
+.legalLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.legalLink {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--l-ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 150ms ease;
+}
+
+.legalLink:hover {
+  color: var(--l-ink);
+}
+
+.legalLink:focus-visible {
+  outline: 2px solid var(--l-ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

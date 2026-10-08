@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase/app';
+import { getUserRecord } from '@/lib/firebase/firestore';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { AdminBreadcrumb, GlobalEntitySearch } from '@/components/admin';
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
@@ -270,13 +271,26 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
           setChecking(false);
           return;
         }
-        router.replace('/auth?return=/admin/command-center');
+        clearSessionCookie();
+        const returnPath = pathname || '/admin/command-center';
+        router.replace(`/auth?return=${encodeURIComponent(returnPath)}`);
         return;
       }
 
       try {
-        const tokenResult = await currentUser.getIdTokenResult();
-        const role = (tokenResult.claims.platformRole as string) || (tokenResult.claims.role as string);
+        const tokenResult = await currentUser.getIdTokenResult(true);
+        let role = (tokenResult.claims.platformRole as string) || (tokenResult.claims.role as string);
+
+        if (!role || !VALID_STAFF_ROLES.has(role)) {
+          try {
+            const userDoc = await getUserRecord(currentUser.uid);
+            if (userDoc?.platformRole && VALID_STAFF_ROLES.has(userDoc.platformRole as string)) {
+              role = userDoc.platformRole as string;
+            } else if (userDoc?.personaType === 'admin') {
+              role = 'SUPER_ADMIN';
+            }
+          } catch {}
+        }
 
         if (role && VALID_STAFF_ROLES.has(role)) {
           setSession({
@@ -286,17 +300,15 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
           });
           setChecking(false);
         } else {
-          const s = getSessionCookie();
-          if (s && s.platformRole && VALID_STAFF_ROLES.has(s.platformRole)) {
-            setSession(s);
-            setChecking(false);
-          } else {
-            router.replace('/auth?return=/admin/command-center');
-          }
+          clearSessionCookie();
+          const returnPath = pathname || '/admin/command-center';
+          router.replace(`/auth?return=${encodeURIComponent(returnPath)}`);
         }
       } catch (err) {
         console.error('Failed to verify staff claims on token:', err);
-        router.replace('/auth?return=/admin/command-center');
+        clearSessionCookie();
+        const returnPath = pathname || '/admin/command-center';
+        router.replace(`/auth?return=${encodeURIComponent(returnPath)}`);
       }
     });
 
@@ -304,7 +316,7 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
       isMounted = false;
       unsubscribe();
     };
-  }, [router]);
+  }, [router, pathname]);
 
   const handleSignOut = useCallback(async () => {
     setSigningOut(true);

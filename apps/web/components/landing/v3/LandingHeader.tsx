@@ -13,21 +13,23 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLanding } from './LandingContext';
 import { trapTab, useBodyScrollLock } from './RoleChooser';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import { useAuth } from '@/lib/hooks/useAuth';
 import l from './landing.module.css';
 import s from './header.module.css';
 
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 
 const MUSICIAN_ITEMS = [
-  { href: '#solo-musicians', title: 'Solo musicians', desc: 'Your profile, QR tips, payouts' },
-  { href: '#bands', title: 'Bands', desc: 'One identity for your band' },
+  { href: '#tile-solo-musicians', title: 'Solo musicians', desc: 'Your profile, QR tips, payouts' },
+  { href: '#tile-bands', title: 'Bands', desc: 'One identity for your band' },
 ];
 
 const MENU_ID = 'cb-musicians-menu';
 const DRAWER_ID = 'cb-mobile-drawer';
 
-function Logo() {
-  return <CrowdbeatsLogo variant="horizontal" height={26} surface="light" priority ariaHidden />;
+function Logo({ surface = 'auto' }: { surface?: 'light' | 'dark' | 'auto' }) {
+  return <CrowdbeatsLogo variant="horizontal" height={26} surface={surface} priority ariaHidden />;
 }
 
 function Chevron() {
@@ -38,8 +40,19 @@ function Chevron() {
   );
 }
 
+function useOptionalAuth() {
+  try {
+    return useAuth();
+  } catch {
+    return null;
+  }
+}
+
 export function LandingHeader() {
   const { openRoleChooser } = useLanding();
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const auth = useOptionalAuth();
+  const isDark = resolvedTheme === 'dark';
 
   /* ── Desktop dropdown ─────────────────────────────────────────────────── */
   const [menuOpen, setMenuOpen] = useState(false);
@@ -160,13 +173,15 @@ export function LandingHeader() {
     openRoleChooser('all', burgerRef.current);
   };
 
+  const themeToggleLabel = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+
   return (
     <>
       <div className={s.spacer} aria-hidden="true" />
       <header id="cb-header" className={s.header}>
         <div className={s.inner}>
           <Link href="/" className={s.brand} aria-label="Crowdbeats home">
-            <Logo />
+            <Logo surface={isDark ? 'dark' : 'light'} />
           </Link>
 
           <nav className={s.nav} aria-label="Primary">
@@ -177,12 +192,12 @@ export function LandingHeader() {
                 </a>
               </li>
               <li className={s.navItem}>
-                <a href="#for-fans" className={s.navLink}>
+                <a href="#tile-fans" className={s.navLink}>
                   For Fans
                 </a>
               </li>
               <li ref={menuWrapRef} className={`${s.navItem} ${s.hasMenu}`} onBlur={onMenuWrapBlur}>
-                <a href="#for-musicians" className={s.navLink} onClick={() => setMenuOpen(false)}>
+                <a href="#tile-solo-musicians" className={s.navLink} onClick={() => setMenuOpen(false)}>
                   For Musicians
                 </a>
                 <button
@@ -219,7 +234,7 @@ export function LandingHeader() {
                 </div>
               </li>
               <li className={s.navItem}>
-                <a href="#how-it-works" className={s.navLink}>
+                <a href="#connection" className={s.navLink}>
                   How It Works
                 </a>
               </li>
@@ -227,9 +242,52 @@ export function LandingHeader() {
           </nav>
 
           <div className={s.actions}>
-            <Link href="/auth" className={s.signIn}>
-              Sign In
-            </Link>
+            <button
+              type="button"
+              className={s.themeToggle}
+              onClick={toggleTheme}
+              aria-label={themeToggleLabel}
+              title={themeToggleLabel}
+            >
+              {isDark ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+
+            {auth?.user || auth?.uid ? (
+              <div className={s.userNav}>
+                <Link href="/account" className={s.signIn}>
+                  {auth.displayName || 'Dashboard'}
+                </Link>
+                <button
+                  type="button"
+                  className={s.signOutBtn}
+                  onClick={() => auth.logout()}
+                  aria-label="Sign out"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <Link href="/auth" className={s.signIn}>
+                Sign In
+              </Link>
+            )}
+
             <button
               type="button"
               className={`${l.btn} ${s.join}`}
@@ -269,19 +327,46 @@ export function LandingHeader() {
         </h2>
         <div className={s.drawerTop}>
           <Link href="/" className={s.brand} aria-label="Crowdbeats home" onClick={onDrawerLinkClick}>
-            <Logo />
+            <Logo surface={isDark ? 'dark' : 'light'} />
           </Link>
-          <button
-            ref={drawerCloseRef}
-            type="button"
-            className={s.burger}
-            aria-label="Close menu"
-            onClick={() => closeDrawer(true)}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
+          <div className={s.drawerTopActions}>
+            <button
+              type="button"
+              className={s.themeToggle}
+              onClick={toggleTheme}
+              aria-label={themeToggleLabel}
+              title={themeToggleLabel}
+            >
+              {isDark ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            <button
+              ref={drawerCloseRef}
+              type="button"
+              className={s.burger}
+              aria-label="Close menu"
+              onClick={() => closeDrawer(true)}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
         </div>
         <nav aria-label="Mobile" className={s.drawerNav}>
           <ul className={s.drawerList}>
@@ -291,12 +376,12 @@ export function LandingHeader() {
               </a>
             </li>
             <li>
-              <a href="#for-fans" className={s.drawerLink} onClick={onDrawerLinkClick}>
+              <a href="#tile-fans" className={s.drawerLink} onClick={onDrawerLinkClick}>
                 For Fans
               </a>
             </li>
             <li>
-              <a href="#for-musicians" className={s.drawerLink} onClick={onDrawerLinkClick}>
+              <a href="#tile-solo-musicians" className={s.drawerLink} onClick={onDrawerLinkClick}>
                 For Musicians
               </a>
               <ul className={s.drawerSubList}>
@@ -311,7 +396,7 @@ export function LandingHeader() {
               </ul>
             </li>
             <li>
-              <a href="#how-it-works" className={s.drawerLink} onClick={onDrawerLinkClick}>
+              <a href="#connection" className={s.drawerLink} onClick={onDrawerLinkClick}>
                 How It Works
               </a>
             </li>
@@ -321,9 +406,27 @@ export function LandingHeader() {
           <button type="button" className={`${l.btn} ${s.drawerBtn}`} onClick={onDrawerJoin}>
             Join Crowdbeats
           </button>
-          <Link href="/auth" className={`${l.btnSecondary} ${s.drawerBtn}`} onClick={onDrawerLinkClick}>
-            Sign In
-          </Link>
+          {auth?.user || auth?.uid ? (
+            <>
+              <Link href="/account" className={`${l.btnSecondary} ${s.drawerBtn}`} onClick={onDrawerLinkClick}>
+                {auth.displayName ? `Dashboard (${auth.displayName})` : 'Dashboard'}
+              </Link>
+              <button
+                type="button"
+                className={`${l.btnSecondary} ${s.drawerBtn}`}
+                onClick={() => {
+                  closeDrawer(false);
+                  auth.logout();
+                }}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link href="/auth" className={`${l.btnSecondary} ${s.drawerBtn}`} onClick={onDrawerLinkClick}>
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </>

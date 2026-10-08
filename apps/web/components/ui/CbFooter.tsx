@@ -60,9 +60,9 @@ export const CbFooter: React.FC = () => {
       links: [
         { label: 'Live Concert Discovery', href: '/' },
         { label: '🎭 Persona Previews (5 Roles)', href: '/preview', highlight: true },
-        { label: 'Nearby Music Stages', href: '/#discovery-stage' },
-        { label: 'Featured Solo Artists', href: '/#artist-story' },
-        { label: 'Live Stages & Venues', href: '/#discovery-stage' },
+        { label: 'Nearby Music Stages', href: '/#discover' },
+        { label: 'Featured Solo Artists', href: '/#carousel' },
+        { label: 'Live Stages & Venues', href: '/#discover' },
       ],
     },
     {

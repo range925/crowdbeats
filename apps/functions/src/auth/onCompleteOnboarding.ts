@@ -73,6 +73,19 @@ export const onCompleteOnboarding = onCall<OnboardingRequest>(
     const db = admin.firestore();
     const now = admin.firestore.FieldValue.serverTimestamp();
 
+    // Prevent existing fan accounts from switching to creator roles
+    const userDocRef = db.collection('users').doc(uid);
+    const existingSnap = await userDocRef.get?.();
+    if (existingSnap?.exists) {
+      const existingPersona = existingSnap.data?.()?.['personaType'];
+      if (existingPersona === 'fan' && personaType !== 'fan') {
+        throw new https.HttpsError(
+          'failed-precondition',
+          'Fan accounts cannot switch to creator or performer roles. Please register a dedicated performer account.',
+        );
+      }
+    }
+
     // Set custom claim (server-authoritative)
     await admin.auth().setCustomUserClaims(uid, {
       personaType,

@@ -5,13 +5,92 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../ui/theme/cb_colors.dart';
 import '../../ui/theme/cb_spacing.dart';
+import '../components/onboarding_shared_components.dart';
+
+class PersonaOption {
+  final String id;
+  final String title;
+  final String? badge;
+  final String desc;
+  final String iconEmoji;
+  final Color accentColor;
+  final List<String> benefits;
+
+  const PersonaOption({
+    required this.id,
+    required this.title,
+    this.badge,
+    required this.desc,
+    required this.iconEmoji,
+    required this.accentColor,
+    required this.benefits,
+  });
+}
 
 const _personas = [
-  (id: 'fan',           icon: '❤️',  title: 'Fan',          desc: 'Discover artists, send tips, follow shows.'),
-  (id: 'artist',        icon: '🎤',  title: 'Artist (Solo)', desc: 'Receive tips, manage profile, grow fanbase.'),
-  (id: 'band',          icon: '🎸',  title: 'Band / Group',  desc: 'Create a band, split tips, manage members.'),
-  (id: 'venue',         icon: '🏟️', title: 'Venue',         desc: 'Host shows, manage stages, support artists.'),
-  (id: 'sponsor',       icon: '💼',  title: 'Sponsor / Brand', desc: 'Discover talent, sponsor shows, track ROI.'),
+  PersonaOption(
+    id: 'fan',
+    title: 'Fan & Listener',
+    badge: 'POPULAR',
+    desc: 'Discover live street performers, tip local talent, and follow your favorites.',
+    iconEmoji: '❤️',
+    accentColor: CbColors.brandPrimary,
+    benefits: [
+      'Instant cashless tipping with verified receipts',
+      'Follow solo artists and bands near you',
+      'Personalized live music discovery stream',
+    ],
+  ),
+  PersonaOption(
+    id: 'artist',
+    title: 'Solo Musician',
+    badge: 'CREATOR',
+    desc: 'Receive direct tips, grow your local fanbase, and broadcast live performance locations.',
+    iconEmoji: '🎤',
+    accentColor: CbColors.creatorAmber,
+    benefits: [
+      'Personal stage QR code for immediate tipping',
+      '6% transparent tech fee with secure Stripe payouts',
+      'Broadcast live street performance pins',
+    ],
+  ),
+  PersonaOption(
+    id: 'band',
+    title: 'Band / Group',
+    badge: 'COLLABORATIVE',
+    desc: 'Create a shared band profile, automate tip splits, and manage musician rosters.',
+    iconEmoji: '🎸',
+    accentColor: CbColors.communityBlue,
+    benefits: [
+      'Automated multi-member tip splits (exact 100% distribution)',
+      'Unified group stage QR code',
+      'Member invitation & role-based management',
+    ],
+  ),
+  PersonaOption(
+    id: 'venue',
+    title: 'Venue / Stage',
+    badge: 'PARTNER',
+    desc: 'Host shows, manage stages, boost foot traffic, and support local talent.',
+    iconEmoji: '🏟️',
+    accentColor: CbColors.discoveryCyan,
+    benefits: [
+      'Official verified stage check-ins',
+      'Schedule lineups and attract local crowds',
+    ],
+  ),
+  PersonaOption(
+    id: 'sponsor',
+    title: 'Sponsor / Brand',
+    badge: 'BUSINESS',
+    desc: 'Discover grassroots talent, sponsor community shows, and track engagement.',
+    iconEmoji: '💼',
+    accentColor: CbColors.expressivePink,
+    benefits: [
+      'Fund grassroots musical activations',
+      'Verified performance analytics & brand reach',
+    ],
+  ),
 ];
 
 class PersonaPickerScreen extends StatefulWidget {
@@ -22,68 +101,84 @@ class PersonaPickerScreen extends StatefulWidget {
 }
 
 class _PersonaPickerScreenState extends State<PersonaPickerScreen> {
-  String? _selected;
+  String? _selected = 'fan';
 
   @override
   Widget build(BuildContext context) {
+    final selectedPersona = _personas.firstWhere(
+      (p) => p.id == _selected,
+      orElse: () => _personas.first,
+    );
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Choose your role')),
+      backgroundColor: CbColors.darkCanvas,
+      appBar: AppBar(
+        title: const Text('Choose your journey'),
+        backgroundColor: CbColors.darkCanvas,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'How will you experience Crowdbeats?',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Select the role that best fits your immediate goal. Joining is free for all personas.',
+                    style: TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(CbSpacing.s5),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 itemCount: _personas.length,
-                separatorBuilder: (_, _) => const SizedBox(height: CbSpacing.s3),
                 itemBuilder: (context, i) {
                   final p = _personas[i];
-                  final sel = _selected == p.id;
-                  return InkWell(
+                  final isSel = _selected == p.id;
+                  return RoleCard(
+                    roleId: p.id,
+                    title: p.title,
+                    badge: p.badge,
+                    description: p.desc,
+                    icon: Text(p.iconEmoji, style: const TextStyle(fontSize: 22)),
+                    accentColor: p.accentColor,
+                    isSelected: isSel,
+                    benefits: p.benefits,
                     onTap: () => setState(() => _selected = p.id),
-                    borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
-                    child: Container(
-                      padding: const EdgeInsets.all(CbSpacing.s4),
-                      decoration: BoxDecoration(
-                        color: sel ? CbColors.accentPrimary.withAlpha(20) : CbColors.surfaceCard,
-                        borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
-                        border: Border.all(
-                          color: sel ? CbColors.accentPrimary : CbColors.borderSubtle,
-                          width: sel ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(children: [
-                        Container(
-                          width: 48, height: 48,
-                          decoration: BoxDecoration(
-                            color: CbColors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(CbSpacing.radiusSm),
-                          ),
-                          child: Center(child: Text(p.icon, style: const TextStyle(fontSize: 24))),
-                        ),
-                        const SizedBox(width: CbSpacing.s4),
-                        Expanded(child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(p.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                            const SizedBox(height: 2),
-                            Text(p.desc, style: const TextStyle(fontSize: 12, color: CbColors.textSecondary, height: 1.4)),
-                          ],
-                        )),
-                        if (sel) const Icon(Icons.check_circle, color: CbColors.accentPrimary),
-                      ]),
-                    ),
                   );
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(CbSpacing.s5),
-              child: FilledButton(
-                onPressed: _selected == null ? null : () => context.push('/onboarding/$_selected'),
-                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                child: const Text('Continue →'),
-              ),
+            StickyActionBar(
+              primaryLabel: _selected != null
+                  ? 'Continue as ${selectedPersona.title} →'
+                  : 'Select a persona to continue',
+              primaryDisabled: _selected == null,
+              accentColor: selectedPersona.accentColor,
+              onPrimary: () {
+                if (_selected != null) {
+                  context.push('/onboarding/$_selected');
+                }
+              },
+              disclaimer: 'Joining is free. Roles can be expanded later without losing your history.',
             ),
           ],
         ),

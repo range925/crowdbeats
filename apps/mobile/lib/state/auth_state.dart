@@ -139,10 +139,6 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
       return const CbAuthState(status: CbAuthStatus.unauthenticated);
     }
 
-    if (!user.emailVerified) {
-      return CbAuthState(status: CbAuthStatus.unverified, user: user);
-    }
-
     try {
       final record = await FirestoreService.instance.getUserRecord(user.uid);
 
@@ -167,7 +163,7 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
     } catch (_) {
       // Firestore unavailable — optimistic fallback
       return CbAuthState(
-        status:      user.emailVerified ? CbAuthStatus.authenticated : CbAuthStatus.unverified,
+        status:      CbAuthStatus.authenticated,
         user:        user,
       );
     }

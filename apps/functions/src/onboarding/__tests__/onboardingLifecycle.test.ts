@@ -1,8 +1,8 @@
-﻿import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 const mockSet = jest.fn().mockResolvedValue({} as never);
 const mockDelete = jest.fn().mockResolvedValue({} as never);
-const mockGet = jest.fn();
+const mockGet = jest.fn().mockResolvedValue({ exists: false, data: () => ({}) } as never);
 const mockAdd = jest.fn().mockResolvedValue({ id: 'audit_onboarding_1' } as never);
 const mockCommit = jest.fn().mockResolvedValue({} as never);
 
@@ -123,4 +123,24 @@ describe('Universal Onboarding Lifecycle & State Machine Callables', () => {
       }),
     ).rejects.toThrow('Terms and Privacy Policy version acceptances are mandatory');
   });
+
+  it('rejects attempt by existing fan account to switch to creator role', async () => {
+    mockGet.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ personaType: 'fan' }),
+    } as never);
+
+    await expect(
+      (completeUniversalOnboarding as any).run({
+        auth: { uid: 'fan_user_1' },
+        data: {
+          primaryPersona: 'artist',
+          displayName: 'Attempted Solo Artist',
+          termsAcceptedVersion: '2026-08-25',
+          privacyAcceptedVersion: '2026-08-25',
+        },
+      }),
+    ).rejects.toThrow('Fan accounts cannot switch to creator or performer roles');
+  });
 });
+

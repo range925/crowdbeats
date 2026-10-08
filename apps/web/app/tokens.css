@@ -54,6 +54,16 @@
   --cb-rank-bronze:       #92400E;
   --cb-error-red:         #DC2626;
 
+  /* ── Crowdbeats Onboarding Semantic Palette Tokens ───────────────────────── */
+  --cb-brand-primary:      #7C3AED;   /* Violet */
+  --cb-discovery-cyan:     #0891B2;   /* Cyan */
+  --cb-creator-amber:      #D97706;   /* Amber */
+  --cb-community-blue:     #2563EB;   /* Blue */
+  --cb-expressive-pink:    #DB2777;   /* Pink */
+  --cb-light-canvas:       #F7F8FC;   /* Light canvas */
+  --cb-dark-canvas:        #101218;   /* Dark canvas */
+  --cb-dark-card:          #1B1E28;   /* Dark card */
+
   /* ── Apple Typography Tokens (Crisp High-Contrast Dark on Light) ───────── */
   --cb-text-primary:      #1D1D1F;   /* Apple Pro dark typography */
   --cb-text-secondary:    #6E6E73;   /* Apple secondary gray */
@@ -161,6 +171,16 @@ body[data-theme="dark"] {
   --cb-rank-silver:       #98989D;
   --cb-rank-bronze:       #AC8E68;
   --cb-error-red:         #FF453A;
+
+  /* ── Crowdbeats Onboarding Semantic Palette Tokens ───────────────────────── */
+  --cb-brand-primary:      #7C3AED;   /* Violet */
+  --cb-discovery-cyan:     #0891B2;   /* Cyan */
+  --cb-creator-amber:      #D97706;   /* Amber */
+  --cb-community-blue:     #2563EB;   /* Blue */
+  --cb-expressive-pink:    #DB2777;   /* Pink */
+  --cb-light-canvas:       #F7F8FC;   /* Light canvas */
+  --cb-dark-canvas:        #101218;   /* Dark canvas */
+  --cb-dark-card:          #1B1E28;   /* Dark card */
 
   /* ── Apple Typography Tokens (Crisp High-Contrast) ─────────────────────── */
   --cb-text-primary:      #F5F5F7;   /* Apple off-white (prevents harsh glare, AAA contrast) */

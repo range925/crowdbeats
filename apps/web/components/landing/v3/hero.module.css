@@ -1,0 +1,192 @@
+/*
+ * Landing v3 — Hero (Frontend A). Always-dark surface; see FOUNDATION.md §3/§6.
+ * Desktop: full-bleed 16:9 photo, left headline zone over a left→right scrim.
+ * Mobile: dedicated 4:5 crop on top, text block pulled over its dark lower third.
+ */
+
+section.hero {
+  /* override shared .section vertical padding — the hero manages its own */
+  padding-block: 0;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0a0a0b;
+  color: var(--l-ink);
+}
+
+/* ── Media ──────────────────────────────────────────────────────────────── */
+.media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  max-height: 64svh;
+  min-height: 300px;
+  overflow: hidden;
+  background: #141416; /* neutral dark frame until / unless the asset loads */
+}
+
+.media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  color: transparent; /* hide alt-text flash while decoding */
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* bottom scrim so the pulled-up copy always sits on near-black */
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 11, 0) 0%,
+    rgba(10, 10, 11, 0) 42%,
+    rgba(10, 10, 11, 0.55) 68%,
+    rgba(10, 10, 11, 0.92) 88%,
+    #0a0a0b 100%
+  );
+}
+
+/* ── Copy ───────────────────────────────────────────────────────────────── */
+.inner {
+  position: relative;
+  z-index: 1;
+  margin-top: -112px;
+  padding-bottom: clamp(48px, 8vw, 64px);
+}
+
+.copy {
+  max-width: 640px;
+}
+
+.eyebrow {
+  color: #c7c7cc;
+  margin-bottom: 14px;
+}
+
+.title {
+  color: #ffffff;
+  text-shadow: 0 1px 24px rgba(0, 0, 0, 0.35);
+}
+
+.titleBreak {
+  display: inline;
+}
+
+.lead {
+  margin-top: 16px;
+  color: #e5e5ea;
+  max-width: 34em;
+}
+
+.ctas {
+  margin-top: 28px;
+}
+
+.cta {
+  flex: 1 1 100%;
+}
+
+.ctaSecondary {
+  background-color: rgba(10, 10, 11, 0.5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.reassure {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #c7c7cc;
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .cta {
+    flex: 0 0 auto;
+  }
+}
+
+/* ── Desktop / tablet ───────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  section.hero {
+    display: flex;
+    align-items: center;
+    min-height: min(88vh, 860px);
+  }
+
+  .media {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    max-height: none;
+    min-height: 0;
+    z-index: -1;
+  }
+
+  .img {
+    /* subject sits right-of-centre in the 16:9 master */
+    object-position: 70% 40%;
+  }
+
+  .scrim {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.78) 0%,
+        rgba(0, 0, 0, 0.66) 30%,
+        rgba(0, 0, 0, 0.3) 52%,
+        rgba(0, 0, 0, 0) 72%
+      ),
+      linear-gradient(180deg, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.45) 100%);
+  }
+
+  .inner {
+    margin-top: 0;
+    padding-block: clamp(96px, 12vh, 140px) clamp(72px, 10vh, 112px);
+  }
+
+  .copy {
+    max-width: min(640px, 56%);
+  }
+
+  .titleBreak {
+    display: block;
+  }
+
+  .cta {
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .copy {
+    max-width: 70%;
+  }
+
+  .scrim {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.82) 0%,
+        rgba(0, 0, 0, 0.7) 45%,
+        rgba(0, 0, 0, 0.25) 75%,
+        rgba(0, 0, 0, 0.1) 100%
+      ),
+      linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.5) 100%);
+  }
+}
+
+/* Focus ring must read on the photo */
+.hero a:focus-visible,
+.hero button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}

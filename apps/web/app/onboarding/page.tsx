@@ -15,11 +15,13 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { recordConsent } from '@/lib/firebase/firestore';
 import { CbButton } from '@/components/ui/Button';
+import { getPersonaDashboard } from '@/app/auth/page';
+import { getSessionCookie } from '@/lib/session';
 
 const CONSENT_VERSION = '2026-08-25';
 
 export default function ConsentPage() {
-  const { status, uid } = useAuth();
+  const { status, uid, personaType } = useAuth();
   const router = useRouter();
   const [tosChecked, setTosChecked] = useState(false);
   const [ppChecked,  setPpChecked]  = useState(false);
@@ -28,12 +30,18 @@ export default function ConsentPage() {
 
   useEffect(() => {
     if (status === 'loading') return;
-    if (status === 'unverified')      router.replace('/auth/verify-email');
-    if (status === 'unauthenticated') router.replace('/auth');
-    // 'unonboarded' = verified but no persona yet → stay here (this is the right place)
+    if (status === 'unauthenticated') {
+      const cookie = getSessionCookie();
+      if (cookie?.uid) return; // session cookie exists, wait for Firebase Auth hydration
+      router.replace('/auth');
+      return;
+    }
+    // 'unonboarded' = no persona chosen yet → stay here (this is the right place)
     // 'authenticated' = already fully onboarded → send to their dashboard
-    if (status === 'authenticated')   router.replace('/fan');
-  }, [status, router]);
+    if (status === 'authenticated') {
+      router.replace(getPersonaDashboard(personaType));
+    }
+  }, [status, personaType, router]);
 
   const canProceed = tosChecked && ppChecked;
 

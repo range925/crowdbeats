@@ -41,8 +41,6 @@ class _MockHttpClient implements HttpClient {
   String? userAgent;
 
   @override
-  void addAuthenticate(Uri url, String realm, HttpClientCredentials credentials) {}
-  @override
   void addCredentials(Uri url, String realm, HttpClientCredentials credentials) {}
   @override
   void close({bool force = false}) {}

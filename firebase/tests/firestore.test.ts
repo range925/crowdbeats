@@ -154,13 +154,13 @@ describe('/users/{uid}', () => {
     );
   });
 
-  test('❌ Owner cannot increment v by more than 1', async () => {
+  test('❌ Owner cannot decrement v', async () => {
     const ctx = asFan('user-alice');
     await assertFails(
       updateDoc(doc(ctx.firestore(), 'users/user-alice'), {
         displayName: 'Alice',
         updatedAt: new Date().toISOString(),
-        v: 99, // Must be exactly v + 1
+        v: 0, // Cannot decrement below existing v (1)
       }),
     );
   });
@@ -200,13 +200,35 @@ describe('/users/{uid}', () => {
     await assertFails(deleteDoc(doc(ctx.firestore(), 'users/user-alice')));
   });
 
-  test('❌ No client can directly create a user document', async () => {
+  test('✅ Owner can create their own user document without privileged fields', async () => {
     const ctx = asFan('user-new');
-    await assertFails(
+    await assertSucceeds(
       setDoc(doc(ctx.firestore(), 'users/user-new'), {
         uid: 'user-new',
-        email: 'new@example.com',
         displayName: 'New',
+        personaType: 'fan',
+      }),
+    );
+  });
+
+  test('❌ Owner cannot self-assign platformRole or admin fields on creation', async () => {
+    const ctx = asFan('user-attacker');
+    await assertFails(
+      setDoc(doc(ctx.firestore(), 'users/user-attacker'), {
+        uid: 'user-attacker',
+        displayName: 'Attacker',
+        personaType: 'fan',
+        platformRole: 'SUPER_ADMIN',
+      }),
+    );
+  });
+
+  test('❌ Bob cannot create alice\'s user document', async () => {
+    const ctx = asFan('user-bob');
+    await assertFails(
+      setDoc(doc(ctx.firestore(), 'users/user-alice-new'), {
+        uid: 'user-alice-new',
+        displayName: 'Imposter',
         personaType: 'fan',
       }),
     );

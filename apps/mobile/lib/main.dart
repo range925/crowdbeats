@@ -120,15 +120,6 @@ GoRouter _buildRouter(Ref ref) {
           loc == '/preview' ||
           loc.startsWith('/preview') ||
           loc == '/gallery' ||
-          loc == '/artist' ||
-          loc == '/musician' ||
-          loc == '/creator' ||
-          loc.startsWith('/creator') ||
-          loc == '/band' ||
-          loc == '/band_member' ||
-          loc == '/sponsor' ||
-          loc == '/sponsor_rep' ||
-          loc.startsWith('/sponsor') ||
           loc == '/legal' ||
           loc == '/terms' ||
           loc == '/privacy' ||
@@ -145,9 +136,20 @@ GoRouter _buildRouter(Ref ref) {
           return loc == '/splash' ? null : null; // Allow unauthenticated browsing immediately
         case CbAuthStatus.unauthenticated:
           if (loc.startsWith('/auth') || loc == '/splash') return null;
-          // Protect account and creator management dashboards
-          if (loc.startsWith('/account') || loc == '/artist' || loc == '/band_member') {
-            return '/auth';
+          // Protect account and creator/sponsor management dashboards
+          if (loc.startsWith('/account') ||
+              loc == '/artist' ||
+              loc == '/musician' ||
+              loc == '/creator' ||
+              loc.startsWith('/creator') ||
+              loc == '/band' ||
+              loc == '/band_member' ||
+              loc == '/venue_manager' ||
+              loc == '/sponsor' ||
+              loc == '/sponsor_rep' ||
+              loc.startsWith('/sponsor')) {
+            final targetUri = state.uri.toString();
+            return '/auth?from=${Uri.encodeComponent(targetUri)}';
           }
           return null; // Default: allow public exploration
         case CbAuthStatus.unverified:
@@ -167,10 +169,10 @@ GoRouter _buildRouter(Ref ref) {
         case CbAuthStatus.authenticated:
           // Allow account settings hub and subroutes
           if (loc.startsWith('/account')) return null;
-          // Redirect to persona dashboard if on auth/splash/onboarding
+          // Redirect to persona dashboard or return destination if on auth/splash/onboarding
           if (loc.startsWith('/auth') || loc == '/splash' || loc.startsWith('/onboarding')) {
             final from = state.uri.queryParameters['from'];
-            if (from != null && from.isNotEmpty) {
+            if (from != null && from.isNotEmpty && from.startsWith('/') && !from.startsWith('/auth')) {
               return from;
             }
             return '/${authState.personaType ?? "fan"}';

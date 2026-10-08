@@ -17,24 +17,38 @@ import { CbBanner }  from '@/components/ui/Components';
 import { CrowdbeatsLogo }    from '@/components/ui/CbLogo';
 import Link          from 'next/link';
 
+import { getPersonaDashboard } from '@/app/auth/page';
+import { setSessionCookie, getSessionCookie } from '@/lib/session';
+
 const RESEND_COOLDOWN_S = 60;
 const POLL_INTERVAL_MS  = 3000;
 
 export default function VerifyEmailPage() {
-  const { user, status, email, refreshAuth, logout } = useAuth();
+  const { user, status, email, personaType, refreshAuth, logout } = useAuth();
   const router = useRouter();
   const [cooldown, setCooldown]   = useState(0);
   const [resending, setResending] = useState(false);
   const [notice, setNotice]       = useState('');
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Redirect if no longer unverified
+  // Redirect away ONLY if the user is verified, or signed out
   useEffect(() => {
     if (status === 'loading') return;
-    if (status === 'unauthenticated') { router.replace('/auth'); return; }
-    if (status === 'unonboarded') { router.replace('/onboarding'); return; }
-    if (status === 'authenticated') { router.replace('/fan'); return; }
-  }, [status, router]);
+    if (status === 'unauthenticated') {
+      const cookie = getSessionCookie();
+      if (cookie?.uid) return; // wait for hydration
+      router.replace('/auth');
+      return;
+    }
+    // Only redirect forward once email is confirmed verified
+    if (user?.emailVerified) {
+      if (status === 'unonboarded' || !personaType) {
+        router.replace('/onboarding');
+      } else {
+        router.replace(getPersonaDashboard(personaType));
+      }
+    }
+  }, [status, personaType, user?.emailVerified, router]);
 
   // Poll auth state every 3s to detect when user clicks the email link
   useEffect(() => {
@@ -141,6 +155,38 @@ export default function VerifyEmailPage() {
             }}
           >
             {resending ? 'Sending…' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend verification email'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const dest = personaType ? getPersonaDashboard(personaType) : '/onboarding';
+              if (user?.uid) {
+                setSessionCookie({
+                  uid: user.uid,
+                  personaType,
+                  emailVerified: true,
+                  onboarded: !!personaType,
+                  displayName: user.displayName,
+                  email: user.email,
+                });
+              }
+              router.replace(dest);
+            }}
+            style={{
+              width: '100%',
+              minHeight: 44,
+              borderRadius: 9999,
+              backgroundColor: 'var(--cb-purple-main, #7C3AED)',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: 'var(--cb-font-display)',
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            Continue to dashboard
           </button>
           <button
             type="button"

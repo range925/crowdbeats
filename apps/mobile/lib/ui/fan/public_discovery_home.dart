@@ -33,6 +33,45 @@ class PublicDiscoveryHome extends ConsumerStatefulWidget {
 
 class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
   PublicPerformer? _selectedPerformer;
+  bool _dismissedPrimer = false;
+
+  Widget _buildPrimerCard(String icon, String title, String subtitle, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(icon, style: const TextStyle(fontSize: 12)),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    title,
+                    style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 3),
+            Text(
+              subtitle,
+              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, height: 1.2),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +92,6 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
     return Scaffold(
       backgroundColor: CbColors.bgApp,
       body: SafeArea(
-        bottom: false,
         child: RefreshIndicator(
           color: CbColors.purpleMain,
           backgroundColor: const Color(0xFF151722),
@@ -121,9 +159,8 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                                 TextButton(
                                   onPressed: () => context.push('/auth'),
                                   style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    minimumSize: const Size(48, 44),
                                   ),
                                   child: const Text(
                                     'Sign in',
@@ -140,9 +177,8 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: CbColors.purpleMain,
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    minimumSize: const Size(48, 44),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -170,6 +206,65 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                   ),
                 ),
               ),
+
+              // Lightweight Dismissible Guest Introduction (G1)
+              if (isGuest && !_dismissedPrimer)
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  sliver: SliverToBoxAdapter(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1B1E28),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFF2B2D44)),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Row(
+                                children: [
+                                  Text('✦ ', style: TextStyle(color: Color(0xFFA855F7), fontSize: 13)),
+                                  Text(
+                                    'Welcome to Crowdbeats',
+                                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                                  ),
+                                ],
+                              ),
+                              Semantics(
+                                button: true,
+                                label: 'Dismiss welcome card',
+                                child: InkWell(
+                                  onTap: () => setState(() => _dismissedPrimer = true),
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                    child: Text(
+                                      '✕ Dismiss',
+                                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              _buildPrimerCard('📍', 'Explore Live', 'Find live talent near you', const Color(0xFF0891B2)),
+                              const SizedBox(width: 8),
+                              _buildPrimerCard('🔔', 'Follow', 'Get live stage alerts', const Color(0xFF7C3AED)),
+                              const SizedBox(width: 8),
+                              _buildPrimerCard('⚡', 'Support', 'Tip performers directly', const Color(0xFFD97706)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
 
               // 2. ACCESSIBLE LOCATION SEARCH
               SliverPadding(

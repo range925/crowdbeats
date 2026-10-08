@@ -24,10 +24,9 @@ export function AppleHeroSection() {
         <div className={styles.heroContent}>
           <p className={styles.eyebrow}>Live Music Near You</p>
           <h1 id="hero-title" className={`${styles.headline} ${styles.heroHeadline}`}>
-            Find your<br />
-            next favorite.<br />
-            Help them<br />
-            go further.
+            Discover live musicians near you.{' '}
+            <br />
+            Support the music you love.
           </h1>
           <p className={styles.heroSubheadline}>
             Discover live solo musicians and bands near you—or explore music around the world.

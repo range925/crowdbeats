@@ -24,7 +24,7 @@ const CAROUSEL_SLIDES: CarouselSlideData[] = [
     description: 'Intimate acoustic sessions, delicate fingerpicking, and poetic storytelling in warm candlelit venues.',
     image: '/landing/apple/carousel_maya.jpg',
     profileUrl: '/artist/maya-lin',
-    tipUrl: '/tip/artist_maya_lin',
+    tipUrl: '/tip/art_maya_lin',
   },
   {
     id: 'midnight-echoes',
@@ -43,8 +43,8 @@ const CAROUSEL_SLIDES: CarouselSlideData[] = [
     venue: 'Blue Note Lounge • San Diego, CA',
     description: 'Soulful tenor saxophone improvisations and infectious Latin syncopation over warm analog Rhodes.',
     image: '/landing/apple/carousel_marcus.jpg',
-    profileUrl: '/discover?genre=jazz',
-    tipUrl: '/discover',
+    profileUrl: '/artist/marcus-rivera',
+    tipUrl: '/tip/marcus-rivera',
   },
   {
     id: 'elena-cruz',

@@ -1,0 +1,187 @@
+/* Section 4 — #for-musicians (always dark). Owner: Frontend C. Tokens come from landing.module.css (.dark). */
+
+.section {
+  overflow: hidden;
+}
+
+.intro {
+  max-width: 820px;
+}
+
+.title {
+  max-width: 14ch;
+}
+
+.lead {
+  margin-top: 24px;
+  max-width: 620px;
+}
+
+/* Why join — three quiet columns separated by hairlines */
+.why {
+  list-style: none;
+  margin: clamp(40px, 5vw, 64px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--l-line);
+}
+
+.whyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px 24px 0 0;
+}
+
+.whyItem + .whyItem {
+  padding-left: 24px;
+  border-left: 1px solid var(--l-line);
+}
+
+.whyTitle {
+  font-family: var(--l-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--l-ink);
+}
+
+.whyText {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--l-ink-2);
+}
+
+/* Editorial blocks */
+.blocks {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(72px, 9vw, 128px);
+  margin-top: clamp(64px, 8vw, 112px);
+}
+
+.block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+}
+
+.media {
+  width: 100%;
+  border: 1px solid var(--l-line);
+}
+
+.portrait {
+  aspect-ratio: 4 / 5;
+}
+
+.landscape {
+  aspect-ratio: 4 / 3;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.kicker {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--l-ink-3);
+}
+
+.blockTitle {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.body {
+  margin-top: 16px;
+  max-width: 480px;
+  font-size: 17px;
+}
+
+.benefits {
+  list-style: none;
+  margin: 28px 0 32px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+}
+
+.benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--l-line);
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--l-ink);
+}
+
+.benefits li:last-child {
+  border-bottom: 1px solid var(--l-line);
+}
+
+.check {
+  flex: none;
+  margin-top: 1px;
+  color: var(--l-ink);
+}
+
+.note {
+  margin-top: clamp(56px, 7vw, 96px);
+  padding-top: 24px;
+  border-top: 1px solid var(--l-line);
+  max-width: 100%;
+}
+
+@media (min-width: 960px) {
+  .block {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(48px, 7vw, 112px);
+  }
+
+  .blockReverse {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+
+  .blockReverse .media {
+    order: 2;
+  }
+
+  .blockReverse .copy {
+    order: 1;
+  }
+}
+
+@media (max-width: 719px) {
+  .why {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .whyItem,
+  .whyItem + .whyItem {
+    padding: 20px 0;
+    border-left: 0;
+  }
+
+  .whyItem + .whyItem {
+    border-top: 1px solid var(--l-line);
+  }
+
+  .whyItem:last-child {
+    padding-bottom: 0;
+  }
+}

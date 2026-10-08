@@ -7,7 +7,7 @@
  *
  * Cookie is:
  * - HttpOnly: false (must be readable by edge middleware in Next.js config)
- * - SameSite: Strict
+ * - SameSite: Lax
  * - Secure: false on localhost, true in production
  * - Max-Age: 3600 * 24 * 7 (7 days)
  */
@@ -33,14 +33,25 @@ export function setSessionCookie(data: SessionData): void {
     `${SESSION_COOKIE}=${value}`,
     `max-age=${MAX_AGE}`,
     'path=/',
-    'samesite=strict',
+    'samesite=lax',
     isSecure ? 'secure' : '',
   ].filter(Boolean).join('; ');
 }
 
 export function clearSessionCookie(): void {
   if (typeof document === 'undefined') return;
-  document.cookie = `${SESSION_COOKIE}=; max-age=0; path=/`;
+  document.cookie = `${SESSION_COOKIE}=; max-age=0; path=/; samesite=lax`;
+}
+
+export function getSessionCookie(): SessionData | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie
+    .split(';')
+    .map(c => c.trim())
+    .find(c => c.startsWith(`${SESSION_COOKIE}=`));
+  if (!match) return null;
+  const rawCookie = match.slice(SESSION_COOKIE.length + 1);
+  return parseSessionCookie(rawCookie);
 }
 
 export function validateSessionData(data: unknown): SessionData | null {

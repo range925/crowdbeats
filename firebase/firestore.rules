@@ -193,17 +193,31 @@ service cloud.firestore {
       // Owner reads own full doc; support staff can read (non-PII check in app layer)
       allow read: if isOwner(userId) || isUserSupportStaff();
 
-      // User documents are created exclusively by the server auth trigger (onCreateUser)
-      allow create: if false;
-
-      // Owner can update profile and persona fields during onboarding / profile editing.
-      allow update: if isOwner(userId) &&
-        (!('v' in request.resource.data) || request.resource.data.v == resource.data.get('v', 0) + 1) &&
+      // Allow user document creation by the owner (handles onCreateUser latency / client fallback)
+      allow create: if isOwner(userId) &&
+        request.resource.data.uid == userId &&
         (request.resource.data.get('personaType', null) == null ||
           request.resource.data.personaType in ['fan', 'artist', 'band_member', 'venue_manager', 'sponsor_rep']) &&
         // Cannot self-assign platform admin roles, stripe accounts, compliance holds, or suspension fields
+        request.resource.data.get('platformRole', null) == null &&
+        request.resource.data.get('complianceHold', null) == null &&
+        request.resource.data.get('suspendedAt', null) == null &&
+        request.resource.data.get('deletedAt', null) == null &&
+        request.resource.data.get('stripeConnectAccountId', null) == null &&
+        request.resource.data.get('stripeCustomerId', null) == null &&
+        request.resource.data.get('payoutHoldReason', null) == null;
+
+      // Owner can update profile and persona fields during onboarding / profile editing.
+      allow update: if isOwner(userId) &&
+        request.resource.data.uid == userId &&
+        (!('v' in request.resource.data) || request.resource.data.v >= resource.data.get('v', 0)) &&
+        (request.resource.data.get('personaType', null) == null ||
+          request.resource.data.personaType in ['fan', 'artist', 'band_member', 'venue_manager', 'sponsor_rep']) &&
+        (resource.data.get('personaType', null) == null ||
+          request.resource.data.get('personaType', null) == resource.data.personaType) &&
+        // Cannot self-assign platform admin roles, stripe accounts, compliance holds, or suspension fields
         immutableOnUpdate([
-          'uid', 'email', 'createdAt', 'deletedAt', 'suspendedAt',
+          'email', 'createdAt', 'deletedAt', 'suspendedAt',
           'platformRole', 'stripeCustomerId',
           'stripeConnectAccountId', 'complianceHold', 'payoutHoldReason'
         ]);

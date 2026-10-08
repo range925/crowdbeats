@@ -1,0 +1,524 @@
+/*
+ * Crowdbeats V2 — DiscoverMap Styling Module
+ * Uber/Lyft-inspired Quiet Premium Map Canvas, Markers & Overlays
+ */
+
+.mapContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  isolation: isolate;
+  background: transparent;
+}
+
+.mapCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* ── Markers Overlay Pane ─────────────────────────────────────────────────── */
+.markersOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* ── Marker Element (Numbered Pin) ────────────────────────────────────────── */
+.markerWrapper {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  transform: translate(-50%, -100%);
+  transform-origin: 50% 100%;
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), z-index 220ms ease;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+
+.markerWrapper:hover {
+  transform: translate(-50%, -100%) scale(1.08);
+  z-index: 50;
+}
+
+.markerWrapper:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 4px;
+  border-radius: 9999px;
+}
+
+/* Selected marker state: enlarged scale, violet halo, higher z-index */
+.markerSelected {
+  transform: translate(-50%, -100%) scale(1.18) !important;
+  z-index: 1000 !important;
+}
+
+.pinContainer {
+  position: relative;
+  width: 44px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pinSvg {
+  width: 44px;
+  height: 52px;
+  overflow: visible;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.16));
+  transition: filter 220ms ease;
+}
+
+.pinPath {
+  fill: #ffffff;
+  stroke: #e2e8f0;
+  stroke-width: 2px;
+  transition: fill 200ms ease, stroke 200ms ease, stroke-width 200ms ease;
+}
+
+.pinDisc {
+  fill: #f8fafc;
+  transition: fill 200ms ease;
+}
+
+:global(html[data-theme='dark']) .pinPath {
+  fill: #1e293b;
+  stroke: #334155;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+
+:global(html[data-theme='dark']) .pinDisc {
+  fill: #0f172a;
+}
+
+/* Violet Halo on Selected Pin */
+.markerSelected .pinSvg {
+  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.65)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
+}
+
+.markerSelected .pinPath {
+  stroke: #7c3aed;
+  stroke-width: 2.5px;
+}
+
+.markerSelected .pinDisc {
+  fill: rgba(124, 58, 237, 0.08);
+}
+
+:global(html[data-theme='dark']) .markerSelected .pinSvg {
+  filter: drop-shadow(0 0 14px rgba(167, 139, 250, 0.75)) drop-shadow(0 6px 16px rgba(0, 0, 0, 0.5));
+}
+
+:global(html[data-theme='dark']) .markerSelected .pinPath {
+  stroke: #a78bfa;
+  stroke-width: 2.5px;
+}
+
+:global(html[data-theme='dark']) .markerSelected .pinDisc {
+  fill: rgba(167, 139, 250, 0.15);
+}
+
+/* Center Icon (Solo microphone vs Band notes) */
+.iconWrapper {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  transition: color 200ms ease;
+}
+
+:global(html[data-theme='dark']) .iconWrapper {
+  color: #a78bfa;
+}
+
+.markerSelected .iconWrapper {
+  color: #7c3aed;
+}
+
+:global(html[data-theme='dark']) .markerSelected .iconWrapper {
+  color: #c4b5fd;
+}
+
+/* Numbered Badge (1 to 5) */
+.numberBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7c3aed;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+  z-index: 4;
+  line-height: 1;
+}
+
+:global(html[data-theme='dark']) .numberBadge {
+  background: #8b5cf6;
+  border-color: #1e293b;
+}
+
+/* Live Now Pulsing Ring / Green Glow Indicator */
+.liveIndicator {
+  position: absolute;
+  bottom: 0px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.9);
+}
+
+:global(html[data-theme='dark']) .liveDot {
+  border-color: #1e293b;
+}
+
+.livePulseRing {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.45);
+  animation: liveRipple 2s infinite cubic-bezier(0, 0.2, 0.8, 1);
+  pointer-events: none;
+}
+
+@keyframes liveRipple {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* ── Search Center Marker (Subtle Hollow Ring) ─────────────────────────────── */
+.centerMarker {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.centerMarkerInner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid #7c3aed;
+  background: rgba(124, 58, 237, 0.18);
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.25);
+  box-sizing: border-box;
+}
+
+:global(html[data-theme='dark']) .centerMarkerInner {
+  border-color: #a78bfa;
+  background: rgba(167, 139, 250, 0.25);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.35);
+}
+
+.centerMarkerPulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(124, 58, 237, 0.4);
+  animation: centerRipple 2.8s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+:global(html[data-theme='dark']) .centerMarkerPulse {
+  border-color: rgba(167, 139, 250, 0.45);
+}
+
+@keyframes centerRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* ── Cluster Marker (Zoomed Out Grouping) ─────────────────────────────────── */
+.clusterMarker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #7c3aed;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.45);
+  cursor: pointer;
+  z-index: 15;
+  pointer-events: auto;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  outline: none;
+}
+
+.clusterMarker:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+}
+
+.clusterMarker:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+:global(html[data-theme='dark']) .clusterMarker {
+  background: #8b5cf6;
+  border-color: #1e293b;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5);
+}
+
+/* ── Floating Map Controls ────────────────────────────────────────────────── */
+/* Placed at Top-Right so Google attribution at Bottom-Left / Bottom-Right is 100% preserved */
+.controlsGroup {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 20;
+}
+
+.controlBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--l-line, rgba(0, 0, 0, 0.1));
+  background: var(--l-card, #ffffff);
+  color: var(--l-ink, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
+  padding: 0;
+  outline: none;
+}
+
+.controlBtn:hover {
+  transform: scale(1.06);
+  background: var(--l-canvas-alt, #f8fafc);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  color: var(--l-violet, #7c3aed);
+}
+
+.controlBtn:active {
+  transform: scale(0.96);
+}
+
+.controlBtn:focus-visible {
+  box-shadow: 0 0 0 2px #7c3aed;
+}
+
+:global(html[data-theme='dark']) .controlBtn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+:global(html[data-theme='dark']) .controlBtn:hover {
+  background: #334155;
+  color: #a78bfa;
+}
+
+:global(html[data-theme='dark']) .controlBtn:focus-visible {
+  box-shadow: 0 0 0 2px #a78bfa;
+}
+
+/* ── "Search this area" Pill Button ───────────────────────────────────────── */
+.searchAreaPill {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid var(--l-line, rgba(0, 0, 0, 0.12));
+  background: var(--l-card, #ffffff);
+  color: var(--l-ink, #0f172a);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+  animation: pillSlideDown 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease;
+  white-space: nowrap;
+}
+
+.searchAreaPill:hover {
+  transform: translateX(-50%) scale(1.03);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  color: #7c3aed;
+}
+
+.searchAreaPill:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.searchAreaPill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #7c3aed;
+}
+
+:global(html[data-theme='dark']) .searchAreaPill {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+:global(html[data-theme='dark']) .searchAreaPill:hover {
+  color: #a78bfa;
+}
+
+:global(html[data-theme='dark']) .searchAreaPill:focus-visible {
+  box-shadow: 0 0 0 2px #a78bfa;
+}
+
+@keyframes pillSlideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ── Map Loading State ────────────────────────────────────────────────────── */
+.mapLoading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+:global(html[data-theme='dark']) .mapLoading {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(124, 58, 237, 0.2);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+:global(html[data-theme='dark']) .spinner {
+  border-color: rgba(167, 139, 250, 0.2);
+  border-top-color: #a78bfa;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Fallback Container ──────────────────────────────────────────────────── */
+.fallbackContainer {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 12px;
+}
+
+.fallbackTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--l-ink, #0f172a);
+}
+
+.fallbackBody {
+  font-size: 14px;
+  color: var(--l-ink-3, #64748b);
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* ── Prefers-Reduced-Motion Honor ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .markerWrapper,
+  .searchAreaPill,
+  .controlBtn,
+  .livePulseRing,
+  .centerMarkerPulse,
+  .clusterMarker {
+    animation: none !important;
+    transition: none !important;
+  }
+}

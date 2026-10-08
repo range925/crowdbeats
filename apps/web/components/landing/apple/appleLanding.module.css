@@ -372,6 +372,32 @@
   padding-top: clamp(64px, 8vw, 100px);
   padding-bottom: clamp(64px, 8vw, 100px);
   background-color: #FFFFFF;
+  color: #000000;
+}
+
+.connectionSection .headline,
+:global(html[data-theme='dark']) .connectionSection .headline,
+:global([data-theme='dark']) .connectionSection .headline {
+  color: #000000 !important;
+}
+
+.connectionSection .subheadline,
+:global(html[data-theme='dark']) .connectionSection .subheadline,
+:global([data-theme='dark']) .connectionSection .subheadline {
+  color: #000000 !important;
+}
+
+.connectionSection .eyebrow,
+:global(html[data-theme='dark']) .connectionSection .eyebrow,
+:global([data-theme='dark']) .connectionSection .eyebrow {
+  color: #6E6E73 !important;
+}
+
+.connectionSection .btnOutlineBlack,
+:global(html[data-theme='dark']) .connectionSection .btnOutlineBlack,
+:global([data-theme='dark']) .connectionSection .btnOutlineBlack {
+  color: #000000 !important;
+  border-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 .connectionInner {

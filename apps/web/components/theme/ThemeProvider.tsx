@@ -34,8 +34,12 @@ export const THEME_STORAGE_KEY = 'crowdbeats-theme-preference';
 export const LEGACY_THEME_STORAGE_KEY = 'crowdbeats_theme';
 
 function getSystemTheme(): ResolvedTheme {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light';
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
 }
 
 function applyThemeToDom(resolvedTheme: ResolvedTheme) {
@@ -95,13 +99,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // System theme dynamic listener
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
-    };
-    media.addEventListener('change', handler);
-    return () => media.removeEventListener('change', handler);
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    try {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = (e: MediaQueryListEvent) => {
+        setSystemTheme(e.matches ? 'dark' : 'light');
+      };
+      media.addEventListener('change', handler);
+      return () => media.removeEventListener('change', handler);
+    } catch {
+      // Ignored in unsupported environments
+    }
   }, []);
 
   // Sync preference with authenticated Firestore user profile

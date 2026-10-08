@@ -38,14 +38,14 @@ const RAIL_ITEMS: RailItem[] = [
     id: 'studios',
     tag: 'Behind the Scenes',
     name: 'Studio Recording & Vinyl',
-    href: '/creator/studio',
+    href: '/discover?tab=campaigns',
     image: '/landing/apple/tile_campaign.jpg',
   },
   {
     id: 'community',
     tag: 'Social Spaces',
     name: 'Local Music Lounges',
-    href: '/discover',
+    href: '/discover?setting=venue',
     image: '/landing/apple/tile_community.jpg',
   },
   {

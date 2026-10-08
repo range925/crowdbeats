@@ -1,29 +1,33 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import styles from './appleLanding.module.css';
 
 export function AppleConnectionSection() {
   return (
-    <section id="connection" className={`${styles.section} ${styles.connectionSection}`} aria-labelledby="connection-title">
-      <div className={styles.readableContainer}>
-        <div className={styles.connectionInner}>
-          <p className={styles.eyebrow}>Live Moments</p>
-          <h2 id="connection-title" className={styles.headline}>
-            Great music.<br />
-            Real connection.
-          </h2>
-          <p className={styles.subheadline}>
-            Discover independent performers, follow their creative journey, and support the music you love right from your phone.
-          </p>
-          <div className={styles.buttonRow}>
-            <a href="/discover" className={`${styles.pillButton} ${styles.btnBlack}`}>
-              Explore the community
-            </a>
-            <a href="#tile-tipping" className={`${styles.pillButton} ${styles.btnOutlineBlack}`}>
-              How tipping works
-            </a>
-          </div>
+    <>
+      <div id="how-it-works" style={{ scrollMarginTop: '80px' }} aria-hidden="true" />
+      <section id="connection" style={{ scrollMarginTop: '80px' }} className={`${styles.section} ${styles.connectionSection}`} aria-labelledby="connection-title">
+        <div className={styles.readableContainer}>
+          <div className={styles.connectionInner}>
+            <p className={styles.eyebrow}>Live Moments</p>
+            <h2 id="connection-title" className={styles.headline} style={{ color: '#000000' }}>
+              Great music.{' '}
+              <br />
+              Real connection.
+            </h2>
+            <p className={styles.subheadline} style={{ color: '#000000' }}>
+              Discover independent performers, follow their creative journey, and support the music you love right from your phone.
+            </p>
+            <div className={styles.buttonRow}>
+              <Link href="/discover" className={`${styles.pillButton} ${styles.btnBlack}`}>
+                Explore the community
+              </Link>
+              <a href="#tile-tipping" className={`${styles.pillButton} ${styles.btnOutlineBlack}`}>
+                How tipping works
+              </a>
+            </div>
 
           <div className={styles.connectionImageFrame}>
             <img
@@ -38,7 +42,8 @@ export function AppleConnectionSection() {
         </div>
       </div>
     </section>
-  );
+  </>
+);
 }
 
 export default AppleConnectionSection;

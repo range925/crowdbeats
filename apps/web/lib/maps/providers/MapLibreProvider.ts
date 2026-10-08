@@ -30,6 +30,7 @@ import type {
 import { ProviderNotReadyError } from '../types';
 import { createRoutingProvider } from '../routing';
 import { getWalkingRoute, loadMapLibre, CROWDBEATS_MAP_STYLE_URL } from '../../maps/engine/crowdbeatsMapEngine';
+import { OSM_RASTER_FALLBACK_STYLE } from '../tiles/tileConfig';
 
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 const NOMINATIM_HEADERS = {
@@ -51,9 +52,24 @@ export class MapLibreMapProvider implements ICrowdbeatsMapProvider {
     const ml = await loadMapLibre();
     const styleUrl = CROWDBEATS_MAP_STYLE_URL(options.theme ?? 'dark');
 
+    let styleToUse: any = styleUrl;
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch(styleUrl, { method: 'GET', signal: AbortSignal.timeout(1800) });
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('json')) {
+          styleToUse = OSM_RASTER_FALLBACK_STYLE;
+        } else {
+          styleToUse = await res.json();
+        }
+      }
+    } catch {
+      styleToUse = OSM_RASTER_FALLBACK_STYLE;
+    }
+
     this.mapInstance = new ml.Map({
       container,
-      style: styleUrl,
+      style: styleToUse,
       center: [options.center?.lng ?? -117.1611, options.center?.lat ?? 32.7157],
       zoom: options.zoom ?? 14,
       attributionControl: false,

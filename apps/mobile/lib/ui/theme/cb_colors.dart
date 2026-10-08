@@ -94,6 +94,17 @@ class CbColors {
   static const Color gray400            = textSecondary;
   static const Color gray100            = textPrimary;
 
+  // ── Crowdbeats Onboarding Semantic Palette Tokens ─────────────────────────
+  static const Color brandPrimary       = Color(0xFF7C3AED); // Violet #7C3AED
+  static const Color discoveryCyan      = Color(0xFF0891B2); // Cyan #0891B2
+  static const Color creatorAmber       = Color(0xFFD97706); // Amber #D97706
+  static const Color communityBlue      = Color(0xFF2563EB); // Blue #2563EB
+  static const Color expressivePink     = Color(0xFFDB2777); // Pink #DB2777
+  static const Color lightCanvas        = Color(0xFFF7F8FC); // Light canvas #F7F8FC
+  static const Color darkCanvas         = Color(0xFF101218); // Dark canvas #101218
+  static const Color darkCard           = Color(0xFF1B1E28); // Dark card #1B1E28
+
+
   // ── Gradients ──────────────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
