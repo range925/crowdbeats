@@ -155,7 +155,7 @@ describe('Crowdbeats Apple-Inspired Landing Page Redesign Test Suite', () => {
     expect(tileTipping!.textContent).toContain('$10');
     expect(tileTipping!.textContent).toContain('$20');
     expect(tileTipping!.textContent).toContain('Fee (6%)');
-    expect(tileTipping!.textContent).toContain('Apple Pay');
+    expect(tileTipping!.textContent).toContain('Send $10.00 Tip');
 
     // Tile 5: Campaigns
     const tileCampaigns = gridSection!.querySelector('#tile-campaigns');
@@ -192,7 +192,7 @@ describe('Crowdbeats Apple-Inspired Landing Page Redesign Test Suite', () => {
     });
 
     expect(tileTipping!.textContent).toContain('Tip: $20.00 • Fee (6%): $1.20');
-    expect(tileTipping!.textContent).toContain('Send $20.00 with Apple Pay');
+    expect(tileTipping!.textContent).toContain('Send $20.00 Tip');
   });
 
   test('5. Large editorial carousel renders dominant slide with navigation buttons and pagination indicators', async () => {

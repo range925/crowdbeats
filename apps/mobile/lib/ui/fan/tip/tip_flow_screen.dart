@@ -48,7 +48,7 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
   bool _isCustom = false;
   final TextEditingController _customCtrl = TextEditingController();
   final TextEditingController _msgCtrl = TextEditingController();
-  String _paymentMethod = 'apple_pay'; // 'apple_pay' | 'card'
+  String _paymentMethod = 'card'; // 'google_pay' | 'card'
   bool _submitting = false;
 
   late String _resolvedName;
@@ -490,9 +490,9 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
                           children: [
                             Expanded(
                               child: _buildPaymentRadio(
-                                id: 'apple_pay',
-                                label: 'Apple Pay',
-                                icon: Icons.apple,
+                                id: 'google_pay',
+                                label: 'Google Pay',
+                                icon: Icons.account_balance_wallet,
                               ),
                             ),
                             const SizedBox(width: 8),

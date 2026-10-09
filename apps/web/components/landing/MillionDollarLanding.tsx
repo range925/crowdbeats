@@ -1116,7 +1116,7 @@ export function MillionDollarLanding() {
                   Instant Stage Check-In
                 </h3>
                 <p style={{ fontSize: 14, color: '#A1A1AA', lineHeight: 1.6, margin: '0 0 20px' }}>
-                  Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Apple Pay and Google Pay without downloading an app.
+                  Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Google Pay or card without downloading an app.
                 </p>
               </div>
               <div

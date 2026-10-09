@@ -560,7 +560,7 @@ export function FanOnboardingWizard() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
                     {[
                       { icon: '📍', title: 'Nearby Discovery', desc: 'Find live buskers, gig sets, and club acts performing right now.' },
-                      { icon: '⚡', title: '2-Tap Tipping', desc: 'Tip performing musicians directly with Apple Pay or Google Pay.' },
+                      { icon: '⚡', title: '2-Tap Tipping', desc: 'Tip performing musicians directly with Google Pay or card.' },
                       { icon: '❤️', title: 'Artist Direct Connection', desc: 'Follow artists and get notified whenever they start a live set.' },
                     ].map((perk, i) => (
                       <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>

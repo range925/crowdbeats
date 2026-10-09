@@ -9,7 +9,7 @@
 
 | # | Stitch Screen & Function | Existing Flutter Code Status | Existing Next.js Code Status | Gap Classification | Key Visual Differences & Deficiencies |
 | :-: | :--- | :--- | :--- | :--- | :--- |
-| **01** | **Direct Musician Tipping Flow** | `ui/fan/tip/tip_flow_screen.dart` | `app/(fan)/tip/[creatorSlug]/page.tsx` | `DOES NOT MATCH` | Current UI uses generic flat gray cards and square corners; missing high-contrast purple pill CTA, impact banner, performer spotlight hero with live tags, and Apple Pay/Google Pay radio tiles. |
+| **01** | **Direct Musician Tipping Flow** | `ui/fan/tip/tip_flow_screen.dart` | `app/(fan)/tip/[creatorSlug]/page.tsx` | `DOES NOT MATCH` | Current UI uses generic flat gray cards and square corners; missing high-contrast purple pill CTA, impact banner, performer spotlight hero with live tags, and Google Pay radio tiles. |
 | **02** | **Fan Onboarding: Step 1 (Basic Info)** | `ui/auth/auth_screen.dart` (generic) | `app/onboarding/page.tsx` (simple role select) | `MISSING FROM CODE` | Current code has a single-step basic role picker; missing the rich 4-step wizard with avatar upload, live username check, music preferences, and social links. |
 | **03** | **AR Camera Performer Detection & Tip**| `ui/fan/tip/qr_scanner_screen.dart` | N/A (Mobile exclusive feature) | `PARTIAL MATCH` | Current Flutter implementation is a basic QR scanner without real-time bounding reticle, performer detection badge, or integrated bottom tipping drawer. |
 | **04** | **Fan Onboarding: Step 3 (Details)** | None | None | `MISSING FROM CODE` | Detailed bio, show frequency, platform priorities, and interest chips are entirely absent from existing frontend code. |

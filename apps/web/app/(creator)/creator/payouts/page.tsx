@@ -426,7 +426,7 @@ export default function CreatorPayoutsPage() {
       {/* 2. Direct Tip Card Input */}
       <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 12, border: '1px solid var(--border-subtle)', marginBottom: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px' }}>Direct Card & Wallet Tip Processing</h3>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Accept tips instantly via credit card, debit card, Apple Pay, or Google Pay.</p>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Accept tips instantly via credit card, debit card, or Google Pay.</p>
         {stripePromise ? (
           <Elements stripe={stripePromise} options={{ locale: 'en' }}>
             <DemoTipForm />

@@ -41,7 +41,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'tipping-security',
     question: 'How does live tipping work and is my payment information secure?',
-    answer: 'We believe financial safety is fundamental to creative freedom. All voluntary fan tips are tokenized and processed directly by PCI-DSS Level 1 compliant processors (Stripe, Apple Pay, Google Pay). Crowdbeats never sees or stores raw credit card numbers. Tips flow through our immutable zero-sum ledger, and creator split disbursements are transferred directly to verified Stripe Connected Accounts in real time.',
+    answer: 'We believe financial safety is fundamental to creative freedom. All voluntary fan tips are tokenized and processed directly by PCI-DSS Level 1 compliant processors (Stripe, Google Pay). Crowdbeats never sees or stores raw credit card numbers. Tips flow through our immutable zero-sum ledger, and creator split disbursements are transferred directly to verified Stripe Connected Accounts in real time.',
     category: 'tipping',
   },
   {

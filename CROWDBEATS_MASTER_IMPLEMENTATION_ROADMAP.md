@@ -147,7 +147,7 @@ graph LR
 
 ### 2.6 Stripe Dependencies
 - Stripe PaymentIntents API.
-- Stripe Mobile SDK (Apple Pay, Google Pay, Tokenized Cards).
+- Stripe Mobile SDK (Google Pay, Tokenized Cards).
 - Customer SetupIntents for saved default card management.
 
 ### 2.7 Design System Components

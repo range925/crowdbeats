@@ -140,7 +140,7 @@ export function PaymentsSection() {
       {/* Payment Methods */}
       <div style={CARD}>
         <h3 style={TITLE}>Saved Payment Methods</h3>
-        <p style={DESC}>Credit cards, Apple Pay, and debit methods managed securely by Stripe.</p>
+        <p style={DESC}>Credit cards, Google Pay, and debit methods managed securely by Stripe.</p>
         <button
           type="button"
           onClick={() => showToast('Stripe card management coming in next update')}

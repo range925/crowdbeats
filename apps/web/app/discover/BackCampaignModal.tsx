@@ -413,7 +413,7 @@ export function BackCampaignModal({ campaign, onClose }: BackCampaignModalProps)
                     opacity: isSubmitting || activeDollars <= 0 ? 0.7 : 1,
                   }}
                 >
-                  {isSubmitting ? 'Processing...' : `Pledge ${formatCurrency(activeDollars)} with Apple Pay / Card`}
+                  {isSubmitting ? 'Processing...' : `Pledge ${formatCurrency(activeDollars)} with Google Pay / Card`}
                 </button>
                 <button
                   type="button"

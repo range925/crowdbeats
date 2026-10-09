@@ -80,7 +80,7 @@ export default function CreatorDashboardPage() {
             </span>
           </div>
           <p style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-            Check in at your venue or street pitch — fans within 5 miles will see you on the discovery map and can send instant Apple Pay tips.
+            Check in at your venue or street pitch — fans within 5 miles will see you on the discovery map and can send instant tips via card or Google Pay.
           </p>
         </div>
         <a href="/creator/performances" style={{ textDecoration: 'none' }}>

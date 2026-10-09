@@ -312,7 +312,7 @@ Pre-populated with performer details and standard **\$5.00** preset. Transparent
 |                                                             |
 |  PAYMENT METHOD                                             |
 |  +-------------------------------------------------------+  |
-|  | ( Apple Pay )   Card ending in ••••4242      [ Change]|  |  <- 48dp Saved PM Chip
+|  | ( Google Pay )   Card ending in ••••4242      [ Change]|  |  <- 48dp Saved PM Chip
 |  +-------------------------------------------------------+  |
 |                                                             |
 |  SUMMARY & FEES                                             |
@@ -362,7 +362,7 @@ Emerald checkmark badge with celebration metadata, social share action, and clea
 |                                                             |
 |  +-------------------------------------------------------+  |
 |  | Receipt ID: cb_tip_9a2f4c1e                           |  |  <- Frosted Receipt Container
-|  | Paid with: Apple Pay (••••4242)                       |  |
+|  | Paid with: Google Pay (••••4242)                       |  |
 |  | Time: 9:42 PM · The Casbah                            |  |
 |  | Destination: Direct Musician Connected Account        |  |
 |  +-------------------------------------------------------+  |
@@ -1607,7 +1607,7 @@ class _CameraTipFlowSheetState extends State<CameraTipFlowSheet> {
               const Icon(Icons.apple, color: Colors.white, size: 20),
               const SizedBox(width: CbSpacing.s2),
               Text(
-                'Apple Pay / Card ••••4242',
+                'Card ••••4242',
                 style: GoogleFonts.dmSans(
                   color: CbColors.textPrimary,
                   fontSize: 14,

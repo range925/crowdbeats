@@ -55,7 +55,7 @@ const PERSONAS: Record<PersonaKey, PersonaConfig> = {
       '📍 Location-first search (city, neighborhood, GPS autocomplete)',
       '🗺️ Interactive 220px compact map preview with live performer pins',
       '🔥 Top 5 Nearby & Top 3 Popular performer discovery cards',
-      '💸 Instant tipping modal with Apple Pay / Google Pay / Card gate',
+      '💸 Instant tipping modal with Google Pay / Card gate',
       '🎤 Public Artist EPK & Band profiles with upcoming dates & media',
     ],
     routes: [

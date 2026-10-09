@@ -74,7 +74,7 @@ Fans must be able to:
 - change the default;
 - remove an eligible saved method after confirmation;
 - replace an expired or failed method;
-- use Apple Pay or Google Pay when supported by the device, browser, country, currency, and Stripe configuration;
+- use Google Pay or card when supported by the device, browser, country, currency, and Stripe configuration;
 - understand when a wallet is available only at checkout and cannot be stored as a reusable Crowdbeats default in the same way as a saved card;
 - receive clear authentication, decline, offline, duplicate-submit, canceled-wallet, and retry states;
 - view and download Crowdbeats receipts for completed payments.

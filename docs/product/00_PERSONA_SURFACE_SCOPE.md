@@ -69,7 +69,7 @@ Final consent screen is not removable to achieve the metric.
 - QR scanner, nearby selection, and search
 - Verified artist/stage identity confirmation before payment
 - Preset and custom tip amounts
-- Apple Pay and Google Pay where supported by Stripe mobile flow
+- Google Pay where supported by Stripe mobile flow
 - Clear recipient, amount, applicable fees, and final consent before payment
 - Success, receipt, failure, cancellation, retry, and duplicate-tap prevention
 - Loyalty and VIP tier only after rules/rewards policy is documented and approved

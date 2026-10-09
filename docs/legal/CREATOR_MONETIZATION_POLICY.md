@@ -29,7 +29,7 @@
   3. **Musician or Band Net Proceeds:** The original transaction amount minus the 6% Crowdbeats platform fee, Stripe's applicable fees, and any legally required taxes, refunds, disputes, chargebacks, or adjustments.
 - **Mandatory Fee Disclosure:**  
   > *"Crowdbeats is 100% free to join. When voluntary tips occur, Crowdbeats charges a 6% platform fee. Stripe payment-processing and applicable Stripe Connect fees are additional."*
-- **Dynamic Stripe Pricing:** Exact Stripe fees are determined dynamically based on Stripe's live pricing, payment method (card, Apple Pay, Google Pay), connected account configuration, currency, and country of issuance—never permanently hardcoded.
+- **Dynamic Stripe Pricing:** Exact Stripe fees are determined dynamically based on Stripe's live pricing, payment method (card, Google Pay), connected account configuration, currency, and country of issuance—never permanently hardcoded.
 
 ---
 

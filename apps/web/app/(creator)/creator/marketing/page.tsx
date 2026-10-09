@@ -292,7 +292,7 @@ export default function CreatorMarketingPage() {
 
             <div style={{ fontSize: 12, color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
               💡 <strong>Pro Tip:</strong> Print this QR code on stickers, acrylic signs, mic stands, or business cards.
-              Fans scan with standard smartphone cameras to tip via Apple Pay, Google Pay, or Card.
+              Fans scan with standard smartphone cameras to tip via Google Pay or Card.
             </div>
           </div>
         </div>

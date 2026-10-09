@@ -93,7 +93,7 @@ class _FanMobilePreviewHubState extends ConsumerState<FanMobilePreviewHub> {
   int _selectedPerformerIndex = 0;
   int _tipAmountCents = 1000;
   String _tipNote = 'Loved the encore! Keep rocking 🔥';
-  String _paymentMethod = 'apple_pay'; // 'apple_pay' | 'card_4242'
+  String _paymentMethod = 'card_4242'; // 'google_pay' | 'card_4242'
   bool _isProcessingPay = false;
 
   PreviewPerformer get _currentPerformer => kPreviewPerformers[_selectedPerformerIndex];
@@ -1756,9 +1756,9 @@ class _FanMobilePreviewHubState extends ConsumerState<FanMobilePreviewHub> {
                       children: [
                         Expanded(
                           child: _buildPaymentMethodCard(
-                            id: 'apple_pay',
-                            label: 'Apple Pay',
-                            icon: Icons.apple,
+                            id: 'google_pay',
+                            label: 'Google Pay',
+                            icon: Icons.account_balance_wallet,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -2082,7 +2082,7 @@ class _FanMobilePreviewHubState extends ConsumerState<FanMobilePreviewHub> {
                 child: Row(
                   children: [
                     Icon(
-                      _paymentMethod == 'apple_pay' ? Icons.apple : Icons.credit_card,
+                      _paymentMethod == 'google_pay' ? Icons.account_balance_wallet : Icons.credit_card,
                       color: Colors.white,
                       size: 20,
                     ),
@@ -2092,7 +2092,7 @@ class _FanMobilePreviewHubState extends ConsumerState<FanMobilePreviewHub> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _paymentMethod == 'apple_pay' ? 'Apple Pay' : 'Visa ending in 4242',
+                            _paymentMethod == 'google_pay' ? 'Google Pay' : 'Visa ending in 4242',
                             style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                           const Text('Instant charge on confirmation', style: TextStyle(color: CbColors.textMuted, fontSize: 10)),

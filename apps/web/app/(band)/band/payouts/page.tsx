@@ -5,7 +5,7 @@
  * Features:
  * - Stripe Connect Express onboarding for each member
  * - Card deposit / withdrawal
- * - Apple Pay & Google Pay via PaymentRequest API
+ * - Google Pay via PaymentRequest API
  */
 'use client';
 
@@ -43,7 +43,7 @@ function WalletButtons({ amount }: { amount: number }) {
     if (!stripe) return;
     const req = stripe.paymentRequest({ country: 'US', currency: 'usd', total: { label: 'Crowdbeats Band Payout', amount }, requestPayerName: true, requestPayerEmail: true });
     req.canMakePayment().then((r: any) => { if (r) setPr(req); });
-    req.on('paymentmethod', (ev: any) => { ev.complete('success'); alert('Apple/Google Pay captured: ' + ev.paymentMethod.id); });
+    req.on('paymentmethod', (ev: any) => { ev.complete('success'); alert('Google Pay payment method captured: ' + ev.paymentMethod.id); });
   }, [stripe, amount]);
   if (!pr) return null;
   return (
@@ -196,7 +196,7 @@ export default function BandPayoutsPage() {
   return (
     <div style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', color: 'var(--text-primary)' }}>Band Payouts & Stripe Connect</h1>
-      <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28 }}>Connect your bank, deposit or withdraw funds via card, Apple Pay, or Google Pay.</p>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28 }}>Connect your bank, deposit or withdraw funds via card or Google Pay.</p>
 
       {/* 1. Stripe Connect */}
       <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 14, border: '1px solid var(--border-subtle)', marginBottom: 24 }}>
@@ -341,10 +341,10 @@ export default function BandPayoutsPage() {
         )}
       </div>
 
-      {/* 2. Card / Apple Pay / Google Pay */}
+      {/* 2. Card / Google Pay */}
       <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 14, border: '1px solid var(--border-subtle)', marginBottom: 24 }}>
         <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 4px' }}>Deposit / Withdraw Funds</h3>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Use credit card, debit card, Apple Pay, or Google Pay.</p>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>Use credit card, debit card, or Google Pay.</p>
         {stripePromise ? (
           <Elements stripe={stripePromise} options={{ locale: 'en' }}>
             <BandCardForm />

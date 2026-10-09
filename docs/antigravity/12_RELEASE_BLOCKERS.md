@@ -22,7 +22,7 @@ Before switching from Stripe testmode and local/emulator environments to live pr
 - [ ] Transition from `sk_test_...` and `pk_test_...` to live Stripe API keys (`sk_live_...`, `pk_live_...`).
 - [ ] Configure live Stripe Webhook endpoint `https://us-central1-<PROJECT_ID>.cloudfunctions.net/stripeWebhook` in Stripe Dashboard.
 - [ ] Retrieve production `STRIPE_WEBHOOK_SECRET` (`whsec_...`) and store in Google Cloud Secret Manager.
-- [ ] Enable Apple Pay and Google Pay merchant IDs in Stripe Dashboard.
+- [ ] Enable Google Pay merchant IDs in Stripe Dashboard.
 
 ### 2.2 Firebase & Google Cloud IAM Configuration
 - [ ] Deploy Cloud Firestore Security Rules (`firebase deploy --only firestore:rules`).

@@ -2038,7 +2038,7 @@ export function LiveRadarMap({
               }}
             >
               <span>💳</span>
-              <span>Apple Pay</span>
+              <span>Google Pay</span>
               <span style={{ color: mp.textMuted }}>•••• 4242</span>
             </div>
 

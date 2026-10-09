@@ -86,7 +86,7 @@ This document specifies the complete Fan mobile experience for Crowdbeats V2 bas
 *   **Widgets:**
     *   `PerformerSpotlightCard` (Name, verified badge, venue, following pill)
     *   `AmountPresetGrid` ($5 / $10 / $20 / Custom)
-    *   `PaymentMethodSelector` (Apple Pay, Google Pay, Card)
+    *   `PaymentMethodSelector` (Google Pay, Card)
     *   `TextField` (Optional cheer message)
     *   `PrimaryCTAButton` ("Tip Now")
 
@@ -96,7 +96,7 @@ This document specifies the complete Fan mobile experience for Crowdbeats V2 bas
     *   `CameraViewfinder` (With "PERFORMER DETECTED" reticle)
     *   `DetectedPerformerCard` (Overlay when recognized)
     *   `InstantAmountPills` (Quick selection)
-    *   `NativePaymentButton` (Apple Pay / Google Pay)
+    *   `NativePaymentButton` (Google Pay)
 
 ### 10. Activity Feed
 *   **State:** `ActivityFeedState` (activeFilter, groupedActivities)

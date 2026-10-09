@@ -362,7 +362,7 @@ export function Variation4DynamicHub() {
                 id: 'fan',
                 icon: '🎧',
                 title: 'Music Lovers',
-                desc: 'Instant 2-tap tips via Apple Pay. Discover nearby gigs and song request queuing.',
+                desc: 'Instant 2-tap tips via Google Pay or card. Discover nearby gigs and song request queuing.',
                 cta: 'Explore Gigs',
                 href: '/fan',
               },

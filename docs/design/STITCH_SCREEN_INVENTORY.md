@@ -40,7 +40,7 @@
 5. **Payment Method Selector:**
    - Header: "Payment Method"
    - Radio List:
-     - `Apple Pay` (Brand icon + selected radio indicator)
+     - `Google Pay` (Brand icon + selected radio indicator)
      - `Google Pay` (Brand icon + unselected radio indicator)
      - `Card` (Credit card icon + unselected radio indicator)
 6. **Optional Cheer Message Input:**
@@ -113,7 +113,7 @@
    - "How much would you like to tip?"
    - Presets: `$5`, `$10` (selected in solid purple with star badge ⭐), `$20`, `$50`, `Other`.
    - Message Input: `💜 Add a message (optional)` / "Keep up the amazing music! 🎶🔥" / char counter `24/100`.
-   - Payment Selector: `Apple Pay` dropdown.
+   - Payment Selector: `Google Pay` dropdown.
    - Primary CTA: `💜 Tip $10` (Right arrow, subtext `Secure • Instant • 100% to Artist`).
 4. **Bottom Navigation Bar:**
    - 5 tabs: Home, Nearby, Center Floating Tip Pill (Active), Activity, Profile.
@@ -303,7 +303,7 @@
      - Tip Sent: "You tipped Riverstone" + green `$15`.
      - Event Notice: "Indie in the Park is happening soon!".
    - **Group: "This Week":**
-     - Platform Update: "Crowdbeats update — We added Apple Pay and Google Pay...".
+     - Platform Update: "Crowdbeats update — We added Google Pay...".
 4. **Bottom Navigation Bar:**
    - Activity tab active in purple.
 
@@ -386,5 +386,5 @@
 3. **Bottom Sheet:**
    - Amount selection: `$5`, `⭐ $10`, `$20`, `Custom`.
    - Message field with emoji picker button (`😀`).
-   - Apple Pay selector.
+   - Google Pay selector.
    - Glowing purple CTA: `💜 Tip Now — $10`.

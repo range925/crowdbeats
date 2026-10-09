@@ -83,7 +83,7 @@ graph TD
 ### Batch 5 — Direct Tipping Flow, AR Camera Scanner & Activity Feed (Screens 1, 3, 9, 12)
 **Goal:** Implement the core monetization and engagement interactions.
 - **Features:**
-  - Direct Tipping Flow Modal (Spotlight concert hero, amount presets, impact banner, Apple Pay/Google Pay radio options, message input, Tip CTA)
+  - Direct Tipping Flow Modal (Spotlight concert hero, amount presets, impact banner, Google Pay radio options, message input, Tip CTA)
   - AR Camera Performer Detection Viewfinder with dynamic neon green reticle and instant bottom tipping sheet
   - Fan Activity & Notifications Feed with category chips (All, Tips, Follows, Campaigns, System), chronological groupings, and "Follow Back" actions
 - **Files Affected:**

@@ -42,7 +42,7 @@ export function CrowdbeatsJsonLd() {
         description: 'Free to join for fans, solo musicians, bands, and live music venues.',
       },
       featureList: [
-        'Direct artist tipping in 2 taps via Apple Pay and Google Pay',
+        'Direct artist tipping in 2 taps via Google Pay or card',
         'Real-time venue check-in radar with GPS stage proximity',
         'Automated multi-member band revenue splits with Stripe Connect',
         'Transparent 6% platform fee with zero monthly subscription fees',
@@ -58,7 +58,7 @@ export function CrowdbeatsJsonLd() {
           name: 'How does Crowdbeats tipping work?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Fans can discover nearby live gigs or scan an artist stage QR code to tip in 2 taps using Apple Pay, Google Pay, or card with zero app downloads required.',
+            text: 'Fans can discover nearby live gigs or scan an artist stage QR code to tip in 2 taps using Google Pay or card with zero app downloads required.',
           },
         },
         {

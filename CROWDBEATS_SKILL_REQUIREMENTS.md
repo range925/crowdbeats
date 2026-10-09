@@ -200,7 +200,7 @@ graph TD
 ## 8. Payment Requirements (Stripe & Ledger)
 
 1. **Stripe Elements & Mobile SDK**:
-   - Tokenized card payments, Apple Pay, Google Pay.
+   - Tokenized card payments, Google Pay.
 2. **Stripe Connect Express**:
    - Automated onboarding for solo musicians and bands; automated split transfers.
 3. **Double-Entry Ledger Architecture**:

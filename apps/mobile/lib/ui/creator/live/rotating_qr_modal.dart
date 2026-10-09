@@ -189,7 +189,7 @@ class _RotatingQrModalState extends State<RotatingQrModal> {
                           style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         const Text(
-                          'Apple Pay · Google Pay · Card',
+                          'Google Pay · Card',
                           style: TextStyle(color: Colors.black54, fontSize: 11),
                         ),
                       ],

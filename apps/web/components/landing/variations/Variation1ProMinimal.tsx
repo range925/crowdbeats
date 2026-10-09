@@ -621,7 +621,7 @@ export function Variation1ProMinimal() {
                 Stages in {selectedLocation.city}
               </h2>
               <p style={{ fontSize: 15, color: 'var(--cb-text-secondary, #94A3B8)', margin: 0 }}>
-                Verified artists performing live right now. Instant 2-tap tips via Apple Pay.
+                Verified artists performing live right now. Instant 2-tap tips via Google Pay or card.
               </p>
             </div>
 
@@ -1144,7 +1144,7 @@ export function Variation1ProMinimal() {
                     <span style={{ color: 'var(--cb-purple-light, #A855F7)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>For Solo Creators</span>
                     <h3 style={{ fontSize: 26, fontWeight: 800, margin: '8px 0 14px' }}>Turn Audience Applause into Direct Digital Income.</h3>
                     <p style={{ fontSize: 15, color: 'var(--cb-text-secondary, #CBD5E1)', lineHeight: 1.6, margin: '0 0 24px' }}>
-                      Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Apple Pay and Google Pay without downloading an app. Keep ~94% net payout with a transparent 6% platform fee and zero subscription lock-in.
+                      Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Google Pay or card without downloading an app. Keep ~94% net payout with a transparent 6% platform fee and zero subscription lock-in.
                     </p>
                     <Link
                       href="/onboarding/artist"
@@ -1193,7 +1193,7 @@ export function Variation1ProMinimal() {
                       <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--cb-purple-light, #A855F7)' }}>QR SCAN</span>
                     </div>
                     <span style={{ fontSize: 12, color: 'var(--cb-text-muted, #64748B)', textAlign: 'center' }}>
-                      Save to Apple Wallet or project to venue monitors.
+                      Save to digital wallet or project to venue monitors.
                     </span>
                   </div>
                 </div>

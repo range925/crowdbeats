@@ -61,7 +61,7 @@ flowchart LR
     A[Single-UID Login] --> B[Context Selection: Solo / Band]
     B --> C[Stage Check-In: Verified Venue / Street GPS]
     C --> D[Live Presence Broadcast & Rotating QR]
-    D --> E[Fan Live Tip via Stripe / Apple Pay]
+    D --> E[Fan Live Tip via Stripe / Google Pay]
     E --> F[Double-Entry Ledger & Band Split Calculator]
     F --> G[Calm Balances & Instant Payout to Bank]
 ```

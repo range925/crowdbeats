@@ -4,7 +4,7 @@
  *
  * Features:
  * - Tip amount presets
- * - Apple Pay & Google Pay (PaymentRequest API)
+ * - Google Pay (PaymentRequest API)
  * - Credit/debit card via Stripe CardElement
  */
 'use client';
@@ -24,7 +24,7 @@ const PRESETS = [
   { cents: 0,    label: 'Custom', badge: undefined,    icon: '✏️' },
 ];
 
-/* ── Wallet (Apple Pay / Google Pay) button ─────────────────────────────── */
+/* ── Wallet (Google Pay) button ─────────────────────────────── */
 function ExpressPayButtons({ amount, onSuccess }: { amount: number; onSuccess: (pm: string) => void }) {
   const stripe = useStripe();
   const [pr, setPr] = useState<any>(null);
@@ -84,7 +84,7 @@ function TipCardForm({ amountCents, onSuccess }: { amountCents: number; onSucces
         <div style={{ padding: '12px 14px', borderRadius: 10, border: '1px solid #2B2D44', background: '#0B0C10' }}>
           <CardElement options={{ style: { base: { fontSize: '15px', color: '#FFFFFF', fontFamily: '-apple-system, sans-serif', '::placeholder': { color: '#64748B' } }, invalid: { color: '#EF4444' } } }} />
         </div>
-        <p style={{ fontSize: 11, color: '#86868B', marginTop: 6 }}>Secured by Stripe 256-bit encryption. All major cards, Apple Pay & Google Pay accepted.</p>
+        <p style={{ fontSize: 11, color: '#86868B', marginTop: 6 }}>Secured by Stripe 256-bit encryption. All major cards & Google Pay accepted.</p>
       </div>
       {msg && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', color: '#EF4444', fontSize: 13 }}>{msg}</div>}
       <button type="submit" disabled={loading || !stripe || amountCents < 100} style={{ width: '100%', padding: '14px 0', borderRadius: 'var(--radius-full, 999px)', background: loading ? '#374151' : '#7C3AED', color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: loading || amountCents < 100 ? 'not-allowed' : 'pointer' }}>
@@ -193,7 +193,7 @@ export default function DirectTipPage() {
           <p className="text-xs text-[#94A3B8] leading-relaxed"><strong className="text-white">100% of your tip</strong> goes directly to the performer via verified Stripe Connect.</p>
         </div>
 
-        {/* Payment — Stripe Elements with Apple Pay / Google Pay / Card */}
+        {/* Payment — Stripe Elements with Google Pay / Card */}
         {stripePromise ? (
           <Elements stripe={stripePromise} options={{ locale: 'en' }}>
             <TipCardForm amountCents={selectedCents} onSuccess={handleSuccess} />

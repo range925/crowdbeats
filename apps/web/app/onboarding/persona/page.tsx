@@ -24,7 +24,7 @@ const PERSONAS = [
     badge:       'Popular',
     description: 'Discover live music, tip your favorite artists, and follow their journeys.',
     color:       '#7C3AED', // Brand Violet
-    benefits:    ['Nearby live stage discovery', 'Instant 2-tap tips with Apple/Google Pay', 'Follow favorite artists & get show alerts'],
+    benefits:    ['Nearby live stage discovery', 'Instant 2-tap tips with Google Pay or card', 'Follow favorite artists & get show alerts'],
   },
   {
     id:          'artist',

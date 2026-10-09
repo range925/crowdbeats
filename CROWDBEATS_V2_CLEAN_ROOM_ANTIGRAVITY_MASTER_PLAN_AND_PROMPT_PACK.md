@@ -305,7 +305,7 @@ Fan path: **identify -> amount -> confirm**.
 - Verified artist/stage identity before payment
 - Preset/custom tip amount
 - Saved/default Stripe-tokenized payment method
-- Apple Pay/Google Pay where supported
+- Google Pay where supported
 - Clear recipient, amount, fees if applicable, and final consent
 - Success, receipt, status, failure, cancellation, retry, and duplicate-tap safety
 - Activity and monthly support summary

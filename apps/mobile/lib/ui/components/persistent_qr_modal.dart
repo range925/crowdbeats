@@ -158,7 +158,7 @@ class PersistentQrModal extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          isBand ? 'Collective Band Treasury · Stripe Connect' : 'Apple Pay · Google Pay · Card',
+                          isBand ? 'Collective Band Treasury · Stripe Connect' : 'Google Pay · Card',
                           style: const TextStyle(color: Colors.black54, fontSize: 11),
                         ),
                       ],

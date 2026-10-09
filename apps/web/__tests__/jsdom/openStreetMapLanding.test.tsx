@@ -167,7 +167,7 @@ describe('OpenStreetMap Web Landing Page Integration (JSDOM)', () => {
     expect(container.textContent).toContain('$50');
 
     // 3. Payment Method & Action CTA
-    expect(container.textContent).toContain('Apple Pay');
+    expect(container.textContent).toContain('Google Pay');
     expect(container.textContent).toContain('Tip $25 & Join Live Stage');
 
     // 4. Clicking a different tier ($50 Backstage) updates the action CTA

@@ -3,7 +3,7 @@
  * Route: /sponsor/payments
  *
  * Features:
- * - Fund Sponsor Account via card, Apple Pay, Google Pay
+ * - Fund Sponsor Account via card, Google Pay
  * - View Campaign balance + ledger
  */
 'use client';
@@ -24,7 +24,7 @@ function WalletButtons({ amount }: { amount: number }) {
     if (!stripe) return;
     const req = stripe.paymentRequest({ country: 'US', currency: 'usd', total: { label: 'Crowdbeats Sponsor Sponsorship Deposit', amount }, requestPayerName: true, requestPayerEmail: true });
     req.canMakePayment().then((r: any) => { if (r) setPr(req); });
-    req.on('paymentmethod', (ev: any) => { ev.complete('success'); alert('Apple/Google Pay captured: ' + ev.paymentMethod.id); });
+    req.on('paymentmethod', (ev: any) => { ev.complete('success'); alert('Google Pay payment method captured: ' + ev.paymentMethod.id); });
   }, [stripe, amount]);
   if (!pr) return null;
   return (
@@ -105,7 +105,7 @@ export default function SponsorPaymentsPage() {
   return (
     <div style={{ padding: '32px 40px', maxWidth: 1000, margin: '0 auto' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', color: 'var(--text-primary)' }}>Sponsor Payments & Financial Ledger</h1>
-      <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28 }}>Fund your sponsorship Campaign Budget using corporate card, Apple Pay, or Google Pay. Minimum $10.00.</p>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28 }}>Fund your sponsorship Campaign Budget using corporate card or Google Pay. Minimum $10.00.</p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, marginBottom: 28 }}>
         {/* Deposit form */}

@@ -6,7 +6,7 @@
 // - Interactive Stat Cards (Total Tipped, Following, Fan Badges)
 // - Followed Artists list with direct View Profile and Tipping
 // - Full Tipping History with transaction receipt modals
-// - Saved Payment Methods management (Apple Pay, Google Pay, Cards)
+// - Saved Payment Methods management (Google Pay, Cards)
 // - Notification & Location privacy preferences
 // - Account Settings, Switch Persona, and Sign Out actions
 
@@ -633,10 +633,10 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
 
   Widget _buildTipHistorySection() {
     final history = [
-      (artist: 'Maya Lin', venue: 'The Echo Lounge', amount: '\$20.00', date: 'Today, 8:45 PM', method: 'Apple Pay'),
+      (artist: 'Maya Lin', venue: 'The Echo Lounge', amount: '\$20.00', date: 'Today, 8:45 PM', method: 'Google Pay'),
       (artist: 'The Velvet Waves', venue: 'Beachside Pavilion', amount: '\$15.00', date: 'Yesterday', method: 'Visa •••• 4242'),
       (artist: 'Echo Pulse', venue: 'Underground Sound', amount: '\$10.00', date: 'Aug 24', method: 'Google Pay'),
-      (artist: 'Neon Sunset', venue: 'Sunset Rooftop', amount: '\$20.00', date: 'Aug 21', method: 'Apple Pay'),
+      (artist: 'Neon Sunset', venue: 'Sunset Rooftop', amount: '\$20.00', date: 'Aug 21', method: 'Mastercard •••• 8812'),
     ];
 
     return Column(
@@ -753,8 +753,8 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
           child: Column(
             children: [
               _buildPaymentMethodRow(
-                icon: Icons.apple,
-                title: 'Apple Pay',
+                icon: Icons.account_balance_wallet,
+                title: 'Google Pay',
                 subtitle: 'Fast 1-tap checkout enabled',
                 isDefault: true,
               ),

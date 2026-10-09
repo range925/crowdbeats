@@ -319,7 +319,7 @@ export function CrowdbeatsWebLanding() {
                 <div className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-purple-400 transition-colors">
                   &lt; 3 Seconds
                 </div>
-                <p className="text-xs text-zinc-400 mt-1 font-medium">Instant Apple &amp; Google Pay</p>
+                <p className="text-xs text-zinc-400 mt-1 font-medium">Instant Google Pay &amp; Card</p>
               </div>
             </div>
           </div>
@@ -867,7 +867,7 @@ export function CrowdbeatsWebLanding() {
                 </h3>
                 <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
                   {selectedRole === 'solo' &&
-                    'Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Apple Pay and Google Pay without downloading an app.'}
+                    'Check in to any venue in 10 seconds. Your dynamic QR code displays instantly on your phone or mic stand. Fans tip via Google Pay or card without downloading an app.'}
                   {selectedRole === 'band' &&
                     'No more post-show cash counting or awkward manual Venmo requests. Each band member connects their bank account via Stripe Connect, and splits deposit automatically.'}
                   {selectedRole === 'venue' &&

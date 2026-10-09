@@ -229,7 +229,7 @@ export function Variation2ResonanceKeynote() {
                 fontWeight: 400,
               }}
             >
-              Instant 2-tap tips via Apple Pay. Interactive stage radar with GPS proximity.
+              Instant 2-tap tips via Google Pay or card. Interactive stage radar with GPS proximity.
               Automated band payouts with zero monthly subscription overhead.
             </p>
 

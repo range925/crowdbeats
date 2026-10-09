@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     template: '%s | Crowdbeats Live Music',
   },
   description:
-    'Crowdbeats connects live music fans directly with performing artists. Instant 2-tap tips via Apple Pay, real-time stage radar, automated band splits, and 0% monthly subscriptions.',
+    'Crowdbeats connects live music fans directly with performing artists. Instant 2-tap tips via Google Pay and card, real-time stage radar, automated band splits, and 0% monthly subscriptions.',
   keywords: [
     'Crowdbeats',
     'live music tipping',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     'band revenue splits',
     'live stage radar',
     'gig discovery',
-    'Apple Pay music tip',
+    'Google Pay music tip',
     'indie artist income',
     'venue live music',
   ],

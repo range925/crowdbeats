@@ -133,7 +133,7 @@ The landing page consists of the sticky header and hero, followed by **exactly s
    - 6 steps divided into 2 distinct groups with CSS/SVG code previews:
      - **For Fans:**
        1. *Discover a performer* (browse live map or search city).
-       2. *Choose a tip and confirm payment* (secure one-tap Apple Pay/Google Pay via Stripe).
+       2. *Choose a tip and confirm payment* (secure one-tap Google Pay via Stripe).
        3. *Send your support* (personalized note delivered directly to the artist).
      - **For Solo Musicians & Bands:**
        1. *Create your profile and complete payout setup* (verification and Stripe onboarding).

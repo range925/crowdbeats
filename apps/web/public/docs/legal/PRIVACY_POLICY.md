@@ -40,7 +40,7 @@ We collect only essential data needed to deliver free artist discovery and volun
 
 1. **Free Account Information:** Email address, display name, username, and authentication tokens (Google, Apple, or email login) to manage your profile and favorites.
 2. **Ephemeral Local Geolocation (Optional):** Used in real time solely to display nearby live musicians, bands, and venues on our interactive discovery map. Geolocation calculations are processed locally on your device and are never sold or permanently logged to surveillance databases.
-3. **Payment Tokens for Voluntary Tips:** Tokenized customer and payment references processed securely via PCI-DSS Level 1 compliant processors (Stripe, Inc., Apple Pay, Google Pay). Crowdbeats LLC **never** receives, handles, or stores raw credit card numbers or banking PINs.
+3. **Payment Tokens for Voluntary Tips:** Tokenized customer and payment references processed securely via PCI-DSS Level 1 compliant processors (Stripe, Inc., Google Pay). Crowdbeats LLC **never** receives, handles, or stores raw credit card numbers or banking PINs.
 4. **Performance & Interaction Logs:** Song requests, live session check-ins, and voluntary tip allocations recorded on our immutable zero-sum ledger.
 
 ---

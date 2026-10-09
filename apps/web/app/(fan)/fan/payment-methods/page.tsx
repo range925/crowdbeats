@@ -4,7 +4,7 @@
  *
  * Features:
  * - Add/save cards via Stripe Elements
- * - Apple Pay & Google Pay via PaymentRequest API
+ * - Google Pay via PaymentRequest API
  * - Deposit to tip wallet
  */
 'use client';
@@ -53,7 +53,7 @@ function WalletButtons({ amount }: { amount: number }) {
     });
     pr.on('paymentmethod', (ev) => {
       ev.complete('success');
-      alert('Apple Pay / Google Pay payment method captured: ' + ev.paymentMethod.id);
+      alert('Google Pay payment method captured: ' + ev.paymentMethod.id);
     });
   }, [stripe, amount]);
 
@@ -138,7 +138,7 @@ export default function FanPaymentMethodsPage() {
   return (
     <div style={{ padding: '24px 20px', maxWidth: 640, margin: '0 auto' }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 4px', color: '#1D1D1F' }}>Payment Methods & Wallet</h1>
-      <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24 }}>Deposit funds to your tip wallet. Supports Apple Pay, Google Pay, debit & credit cards.</p>
+      <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24 }}>Deposit funds to your tip wallet. Supports Google Pay, debit & credit cards.</p>
 
       <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #E5E7EB', padding: 24, marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
         <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1D1D1F' }}>Tip Wallet Balance</h3>

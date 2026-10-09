@@ -43,8 +43,8 @@ Crowdbeats LLC operates on an aligned, creator-first partnership model:
    - **Musician or Band Net Proceeds:** The original transaction amount minus the 6% Crowdbeats platform fee, Stripe's applicable fees, and any legally required taxes, refunds, disputes, or adjustments.
 3. **Mandatory Universal Fee Disclosure:**  
    > *"Crowdbeats is 100% free to join and use. On voluntary tips and contributions, Crowdbeats charges an honest 6% platform technology fee. Stripe payment-processing and applicable Stripe Connect fees are separate and additional."*
-4. **Dynamic Stripe Pricing Transparency:** Exact Stripe processing fees are calculated or confirmed in real time using Stripe’s current pricing, payment method (card, Apple Pay, Google Pay), connected-account configuration, currency, country, and transaction type. Stripe fees are never hidden or marked up by Crowdbeats.
-5. **PCI-DSS Level 1 Security:** All tip transactions are tokenized and processed directly by PCI-DSS Level 1 compliant processors (Stripe, Inc., Apple Pay, Google Pay). Crowdbeats LLC never receives, handles, or stores raw credit card numbers or banking PINs.
+4. **Dynamic Stripe Pricing Transparency:** Exact Stripe processing fees are calculated or confirmed in real time using Stripe’s current pricing, payment method (card, Google Pay), connected-account configuration, currency, country, and transaction type. Stripe fees are never hidden or marked up by Crowdbeats.
+5. **PCI-DSS Level 1 Security:** All tip transactions are tokenized and processed directly by PCI-DSS Level 1 compliant processors (Stripe, Inc., Google Pay). Crowdbeats LLC never receives, handles, or stores raw credit card numbers or banking PINs.
 6. **Voluntary Tip Finality & Disputed Billing:** Because tips are immediately distributed to performing creators in real time via Stripe Connect, all voluntary tips are **strictly final and non-refundable**, except where an explicit technical error (e.g. duplicate billing) occurs and is reported within 14 days via our [Help & Support Center](/legal/support).
 
 ---
