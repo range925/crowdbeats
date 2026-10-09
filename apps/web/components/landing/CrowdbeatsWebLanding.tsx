@@ -1177,15 +1177,6 @@ export function CrowdbeatsWebLanding() {
         </div>
       </footer>
 
-      {/* Fixed Privacy & CCPA Badge */}
-      <Link
-        className="fixed bottom-4 left-4 z-40 px-3 py-1.5 rounded-full bg-zinc-900/90 text-[11px] font-semibold text-zinc-400 border border-white/10 shadow-lg flex items-center gap-1.5 hover:text-white transition"
-        href="/legal/privacy"
-      >
-        <span className="material-symbols-outlined text-sm text-purple-500">lock</span>
-        <span>Privacy &amp; CCPA</span>
-      </Link>
-
       {/* Tip Authentication Gate Modal */}
       {activePerformer && (
         <TipAuthGateModal

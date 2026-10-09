@@ -221,6 +221,8 @@ export default function MultiPersonaPreviewStudio() {
     setIframeKey(k => k + 1);
   };
 
+  const previewIframeSrc = currentPath.includes('?') ? `${currentPath}&preview=1` : `${currentPath}?preview=1`;
+
   return (
     <div
       style={{
@@ -768,7 +770,7 @@ export default function MultiPersonaPreviewStudio() {
               <div style={{ width: '100%', height: 860, backgroundColor: '#0B0C10', position: 'relative' }}>
                 <iframe
                   key={iframeKey}
-                  src={currentPath}
+                  src={previewIframeSrc}
                   title={`${activePersona.name} Desktop Preview`}
                   style={{
                     width: '100%',
@@ -842,7 +844,7 @@ export default function MultiPersonaPreviewStudio() {
                 >
                   <iframe
                     key={iframeKey}
-                    src={currentPath}
+                    src={previewIframeSrc}
                     title="iPhone Preview"
                     style={{ width: '100%', height: '100%', border: 'none' }}
                   />
@@ -903,7 +905,7 @@ export default function MultiPersonaPreviewStudio() {
                 >
                   <iframe
                     key={iframeKey}
-                    src={currentPath}
+                    src={previewIframeSrc}
                     title="Pixel Preview"
                     style={{ width: '100%', height: '100%', border: 'none' }}
                   />
@@ -947,7 +949,7 @@ export default function MultiPersonaPreviewStudio() {
                     <div style={{ width: 100, height: 26, backgroundColor: '#000', borderRadius: 16 }} />
                   </div>
                   <div style={{ width: '100%', height: 680, borderRadius: 36, overflow: 'hidden', backgroundColor: '#0B0C10' }}>
-                    <iframe key={`ios-${iframeKey}`} src={currentPath} title="iOS Frame" style={{ width: '100%', height: '100%', border: 'none' }} />
+                    <iframe key={`ios-${iframeKey}`} src={previewIframeSrc} title="iOS Frame" style={{ width: '100%', height: '100%', border: 'none' }} />
                   </div>
                   <div style={{ height: 18, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 4 }}>
                     <div style={{ width: 120, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.3)' }} />
@@ -972,7 +974,7 @@ export default function MultiPersonaPreviewStudio() {
                     <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#0a0a0a' }} />
                   </div>
                   <div style={{ width: '100%', height: 680, borderRadius: 8, overflow: 'hidden', backgroundColor: '#0B0C10' }}>
-                    <iframe key={`pixel-${iframeKey}`} src={currentPath} title="Pixel Frame" style={{ width: '100%', height: '100%', border: 'none' }} />
+                    <iframe key={`pixel-${iframeKey}`} src={previewIframeSrc} title="Pixel Frame" style={{ width: '100%', height: '100%', border: 'none' }} />
                   </div>
                   <div style={{ height: 18, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 4 }}>
                     <div style={{ width: 120, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.25)' }} />

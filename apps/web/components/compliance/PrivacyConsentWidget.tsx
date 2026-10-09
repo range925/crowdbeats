@@ -33,12 +33,13 @@ export function PrivacyConsentWidget() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = getStoredConsent();
-    const previewMode = typeof window !== 'undefined' && window.location.search.includes('preview=1');
+    const inIframe = typeof window !== 'undefined' && window.self !== window.top;
+    const previewMode = (typeof window !== 'undefined' && window.location.search.includes('preview=1')) || inIframe;
     setIsPreview(previewMode);
-    if (stored || previewMode) {
+    if (storedConsentFound() || previewMode) {
       setHasConsent(true);
       setIsBannerVisible(false);
+      const stored = getStoredConsent();
       setOptAnalytics(stored?.analytics ?? false);
       setOptGeolocation(stored?.ephemeralGeolocation ?? false);
     } else {
@@ -52,6 +53,7 @@ export function PrivacyConsentWidget() {
       if (customEvent.detail) {
         setHasConsent(true);
         setIsBannerVisible(false);
+        setIsModalOpen(false);
         setOptAnalytics(customEvent.detail.analytics);
         setOptGeolocation(customEvent.detail.ephemeralGeolocation);
       } else {
@@ -60,11 +62,24 @@ export function PrivacyConsentWidget() {
       }
     };
 
+    const handleOpenModal = () => {
+      setIsModalOpen(true);
+    };
+
     window.addEventListener('cb_privacy_consent_updated', handleConsentUpdate);
-    return () => window.removeEventListener('cb_privacy_consent_updated', handleConsentUpdate);
+    window.addEventListener('cb_open_privacy_modal', handleOpenModal);
+    return () => {
+      window.removeEventListener('cb_privacy_consent_updated', handleConsentUpdate);
+      window.removeEventListener('cb_open_privacy_modal', handleOpenModal);
+    };
   }, []);
 
-  if (!mounted) return null;
+  function storedConsentFound(): boolean {
+    return getStoredConsent() !== null;
+  }
+
+  if (!mounted || isPreview) return null;
+  if (!isBannerVisible && !isModalOpen) return null;
 
   const handleAcceptAll = () => {
     const record: PrivacyConsentRecord = {
@@ -278,40 +293,6 @@ export function PrivacyConsentWidget() {
         </aside>
       )}
 
-      {/* ── 2. PERSISTENT FLOATING PRIVACY SHIELD BADGE ─────────────── */}
-      {/* Allows users to review or alter their privacy choice at any time */}
-      {!isBannerVisible && !isPreview && (
-        <button
-          type="button"
-          className="hidden md:inline-flex"
-          onClick={() => setIsModalOpen(true)}
-          title="Review CCPA § 1798.100 & GDPR Art. 15 Privacy Settings"
-          aria-label="Privacy Settings"
-          style={{
-            position: 'fixed',
-            bottom: 20,
-            left: 20,
-            zIndex: 9000,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 14px',
-            borderRadius: 9999,
-            backgroundColor: 'rgba(18, 20, 31, 0.90)',
-            border: '1px solid rgba(168, 85, 247, 0.35)',
-            backdropFilter: 'blur(16px)',
-            color: '#CBD5E1',
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
-            transition: 'transform 0.15s ease',
-          }}
-        >
-          <span style={{ fontSize: 14 }}>🛡️</span>
-          <span>Privacy &amp; CCPA</span>
-        </button>
-      )}
 
       {/* ── 3. DETAILED STATUTORY PRIVACY MODAL (RIGHTS & TOGGLES) ───── */}
       {isModalOpen && (

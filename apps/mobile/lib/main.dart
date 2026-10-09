@@ -60,6 +60,7 @@ import 'ui/settings/accessibility_appearance_screen.dart';
 import 'ui/preview/fan_mobile_preview_hub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ui/sponsor/sponsor_shell.dart';
+import 'ui/components/cb_privacy_consent_banner.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -326,7 +327,12 @@ class CrowdbeatsV2App extends ConsumerWidget {
             textScaler: TextScaler.linear(a11y.fontScale),
             boldText: a11y.highContrastMode,
           ),
-          child: child ?? const SizedBox.shrink(),
+          child: Stack(
+            children: [
+              child ?? const SizedBox.shrink(),
+              const CbPrivacyConsentBanner(),
+            ],
+          ),
         );
       },
     );
