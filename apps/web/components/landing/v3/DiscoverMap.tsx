@@ -76,29 +76,69 @@ export const MAP_STYLE_LIGHT: google.maps.MapTypeStyle[] = [
 
 /* ── Map Style: Dark Mode ───────────────────────────────────────────────── */
 export const MAP_STYLE_DARK: google.maps.MapTypeStyle[] = [
-  // Commercial POI declutter
+  // 1. Base Geometry & Canvas: Deep midnight charcoal-blue (#162332)
+  { elementType: 'geometry', stylers: [{ color: '#162332' }] },
+  { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#162332' }] },
+  { featureType: 'landscape.man_made', elementType: 'geometry', stylers: [{ color: '#162332' }] },
+  { featureType: 'landscape.natural', elementType: 'geometry', stylers: [{ color: '#162332' }] },
+  { featureType: 'landscape.natural.terrain', elementType: 'geometry', stylers: [{ color: '#162332' }] },
+
+  // 2. Base Typography & Halo
+  { elementType: 'labels.text.fill', stylers: [{ color: '#7c93a8' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#14202c' }, { weight: 2 }] },
+
+  // 3. Commercial POI & Transit Decluttering: Hide business/store icons and minor subdivisions
   { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
   { featureType: 'poi', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
   { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  // Soft neutral land (#1e293b)
-  { elementType: 'geometry', stylers: [{ color: '#1e293b' }] },
-  { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#1e293b' }] },
-  // Subtle parks (#14532d)
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#14532d' }] },
-  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#4ade80' }] },
-  // Gentle water (#0f172a)
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0f172a' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#38bdf8' }] },
-  // Clear highways (#334155)
-  { featureType: 'road.highway', elementType: 'geometry.fill', stylers: [{ color: '#334155' }] },
-  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#475569' }] },
-  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#cbd5e1' }] },
-  // Local and arterial roads
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#0f172a' }] },
-  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#64748b' }] },
-  // Administrative labels
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
-  { featureType: 'administrative.neighborhood', elementType: 'labels.text.fill', stylers: [{ color: '#64748b' }] },
+  { featureType: 'transit.station', stylers: [{ visibility: 'off' }] },
+  { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
+
+  // 4. Parks / Natural Vegetation: Muted cyan-teal slate (#17383f), soft sage teal labels (#5ca294)
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#17383f' }] },
+  { featureType: 'poi.park', elementType: 'geometry.fill', stylers: [{ color: '#17383f' }] },
+  { featureType: 'poi.park', elementType: 'labels.text', stylers: [{ visibility: 'on' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#5ca294' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.stroke', stylers: [{ color: '#112229' }, { weight: 2 }] },
+
+  // 5. Water: Deep midnight navy (#0d1927) with subtle darker stroke (#09121c)
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0d1927' }] },
+  { featureType: 'water', elementType: 'geometry.fill', stylers: [{ color: '#0d1927' }] },
+  { featureType: 'water', elementType: 'geometry.stroke', stylers: [{ color: '#09121c' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3e5b76' }] },
+  { featureType: 'water', elementType: 'labels.text.stroke', stylers: [{ color: '#0d1927' }] },
+
+  // 6. Highway & Road Hierarchy
+  // Major Highways (I-5, 805, 8, 94): Clear steel-blue (#385875 fill, #1b2b3a stroke) with shields
+  { featureType: 'road.highway', elementType: 'geometry.fill', stylers: [{ color: '#385875' }] },
+  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#1b2b3a' }, { weight: 1.2 }] },
+  { featureType: 'road.highway.controlled_access', elementType: 'geometry.fill', stylers: [{ color: '#385875' }] },
+  { featureType: 'road.highway.controlled_access', elementType: 'geometry.stroke', stylers: [{ color: '#1b2b3a' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#8faec7' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.stroke', stylers: [{ color: '#14202c' }] },
+
+  // Arterial Roads: Slate blue (#24384a fill, #172533 stroke)
+  { featureType: 'road.arterial', elementType: 'geometry.fill', stylers: [{ color: '#24384a' }] },
+  { featureType: 'road.arterial', elementType: 'geometry.stroke', stylers: [{ color: '#172533' }] },
+
+  // Local Roads: Subtle dark slate (#1b2a38 fill, #14202c stroke)
+  { featureType: 'road.local', elementType: 'geometry.fill', stylers: [{ color: '#1b2a38' }] },
+  { featureType: 'road.local', elementType: 'geometry.stroke', stylers: [{ color: '#14202c' }] },
+
+  // General Road fallback geometry & labels: Muted blue-gray text (#6f859a fill, #14202c stroke)
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1b2a38' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#14202c' }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#6f859a' }] },
+  { featureType: 'road', elementType: 'labels.text.stroke', stylers: [{ color: '#14202c' }] },
+
+  // 7. Administrative & Locality Typography
+  // Locality ("San Diego"): Crisp, bold white text (#ffffff fill, #131f2b stroke with weight 3)
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#ffffff' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.stroke', stylers: [{ color: '#131f2b' }, { weight: 3 }] },
+
+  // Neighborhoods: Simplified with muted fill (#7c93a8) and dark stroke (#14202c)
+  { featureType: 'administrative.neighborhood', elementType: 'labels.text.fill', stylers: [{ color: '#7c93a8' }] },
+  { featureType: 'administrative.neighborhood', elementType: 'labels.text.stroke', stylers: [{ color: '#14202c' }, { weight: 2 }] },
 ];
 
 /** Check if current HTML theme is dark mode */
@@ -211,6 +251,7 @@ export function DiscoverMap({
   style,
 }: DiscoverMapProps) {
   const mapRegionId = useId();
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const overlayRef = useRef<google.maps.OverlayView | null>(null);
@@ -218,6 +259,7 @@ export function DiscoverMap({
 
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentZoom, setCurrentZoom] = useState<number>(() =>
     getContextAwareZoom(center.label, center.placeType, center.zoom)
   );
@@ -536,7 +578,50 @@ export function DiscoverMap({
     return () => cancelAnimationFrame(frame);
   }, [ready, topPerformers, selectedId, center.lat, center.lng, currentZoom]);
 
+  /* ── 7. Fullscreen Event Synchronization ───────────────────────────────── */
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isFull = Boolean(
+        document.fullscreenElement &&
+          containerRef.current &&
+          document.fullscreenElement === containerRef.current
+      );
+      setIsFullscreen(isFull);
+      if (mapRef.current && window.google?.maps?.event) {
+        google.maps.event.trigger(mapRef.current, 'resize');
+        overlayRef.current?.draw();
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange as EventListener);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange as EventListener);
+    };
+  }, []);
+
   /* ── Control Button Actions ───────────────────────────────────────────── */
+  const handleToggleFullscreen = useCallback(() => {
+    try {
+      if (!document.fullscreenElement) {
+        if (containerRef.current?.requestFullscreen) {
+          containerRef.current.requestFullscreen().catch(() => {});
+        } else if ((containerRef.current as unknown as { webkitRequestFullscreen?: () => void })?.webkitRequestFullscreen) {
+          (containerRef.current as unknown as { webkitRequestFullscreen: () => void }).webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if ((document as unknown as { webkitExitFullscreen?: () => void })?.webkitExitFullscreen) {
+          (document as unknown as { webkitExitFullscreen: () => void }).webkitExitFullscreen();
+        }
+      }
+    } catch {
+      // Gracefully ignore environments without fullscreen support
+    }
+  }, []);
+
   const handleZoomIn = () => {
     if (!mapRef.current) return;
     const z = mapRef.current.getZoom() ?? 12;
@@ -554,6 +639,22 @@ export function DiscoverMap({
     setShowSearchThisArea(false);
     animateCameraTo({ lat: center.lat, lng: center.lng }, targetZoom, 800);
   };
+
+  // Currently selected performer (if any)
+  const selectedPerformer = performers.find((p) => p.uid === selectedId);
+
+  const handleDirectionsClick = useCallback(() => {
+    const destLat = selectedPerformer ? selectedPerformer.latitude : center.lat;
+    const destLng = selectedPerformer ? selectedPerformer.longitude : center.lng;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, [selectedPerformer, center.lat, center.lng]);
+
+  const handleOpenInMapsClick = useCallback(() => {
+    const query = encodeURIComponent(center.label || 'San Diego, CA');
+    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, [center.label]);
 
   const handleSearchThisAreaClick = () => {
     if (!mapRef.current) return;
@@ -598,6 +699,7 @@ export function DiscoverMap({
 
   return (
     <div
+      ref={containerRef}
       className={`${styles.mapContainer} ${className ?? ''}`}
       style={style}
       role="region"
@@ -613,40 +715,69 @@ export function DiscoverMap({
         </div>
       )}
 
-      {/* ── Floating Controls Stack (Top-Right) ── */}
+      {/* ── Top-Right Controls Stack (Fullscreen & Recenter) ── */}
       {ready && (
-        <div className={styles.controlsGroup} role="toolbar" aria-label="Map view controls">
+        <div className={styles.topControlsGroup} role="toolbar" aria-label="Map view controls">
           <button
             type="button"
-            className={styles.controlBtn}
-            onClick={handleZoomIn}
-            aria-label="Zoom in"
-            title="Zoom in"
+            className={`${styles.topControlBtn} ${styles.controlBtn}`}
+            onClick={handleToggleFullscreen}
+            aria-label={isFullscreen ? 'Exit full screen' : 'Toggle full screen'}
+            title={isFullscreen ? 'Exit full screen' : 'Toggle full screen'}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            {isFullscreen ? (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="4 14 10 14 10 20" />
+                <polyline points="20 10 14 10 14 4" />
+                <polyline points="14 20 14 14 20 14" />
+                <polyline points="10 4 10 10 4 10" />
+              </svg>
+            ) : (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="15 3 21 3 21 9" />
+                <polyline points="9 21 3 21 3 15" />
+                <polyline points="21 14 21 21 14 21" />
+                <polyline points="3 10 3 3 10 3" />
+              </svg>
+            )}
           </button>
           <button
             type="button"
-            className={styles.controlBtn}
-            onClick={handleZoomOut}
-            aria-label="Zoom out"
-            title="Zoom out"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className={styles.controlBtn}
+            className={`${styles.topControlBtn} ${styles.controlBtn}`}
             onClick={handleRecenter}
             aria-label={`Recenter map on ${center.label}`}
             title={`Recenter on ${center.label}`}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
               <circle cx="12" cy="12" r="7" />
               <line x1="12" y1="2" x2="12" y2="5" />
               <line x1="12" y1="19" x2="12" y2="22" />
@@ -654,6 +785,112 @@ export function DiscoverMap({
               <line x1="19" y1="12" x2="22" y2="12" />
               <circle cx="12" cy="12" r="2" fill="currentColor" />
             </svg>
+          </button>
+        </div>
+      )}
+
+      {/* ── Bottom-Right: Vertical Zoom Capsule (Zoom In & Zoom Out) ── */}
+      {ready && (
+        <div className={styles.zoomCapsule} role="group" aria-label="Zoom controls">
+          <button
+            type="button"
+            className={styles.zoomBtn}
+            onClick={handleZoomIn}
+            aria-label="Zoom in"
+            title="Zoom in"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <div data-testid="zoom-divider" className={styles.zoomDivider} aria-hidden="true" />
+          <button
+            type="button"
+            className={styles.zoomBtn}
+            onClick={handleZoomOut}
+            aria-label="Zoom out"
+            title="Zoom out"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* ── Bottom Floating Action Buttons: Directions & Open in Maps ── */}
+      {ready && (
+        <div className={styles.bottomActionsGroup} role="toolbar" aria-label="Map navigation actions">
+          <button
+            type="button"
+            className={styles.actionPillBtn}
+            onClick={handleDirectionsClick}
+            aria-label={
+              selectedPerformer
+                ? `Get directions to ${selectedPerformer.performerName}`
+                : `Get directions to ${center.label || 'current location'}`
+            }
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className={styles.actionPillIcon}
+            >
+              <polyline points="15 14 20 9 15 4" />
+              <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
+            </svg>
+            <span>Directions</span>
+          </button>
+
+          <button
+            type="button"
+            className={styles.actionPillBtn}
+            onClick={handleOpenInMapsClick}
+            aria-label={`Open ${center.label || 'San Diego, CA'} in Google Maps`}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className={styles.actionPillIcon}
+            >
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+              <line x1="9" y1="3" x2="9" y2="18" />
+              <line x1="15" y1="6" x2="15" y2="21" />
+            </svg>
+            <span>Open in Maps</span>
           </button>
         </div>
       )}

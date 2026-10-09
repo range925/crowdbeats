@@ -236,21 +236,31 @@ describe('DiscoverMap Component & Styling', () => {
     });
 
     it('defines dark mode style with soft neutral slate land and muted accents', () => {
-      // Dark Land
+      // Dark Land (Deep midnight charcoal-blue)
       const darkLand = MAP_STYLE_DARK.find((s) => s.featureType === 'landscape');
-      expect((darkLand?.stylers?.[0] as any)?.color).toBe('#1e293b');
+      expect((darkLand?.stylers?.[0] as any)?.color).toBe('#162332');
 
-      // Dark Parks
+      // Dark Parks (Muted cyan-teal slate)
       const darkPark = MAP_STYLE_DARK.find((s) => s.featureType === 'poi.park' && s.elementType === 'geometry');
-      expect((darkPark?.stylers?.[0] as any)?.color).toBe('#14532d');
+      expect((darkPark?.stylers?.[0] as any)?.color).toBe('#17383f');
 
-      // Dark Water
+      // Dark Water (Deep rich midnight navy)
       const darkWater = MAP_STYLE_DARK.find((s) => s.featureType === 'water' && s.elementType === 'geometry');
-      expect((darkWater?.stylers?.[0] as any)?.color).toBe('#0f172a');
+      expect((darkWater?.stylers?.[0] as any)?.color).toBe('#0d1927');
 
-      // Dark Highway
+      // Dark Highway (Clear steel-blue fill)
       const darkHighway = MAP_STYLE_DARK.find((s) => s.featureType === 'road.highway' && s.elementType === 'geometry.fill');
-      expect((darkHighway?.stylers?.[0] as any)?.color).toBe('#334155');
+      expect((darkHighway?.stylers?.[0] as any)?.color).toBe('#385875');
+
+      // Decluttering: Land parcels off, Arterial roads styled, Locality text crisp white
+      const landParcel = MAP_STYLE_DARK.find((s) => s.featureType === 'administrative.land_parcel');
+      expect((landParcel?.stylers?.[0] as any)?.visibility).toBe('off');
+
+      const arterialRoad = MAP_STYLE_DARK.find((s) => s.featureType === 'road.arterial' && s.elementType === 'geometry.fill');
+      expect((arterialRoad?.stylers?.[0] as any)?.color).toBe('#24384a');
+
+      const localityText = MAP_STYLE_DARK.find((s) => s.featureType === 'administrative.locality' && s.elementType === 'labels.text.fill');
+      expect((localityText?.stylers?.[0] as any)?.color).toBe('#ffffff');
     });
   });
 
@@ -464,6 +474,131 @@ describe('DiscoverMap Component & Styling', () => {
       const clusterBtn = document.querySelector('button[data-marker-id="cluster-group"]');
       expect(clusterBtn).toBeTruthy();
       expect(clusterBtn?.textContent).toContain('Live');
+    });
+  });
+
+  describe('Image 2 Floating Controls & Action Buttons', () => {
+    let openSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+    });
+
+    afterEach(() => {
+      openSpy.mockRestore();
+    });
+
+    it('renders bottom floating action buttons: Directions and Open in Maps', async () => {
+      await act(async () => {
+        root.render(
+          <DiscoverMap
+            center={{ lat: 32.7157, lng: -117.1611, label: 'San Diego, CA' }}
+            performers={MOCK_PERFORMERS}
+          />
+        );
+      });
+
+      const directionsBtn = container.querySelector('button[aria-label^="Get directions"]') as HTMLButtonElement;
+      const openInMapsBtn = container.querySelector('button[aria-label^="Open San Diego, CA"]') as HTMLButtonElement;
+
+      expect(directionsBtn).toBeTruthy();
+      expect(directionsBtn.textContent).toContain('Directions');
+      expect(openInMapsBtn).toBeTruthy();
+      expect(openInMapsBtn.textContent).toContain('Open in Maps');
+    });
+
+    it('opens Google Maps directions to search center when no performer is selected', async () => {
+      await act(async () => {
+        root.render(
+          <DiscoverMap
+            center={{ lat: 32.7157, lng: -117.1611, label: 'San Diego, CA' }}
+            performers={MOCK_PERFORMERS}
+          />
+        );
+      });
+
+      const directionsBtn = container.querySelector('button[aria-label^="Get directions"]') as HTMLButtonElement;
+      await act(async () => {
+        directionsBtn.click();
+      });
+
+      expect(openSpy).toHaveBeenCalledWith(
+        'https://www.google.com/maps/dir/?api=1&destination=32.7157,-117.1611',
+        '_blank',
+        'noopener,noreferrer'
+      );
+    });
+
+    it('opens Google Maps directions to the selected performer coordinates when selectedId is provided', async () => {
+      await act(async () => {
+        root.render(
+          <DiscoverMap
+            center={{ lat: 32.7157, lng: -117.1611, label: 'San Diego, CA' }}
+            performers={MOCK_PERFORMERS}
+            selectedId="perf-2"
+          />
+        );
+      });
+
+      const directionsBtn = container.querySelector('button[aria-label^="Get directions"]') as HTMLButtonElement;
+      expect(directionsBtn.getAttribute('aria-label')).toContain('The Groove Collective');
+
+      await act(async () => {
+        directionsBtn.click();
+      });
+
+      expect(openSpy).toHaveBeenCalledWith(
+        'https://www.google.com/maps/dir/?api=1&destination=32.72,-117.165',
+        '_blank',
+        'noopener,noreferrer'
+      );
+    });
+
+    it('opens Google Maps search for current location when Open in Maps is clicked', async () => {
+      await act(async () => {
+        root.render(
+          <DiscoverMap
+            center={{ lat: 32.7157, lng: -117.1611, label: 'Austin, TX' }}
+            performers={MOCK_PERFORMERS}
+          />
+        );
+      });
+
+      const openInMapsBtn = container.querySelector('button[aria-label^="Open Austin, TX"]') as HTMLButtonElement;
+      await act(async () => {
+        openInMapsBtn.click();
+      });
+
+      expect(openSpy).toHaveBeenCalledWith(
+        'https://www.google.com/maps/search/?api=1&query=Austin%2C%20TX',
+        '_blank',
+        'noopener,noreferrer'
+      );
+    });
+
+    it('renders top-right fullscreen toggle and bottom-right zoom capsule with divider', async () => {
+      await act(async () => {
+        root.render(
+          <DiscoverMap
+            center={{ lat: 32.7157, lng: -117.1611, label: 'San Diego, CA' }}
+            performers={MOCK_PERFORMERS}
+          />
+        );
+      });
+
+      // Top-right fullscreen toggle
+      const fullscreenBtn = container.querySelector('button[aria-label="Toggle full screen"]') as HTMLButtonElement;
+      expect(fullscreenBtn).toBeTruthy();
+
+      // Bottom-right vertical zoom capsule
+      const zoomInBtn = container.querySelector('button[aria-label="Zoom in"]') as HTMLButtonElement;
+      const zoomOutBtn = container.querySelector('button[aria-label="Zoom out"]') as HTMLButtonElement;
+      expect(zoomInBtn).toBeTruthy();
+      expect(zoomOutBtn).toBeTruthy();
+
+      // Divider exists inside zoom capsule
+      const zoomDivider = container.querySelector('[data-testid="zoom-divider"]');
+      expect(zoomDivider).toBeTruthy();
     });
   });
 });
