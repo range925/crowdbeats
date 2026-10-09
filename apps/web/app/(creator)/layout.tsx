@@ -50,15 +50,8 @@ const ALLOWED_PERSONAS = new Set(['artist', 'band_member', 'admin', 'staff']);
 /** Read __cb_session cookie — only valid client-side after hydration */
 function getSessionPersona(): string | null {
   if (typeof document === 'undefined') return null;
-  try {
-    const match = document.cookie.split('; ').find(c => c.startsWith('__cb_session='));
-    if (!match) return null;
-    const raw = decodeURIComponent(match.split('=').slice(1).join('='));
-    const parsed = JSON.parse(raw);
-    return typeof parsed?.personaType === 'string' ? parsed.personaType : null;
-  } catch {
-    return null;
-  }
+  const cookie = getSessionCookie();
+  return (cookie?.personaType as string | null) ?? null;
 }
 
 export default function CreatorLayout({ children }: { children: React.ReactNode }) {
@@ -80,13 +73,16 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
     }
     if (status === 'loading') return; // keep waiting
 
-    const cookiePersona = getSessionPersona();
+    const cookie = getSessionCookie();
+    const cookiePersona = (cookie?.personaType as string | null) ?? null;
+    const effectivePersona = personaType ?? cookiePersona;
+
+    if (effectivePersona && ALLOWED_PERSONAS.has(effectivePersona)) {
+      setAccessDecision(true);
+      return;
+    }
+
     if (status === 'unauthenticated') {
-      if (cookiePersona && ALLOWED_PERSONAS.has(cookiePersona)) {
-        // Session cookie exists for creator — give Firebase auth listener a moment to hydrate
-        return;
-      }
-      const cookie = getSessionCookie();
       if (cookie?.uid) {
         // Session cookie exists with uid — give Firebase auth a moment to hydrate
         return;
@@ -95,13 +91,7 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
       return;
     }
 
-    // Check React auth state first, then fall back to session cookie
-    const effectivePersona = personaType ?? cookiePersona;
-    const allowed =
-      (status === 'authenticated' && !!effectivePersona && ALLOWED_PERSONAS.has(effectivePersona)) ||
-      (status === 'unonboarded' && !!cookiePersona && ALLOWED_PERSONAS.has(cookiePersona)) ||
-      (status === 'unverified' && !!cookiePersona && ALLOWED_PERSONAS.has(cookiePersona));
-
+    const allowed = Boolean(effectivePersona && ALLOWED_PERSONAS.has(effectivePersona));
     setAccessDecision(allowed);
   }, [status, personaType, isDev]);
 

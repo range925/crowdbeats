@@ -74,8 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>(() => {
     const cookie = typeof window !== 'undefined' ? getSessionCookie() : null;
     if (cookie?.uid) {
+      const isStaff = cookie.personaType === 'staff' || Boolean(cookie.platformRole);
       return {
-        status:      'loading',
+        status:      isStaff ? 'authenticated' : 'loading',
         user:        null,
         uid:         cookie.uid,
         email:       cookie.email ?? null,
@@ -133,6 +134,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const activeCookie = getSessionCookie();
+        // If an authorized staff session exists, preserve it and authenticate
+        if (activeCookie?.uid && (activeCookie.personaType === 'staff' || activeCookie.platformRole)) {
+          isFirstAuthEvent.current = false;
+          setState(s => ({
+            ...s,
+            status:      'authenticated',
+            user:        null,
+            uid:         activeCookie.uid,
+            email:       activeCookie.email ?? null,
+            displayName: activeCookie.displayName ?? 'Authorized Staff',
+            photoUrl:    null,
+            personaType: 'staff' as unknown as PersonaType,
+            error:       null,
+          }));
+          return;
+        }
+
         // If a cookie exists with an active uid, do NOT immediately wipe the cookie
         // on the first event if the page just mounted or if auth is still settling.
         if (activeCookie?.uid && isFirstAuthEvent.current) {
