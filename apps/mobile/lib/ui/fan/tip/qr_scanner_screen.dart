@@ -13,8 +13,72 @@ import '../../theme/cb_colors.dart';
 import '../../theme/cb_spacing.dart';
 import 'tip_flow_screen.dart';
 
+enum QrScanStatus {
+  valid,
+  expired,
+  invalid,
+}
+
+class QrValidationResult {
+  const QrValidationResult({
+    required this.status,
+    this.performerId,
+    this.errorMessage,
+  });
+
+  final QrScanStatus status;
+  final String? performerId;
+  final String? errorMessage;
+
+  bool get isValid => status == QrScanStatus.valid;
+  bool get isExpired => status == QrScanStatus.expired;
+}
+
 class QrScannerScreen extends ConsumerStatefulWidget {
   const QrScannerScreen({super.key});
+
+  /// Validates raw QR code payloads, verifying stage expiration timestamps (exp)
+  /// and extracting clean performer IDs.
+  static QrValidationResult parseAndValidateQr(String rawValue, {DateTime? now}) {
+    final trimmed = rawValue.trim();
+    if (trimmed.isEmpty) {
+      return const QrValidationResult(
+        status: QrScanStatus.invalid,
+        errorMessage: 'Empty QR code data.',
+      );
+    }
+
+    // Check expiration if 'exp' query parameter is present in stage rotating QR
+    try {
+      final uri = Uri.tryParse(trimmed);
+      if (uri != null && uri.queryParameters.containsKey('exp')) {
+        final expMs = int.tryParse(uri.queryParameters['exp']!);
+        if (expMs != null) {
+          final currentTimeMs = (now ?? DateTime.now()).millisecondsSinceEpoch;
+          if (currentTimeMs > expMs) {
+            return const QrValidationResult(
+              status: QrScanStatus.expired,
+              errorMessage:
+                  'This stage QR code has expired. Please ask the performer to refresh their stage code.',
+            );
+          }
+        }
+      }
+    } catch (_) {}
+
+    final performerId = extractPerformerId(trimmed);
+    if (performerId != null && performerId.isNotEmpty) {
+      return QrValidationResult(
+        status: QrScanStatus.valid,
+        performerId: performerId,
+      );
+    }
+
+    return const QrValidationResult(
+      status: QrScanStatus.invalid,
+      errorMessage: 'Invalid Crowdbeats QR code.',
+    );
+  }
 
   static String? extractPerformerId(String rawValue) {
     final trimmed = rawValue.trim();
@@ -147,18 +211,31 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
               for (final barcode in capture.barcodes) {
                 final raw = barcode.rawValue;
                 if (raw != null) {
-                  final performerId = QrScannerScreen.extractPerformerId(raw);
-                  if (performerId != null && performerId.isNotEmpty) {
+                  final validation = QrScannerScreen.parseAndValidateQr(raw);
+                  if (validation.isValid && validation.performerId != null) {
                     _isProcessingBarcode = true;
                     // Route directly to TipFlowScreen(recipientId: performerId) without
                     // substituting any other performer, regardless of distance or GPS.
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute<void>(
                         builder: (_) => TipFlowScreen(
-                          recipientId: performerId,
+                          recipientId: validation.performerId!,
                         ),
                       ),
                     );
+                    break;
+                  } else if (validation.isExpired) {
+                    _isProcessingBarcode = true;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(validation.errorMessage ?? 'This stage QR code has expired.'),
+                        backgroundColor: CbColors.statusWarning,
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                    Future.delayed(const Duration(seconds: 3), () {
+                      if (mounted) setState(() => _isProcessingBarcode = false);
+                    });
                     break;
                   }
                 }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
+import '../theme/cb_theme.dart';
 import 'cb_button.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -31,23 +32,33 @@ class CbCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isLive ? CbColors.liveSurface : CbColors.surfaceCard;
-    final border = isLive ? CbColors.borderFocus : CbColors.borderSubtle;
+    final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isLive ? ext.liveSurface : ext.surfaceCard;
+    final border = isLive ? ext.borderFocus : ext.borderSubtle;
     final shadow = isLive
         ? <BoxShadow>[
-            const BoxShadow(
-              color: CbColors.liveGlow,
+            BoxShadow(
+              color: ext.liveGlow,
               blurRadius: 24,
               spreadRadius: 0,
             ),
           ]
-        : <BoxShadow>[
-            BoxShadow(
-              color: Colors.black.withAlpha(102),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ];
+        : isDark
+            ? <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black.withAlpha(102),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black.withAlpha(15),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ];
 
     Widget card = Container(
       decoration: BoxDecoration(
@@ -129,7 +140,7 @@ class CbInput extends StatelessWidget {
       textInputAction: textInputAction,
       onFieldSubmitted:onSubmitted,
       maxLines:        maxLines,
-      style: GoogleFonts.dmSans(
+      style: GoogleFonts.plusJakartaSans(
         color:    CbColors.textPrimary,
         fontSize: 16,
       ),
@@ -216,7 +227,7 @@ class CbAvatar extends StatelessWidget {
           ? Center(
               child: Text(
                 initials ?? semanticLabel.characters.first.toUpperCase(),
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize:   size.fontSize,
                   fontWeight: FontWeight.w600,
                   color:      CbColors.accentPrimary,
@@ -325,7 +336,7 @@ class CbStatusBadge extends StatelessWidget {
             ],
             Text(
               text,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize:      12,
                 fontWeight:    FontWeight.w600,
                 color:         status.fg,
@@ -457,7 +468,7 @@ class CbToast {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.plusJakartaSans(
                   color: CbColors.textPrimary,
                   fontSize: 14,
                 ),
@@ -480,49 +491,53 @@ Future<T?> showCbBottomSheet<T>({
   String? title,
   bool isDismissible = true,
 }) {
+  final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
   return showModalBottomSheet<T>(
     context:         context,
     isDismissible:   isDismissible,
     isScrollControlled: true,
-    backgroundColor: CbColors.surfaceRaised,
+    backgroundColor: ext.surfaceOverlay,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
         top: Radius.circular(CbSpacing.radiusXl),
       ),
     ),
-    builder: (_) => SafeArea(
-      top: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: CbSpacing.s3),
-          // Handle bar
-          Container(
-            width:        48,
-            height:       4,
-            decoration: BoxDecoration(
-              color:        CbColors.borderSubtle,
-              borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
-            ),
-          ),
-          if (title != null) ...[
-            const SizedBox(height: CbSpacing.s4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: CbSpacing.s5),
-              child: Text(
-                title,
-                style: GoogleFonts.dmSans(
-                  fontSize:   20,
-                  fontWeight: FontWeight.w600,
-                  color:      CbColors.textPrimary,
-                ),
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: CbSpacing.s3),
+            // Handle bar (36x4dp)
+            Container(
+              width:        36,
+              height:       4,
+              decoration: BoxDecoration(
+                color:        ext.borderStrong,
+                borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
               ),
             ),
+            if (title != null) ...[
+              const SizedBox(height: CbSpacing.s4),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: CbSpacing.s5),
+                child: Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize:   20,
+                    fontWeight: FontWeight.w600,
+                    color:      ext.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: CbSpacing.s2),
+            child,
+            const SizedBox(height: CbSpacing.s4),
           ],
-          const SizedBox(height: CbSpacing.s2),
-          child,
-          const SizedBox(height: CbSpacing.s4),
-        ],
+        ),
       ),
     ),
   );
@@ -560,7 +575,7 @@ class CbEmptyState extends StatelessWidget {
               const SizedBox(height: CbSpacing.s4),
               Text(
                 title,
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize:   18,
                   fontWeight: FontWeight.w600,
                   color:      CbColors.textPrimary,
@@ -571,7 +586,7 @@ class CbEmptyState extends StatelessWidget {
                 const SizedBox(height: CbSpacing.s2),
                 Text(
                   subtitle!,
-                  style: GoogleFonts.dmSans(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     color:    CbColors.textSecondary,
                   ),
@@ -641,7 +656,7 @@ Future<bool?> showCbConfirmationSheet({
         children: [
           Text(
             message,
-            style: GoogleFonts.dmSans(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 15,
               color:    CbColors.textSecondary,
             ),
@@ -771,7 +786,7 @@ class _CbAmountSelectorState extends State<CbAmountSelector> {
                   child: Center(
                     child: Text(
                       _fmt(cents),
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize:   16,
                         fontWeight: FontWeight.w500,
                         color: isSelected
@@ -835,9 +850,9 @@ class CbProgressBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(semanticLabel,
-                  style: GoogleFonts.dmSans(fontSize: 12, color: CbColors.textSecondary)),
+                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: CbColors.textSecondary)),
                 Text('$pct%',
-                  style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: CbColors.textPrimary)),
+                  style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: CbColors.textPrimary)),
               ],
             ),
           if (showLabel) const SizedBox(height: CbSpacing.s1_5),
@@ -932,7 +947,7 @@ class CbMiniChart extends StatelessWidget {
                     const SizedBox(height: CbSpacing.s1),
                     Text(
                       labels[i],
-                      style: GoogleFonts.dmSans(fontSize: 10, color: CbColors.textSecondary),
+                      style: GoogleFonts.plusJakartaSans(fontSize: 10, color: CbColors.textSecondary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -1035,7 +1050,7 @@ class _CbLiveStageChipState extends State<CbLiveStageChip>
             const SizedBox(width: CbSpacing.s2),
             Text(
               'LIVE',
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize:      10,
                 fontWeight:    FontWeight.w800,
                 color:         CbColors.accentPrimary,
@@ -1055,7 +1070,7 @@ class _CbLiveStageChipState extends State<CbLiveStageChip>
           ],
           Text(
             widget.stageName,
-            style: GoogleFonts.dmSans(
+            style: GoogleFonts.plusJakartaSans(
               fontSize:   14,
               fontWeight: FontWeight.w500,
               color:      textColor,

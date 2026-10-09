@@ -16,6 +16,7 @@ import type { ISO4217CurrencyCode } from '../common/money';
 import { PAYOUT_MINIMUM_CENTS } from '../common/money';
 
 export { PAYOUT_MINIMUM_CENTS };
+export const INSTANT_PAYOUT_FEE_BPS = 100 as const; // 1.0% fee for Instant Payouts
 
 export const PayoutStatus = {
   PENDING: 'pending',

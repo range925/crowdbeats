@@ -16,6 +16,7 @@ import '../theme/cb_spacing.dart';
 import '../components/cb_button.dart';
 import '../components/cb_live_badge.dart';
 import '../components/cb_profile_social_actions.dart';
+import '../components/cb_safety_action_sheet.dart';
 import 'tip/tip_auth_gate_modal.dart';
 import 'tip/tip_confirmation_sheet.dart';
 import '../camera/camera_capture_screen.dart';
@@ -111,17 +112,17 @@ class PublicProfileScreen extends ConsumerWidget {
               onPressed: () => context.pop(),
             ),
             actions: [
-              // Follow / Favorite Button
+              // Safety & Moderation Menu
               IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.white),
+                icon: const Icon(Icons.shield_outlined, color: Colors.white70),
+                tooltip: 'Safety & Moderation',
                 onPressed: () {
-                  if (!isAuthenticated) {
-                    _showFollowAuthGate(context, performer.name);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Following ${performer.name}!')),
-                    );
-                  }
+                  CbSafetyActionSheet.show(
+                    context,
+                    targetId: performer.id,
+                    targetType: performer.type,
+                    targetName: performer.name,
+                  );
                 },
               ),
             ],
@@ -263,6 +264,33 @@ class PublicProfileScreen extends ConsumerWidget {
                     }).toList(),
                   ),
 
+                  const SizedBox(height: 14),
+
+                  // Performer Follower & Following Metrics
+                  Row(
+                    children: [
+                      const Text(
+                        '12.4k',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'followers',
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
+                      ),
+                      const SizedBox(width: 16),
+                      const Text(
+                        '340',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'following',
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
+                      ),
+                    ],
+                  ),
+
                   const SizedBox(height: 18),
 
                   // Social Actions (Follow, Message, Safety Menu)
@@ -270,6 +298,77 @@ class PublicProfileScreen extends ConsumerWidget {
                     targetId: performer.id,
                     targetType: performer.type,
                     targetName: performer.name,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Featured Crowdfunding Campaign Card
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF151C2C),
+                      borderRadius: BorderRadius.circular(CbSpacing.radiusLg),
+                      border: Border.all(color: const Color(0x3300E5FF)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0x2200E5FF),
+                                borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
+                              ),
+                              child: const Text(
+                                'ACTIVE CAMPAIGN',
+                                style: TextStyle(color: Color(0xFF00E5FF), fontSize: 10, fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                            const Text(
+                              '14 days left',
+                              style: TextStyle(color: Colors.white54, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'New Studio Album & Vinyl Pressing',
+                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Support studio mastering and limited vinyl run for our upcoming release.',
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
+                        ),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: const LinearProgressIndicator(
+                            value: 0.72,
+                            backgroundColor: Colors.white12,
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00E5FF)),
+                            minHeight: 6,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '\$3,600 of \$5,000 goal',
+                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              '72% funded',
+                              style: TextStyle(color: Color(0xFF00E5FF), fontSize: 12, fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 16),
@@ -476,53 +575,5 @@ class PublicProfileScreen extends ConsumerWidget {
           );
       TipConfirmationSheet.show(context);
     }
-  }
-
-  void _showFollowAuthGate(BuildContext context, String creatorName) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Color(0xF0131315),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(CbSpacing.radiusXl)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Sign in to follow $creatorName',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Get notified when $creatorName goes live or announces upcoming shows.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
-            ),
-            const SizedBox(height: 20),
-            CbButton(
-              label: 'Sign In / Register',
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                context.push('/auth');
-              },
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

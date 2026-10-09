@@ -575,11 +575,14 @@ class _SummaryRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style: TextStyle(
-              color: highlight ? CbColors.textPrimary : CbColors.textSecondary,
-              fontSize: isLarge ? 16 : 14,
-            )),
+        Expanded(
+          child: Text(label,
+              style: TextStyle(
+                color: highlight ? CbColors.textPrimary : CbColors.textSecondary,
+                fontSize: isLarge ? 16 : 14,
+              )),
+        ),
+        const SizedBox(width: 8),
         Text(value,
             style: TextStyle(
               fontWeight:

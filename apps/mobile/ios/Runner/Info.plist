@@ -65,6 +65,7 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Crowdbeats uses your location to discover nearby live performances, find venues, and verify venue check-ins.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

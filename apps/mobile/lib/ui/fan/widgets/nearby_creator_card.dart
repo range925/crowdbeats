@@ -20,12 +20,14 @@ class NearbyCreatorCard extends StatelessWidget {
     super.key,
     required this.performer,
     this.isSelected = false,
+    this.rank,
     this.onTap,
     this.onTapTip,
   });
 
   final PublicPerformer performer;
   final bool isSelected;
+  final int? rank;
   final VoidCallback? onTap;
   final VoidCallback? onTapTip;
 
@@ -79,6 +81,34 @@ class NearbyCreatorCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                if (rank != null) ...[
+                  Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFF7C3AED)
+                          : const Color(0xFF242838),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFFA855F7)
+                            : const Color(0x33FFFFFF),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$rank',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 // Avatar (56px) with optional Live ring
                 Stack(
                   children: [

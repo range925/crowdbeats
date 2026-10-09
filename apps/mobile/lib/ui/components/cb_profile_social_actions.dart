@@ -14,6 +14,7 @@ import '../../state/auth_state.dart';
 import '../fan/social_messaging_screen.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
+import 'cb_safety_action_sheet.dart';
 
 class CbProfileSocialActions extends ConsumerStatefulWidget {
   const CbProfileSocialActions({
@@ -66,6 +67,7 @@ class _CbProfileSocialActionsState extends ConsumerState<CbProfileSocialActions>
           _followsViewer = state.followsViewer;
           _isBlocked = state.isBlocked;
           _isRestricted = state.isRestricted;
+          _canMessage = state.canMessage;
         });
       }
     } catch (_) {
@@ -155,247 +157,30 @@ class _CbProfileSocialActionsState extends ConsumerState<CbProfileSocialActions>
     );
   }
 
+  bool _canMessage = true;
+
   void _showSafetyMenu() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: CbColors.surfaceCard,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(CbSpacing.radiusXl)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_isBlocked)
-                ListTile(
-                  leading: const Icon(Icons.lock_open, color: Colors.green),
-                  title: Text('Unblock ${widget.targetName}', style: const TextStyle(color: Colors.white)),
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    try {
-                      await ref.read(socialServiceProvider).unblockEntity(
-                        targetId: widget.targetId,
-                        targetType: widget.targetType,
-                        actingAsBandId: widget.actingAsBandId,
-                        actingAsArtistId: widget.actingAsArtistId,
-                      );
-                      if (mounted) {
-                        setState(() {
-                          _isBlocked = false;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${widget.targetName} unblocked.')),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed: $e')),
-                        );
-                      }
-                    }
-                  },
-                )
-              else ...[
-                ListTile(
-                  leading: const Icon(Icons.shield, color: Colors.blue),
-                  title: Text(
-                    _isRestricted ? 'Unrestrict ${widget.targetName}' : 'Restrict ${widget.targetName}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  subtitle: const Text(
-                    'Quietly isolates messages without read receipts',
-                    style: TextStyle(color: Colors.white54, fontSize: 11),
-                  ),
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    try {
-                      if (_isRestricted) {
-                        await ref.read(socialServiceProvider).unrestrictEntity(
-                          targetId: widget.targetId,
-                          targetType: widget.targetType,
-                          actingAsBandId: widget.actingAsBandId,
-                          actingAsArtistId: widget.actingAsArtistId,
-                        );
-                        if (mounted) setState(() => _isRestricted = false);
-                      } else {
-                        await ref.read(socialServiceProvider).restrictEntity(
-                          targetId: widget.targetId,
-                          targetType: widget.targetType,
-                          actingAsBandId: widget.actingAsBandId,
-                          actingAsArtistId: widget.actingAsArtistId,
-                        );
-                        if (mounted) setState(() => _isRestricted = true);
-                      }
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              _isRestricted
-                                  ? '${widget.targetName} restricted.'
-                                  : 'Restriction removed.',
-                            ),
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed: $e')),
-                        );
-                      }
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.block, color: Colors.red),
-                  title: Text('Block ${widget.targetName}', style: const TextStyle(color: Colors.red)),
-                  subtitle: const Text(
-                    'Removes follow edges in both directions and disables messages',
-                    style: TextStyle(color: Colors.white54, fontSize: 11),
-                  ),
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (dCtx) => AlertDialog(
-                        backgroundColor: CbColors.surfaceCard,
-                        title: Text('Block ${widget.targetName}?', style: const TextStyle(color: Colors.white)),
-                        content: const Text(
-                          'You will unfollow each other and neither of you will be able to message or view live activity.',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(dCtx, false),
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                            onPressed: () => Navigator.pop(dCtx, true),
-                            child: const Text('Block'),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirmed == true) {
-                      try {
-                        await ref.read(socialServiceProvider).blockEntity(
-                          targetId: widget.targetId,
-                          targetType: widget.targetType,
-                          actingAsBandId: widget.actingAsBandId,
-                          actingAsArtistId: widget.actingAsArtistId,
-                        );
-                        if (mounted) {
-                          setState(() {
-                            _isBlocked = true;
-                            _isFollowing = false;
-                            _followsViewer = false;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${widget.targetName} blocked.')),
-                          );
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to block: $e')),
-                          );
-                        }
-                      }
-                    }
-                  },
-                ),
-              ],
-              ListTile(
-                leading: const Icon(Icons.flag, color: Colors.orange),
-                title: Text('Report ${widget.targetName}', style: const TextStyle(color: Colors.orange)),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showReportDialog();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showReportDialog() {
-    String selectedCategory = 'harassment';
-    final descController = TextEditingController();
-
-    showDialog<void>(
-      context: context,
-      builder: (dCtx) {
-        return AlertDialog(
-          backgroundColor: CbColors.surfaceCard,
-          title: Text('Report ${widget.targetName}', style: const TextStyle(color: Colors.white)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                initialValue: selectedCategory,
-                dropdownColor: CbColors.surfaceCard,
-                style: const TextStyle(color: Colors.white),
-                items: const [
-                  DropdownMenuItem(value: 'harassment', child: Text('Harassment or Bullying')),
-                  DropdownMenuItem(value: 'hate_speech', child: Text('Hate Speech')),
-                  DropdownMenuItem(value: 'spam', child: Text('Spam or Fraud')),
-                  DropdownMenuItem(value: 'other', child: Text('Other Violation')),
-                ],
-                onChanged: (v) {
-                  if (v != null) selectedCategory = v;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: descController,
-                maxLines: 3,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  hintText: 'Describe violation...',
-                  hintStyle: TextStyle(color: Colors.white38),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dCtx),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              onPressed: () async {
-                Navigator.pop(dCtx);
-                try {
-                  await ref.read(socialServiceProvider).submitReport(
-                    targetType: widget.targetType,
-                    targetId: widget.targetId,
-                    violationCategory: selectedCategory,
-                    description: descController.text.trim(),
-                  );
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Report submitted to Admin Support.')),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed: $e')),
-                    );
-                  }
-                }
-              },
-              child: const Text('Submit Report'),
-            ),
-          ],
-        );
+    CbSafetyActionSheet.show(
+      context,
+      targetId: widget.targetId,
+      targetType: widget.targetType,
+      targetName: widget.targetName,
+      actingAsBandId: widget.actingAsBandId,
+      actingAsArtistId: widget.actingAsArtistId,
+      isBlocked: _isBlocked,
+      isRestricted: _isRestricted,
+      onRelationshipChanged: ({required bool isBlocked, required bool isRestricted}) {
+        if (mounted) {
+          setState(() {
+            _isBlocked = isBlocked;
+            _isRestricted = isRestricted;
+            if (isBlocked) {
+              _isFollowing = false;
+              _followsViewer = false;
+              _canMessage = false;
+            }
+          });
+        }
       },
     );
   }

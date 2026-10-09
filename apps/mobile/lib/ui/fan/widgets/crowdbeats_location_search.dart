@@ -158,12 +158,22 @@ class _SearchModalContentState extends State<_SearchModalContent> {
   void _onQueryChanged(String text) {
     widget.onSearchInput(text);
     setState(() {
-      _filteredLocations = DiscoveryLocation.searchLocations(text);
+      final q = text.trim();
+      if (q.isEmpty) {
+        _filteredLocations = DiscoveryLocation.curatedLocations;
+      } else if (q.length < 3) {
+        _filteredLocations = const [];
+      } else {
+        _filteredLocations = DiscoveryLocation.searchLocations(text);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final query = _controller.text.trim();
+    final isTooShort = query.isNotEmpty && query.length < 3;
+
     return Column(
       children: [
         // Handle bar
@@ -173,7 +183,7 @@ class _SearchModalContentState extends State<_SearchModalContent> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -204,7 +214,7 @@ class _SearchModalContentState extends State<_SearchModalContent> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -218,7 +228,7 @@ class _SearchModalContentState extends State<_SearchModalContent> {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED).withOpacity(0.15),
+              color: const Color(0xFF7C3AED).withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.my_location_rounded, color: Color(0xFFA855F7), size: 20),
@@ -234,15 +244,17 @@ class _SearchModalContentState extends State<_SearchModalContent> {
           onTap: widget.onUseMyLocation,
         ),
         const Divider(color: Color(0xFF232533), height: 1),
-        // Popular city chips
+        // Popular city chips / status header
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'POPULAR MUSIC CITIES',
+              query.isEmpty
+                  ? 'POPULAR MUSIC CITIES'
+                  : (isTooShort ? 'SEARCHING LOCATIONS' : 'MATCHING LOCATIONS'),
               style: TextStyle(
-                color: const Color(0xFF94A3B8).withOpacity(0.8),
+                color: const Color(0xFF94A3B8).withValues(alpha: 0.8),
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.8,
@@ -251,27 +263,87 @@ class _SearchModalContentState extends State<_SearchModalContent> {
           ),
         ),
         Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            itemCount: _filteredLocations.length,
-            separatorBuilder: (_, __) => const Divider(color: Color(0xFF1E202C), height: 1),
-            itemBuilder: (context, index) {
-              final loc = _filteredLocations[index];
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 2),
-                leading: const Icon(Icons.location_on_outlined, color: Color(0xFF94A3B8), size: 20),
-                title: Text(
-                  loc.city,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
-                ),
-                subtitle: Text(
-                  '${loc.administrativeArea}, ${loc.country}',
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-                ),
-                onTap: () => widget.onSelectLocation(loc),
-              );
-            },
-          ),
+          child: isTooShort
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.keyboard_outlined, color: Color(0xFF64748B), size: 36),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Type at least 3 characters',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Enter 3 or more letters to search worldwide cities, venues, or regions',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF94A3B8),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : _filteredLocations.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.location_off_rounded, color: Color(0xFF64748B), size: 36),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No locations found for "$query"',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Try another city name, check spelling, or use current location.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xFF94A3B8),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      itemCount: _filteredLocations.length,
+                      separatorBuilder: (_, __) => const Divider(color: Color(0xFF1E202C), height: 1),
+                      itemBuilder: (context, index) {
+                        final loc = _filteredLocations[index];
+                        return ListTile(
+                          contentPadding: const EdgeInsets.symmetric(vertical: 2),
+                          leading: const Icon(Icons.location_on_outlined, color: Color(0xFF94A3B8), size: 20),
+                          title: Text(
+                            loc.city,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
+                          ),
+                          subtitle: Text(
+                            '${loc.administrativeArea}, ${loc.country}',
+                            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                          ),
+                          onTap: () => widget.onSelectLocation(loc),
+                        );
+                      },
+                    ),
         ),
       ],
     );

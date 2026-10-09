@@ -352,6 +352,13 @@ class AccountHubScreen extends ConsumerWidget {
                 title: 'Preferences',
                 children: [
                   CbSettingsRow(
+                    title: 'Appearance & Accessibility',
+                    subtitle: 'Theme modes, high contrast, text scaling, and language',
+                    icon: Icons.palette_outlined,
+                    iconColor: CbColors.tealGas,
+                    onTap: () => context.push('/account/accessibility'),
+                  ),
+                  CbSettingsRow(
                     title: 'Notifications',
                     subtitle: 'Tips received, live concert alerts, digests, and push',
                     icon: Icons.notifications_none,

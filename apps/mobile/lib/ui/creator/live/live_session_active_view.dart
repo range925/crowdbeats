@@ -396,7 +396,7 @@ class _LiveSessionActiveViewState extends ConsumerState<LiveSessionActiveView> {
             Expanded(
               child: CbMetricCard(
                 title: 'STAGE TIPS',
-                value: r'\$125.00',
+                value: r'$125.00',
                 timeframe: 'Tonight',
                 definition: 'Gross tips collected during this live stage performance.',
                 icon: Icons.volunteer_activism,

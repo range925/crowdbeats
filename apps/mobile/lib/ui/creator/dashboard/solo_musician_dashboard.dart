@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../state/creator_context_state.dart';
+import '../../../state/session_heartbeat_notifier.dart';
 import '../../components/components.dart';
 import '../../theme/cb_colors.dart';
 import 'widgets/dashboard_kyc_banner.dart';
@@ -14,6 +15,9 @@ import 'widgets/dashboard_activity_feed.dart';
 import '../finance/stripe_connect_kyc_screen.dart';
 import '../finance/creator_balances_screen.dart';
 import '../analytics/creator_analytics_screen.dart';
+import '../live/live_checkin_sheet.dart';
+import '../live/rotating_qr_modal.dart';
+import '../profile/creator_epk_editor_screen.dart';
 
 class SoloMusicianDashboard extends ConsumerStatefulWidget {
   const SoloMusicianDashboard({super.key});
@@ -27,10 +31,53 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
     await Future<void>.delayed(const Duration(milliseconds: 600));
   }
 
+  Future<void> _handleEndLiveSession(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CbColors.surfaceCard,
+        title: const Text('End Live Performance?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: const Text(
+          'This will stop broadcasting your live stage presence and reconcile all collected tips to your ledger.',
+          style: TextStyle(color: CbColors.textSecondary, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Keep Playing', style: TextStyle(color: Colors.white70)),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: CbColors.statusError),
+            child: const Text('End Set', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final contextState = ref.read(creatorContextProvider);
+      final sessionId = contextState.activeSessionId;
+      if (sessionId != null) {
+        try {
+          await ref.read(sessionServiceProvider).endSession(sessionId);
+        } catch (_) {}
+      }
+      ref.read(creatorContextProvider.notifier).clearSession();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Live set ended. All stage tips reconciled to your ledger.'),
+            backgroundColor: CbColors.statusLive,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final contextState = ref.watch(creatorContextProvider);
-    final contextNotifier = ref.read(creatorContextProvider.notifier);
     final isLive = contextState.activeContext.hasActiveLiveSession;
 
     return Scaffold(
@@ -57,15 +104,19 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
               listenerCount: isLive ? 42 : 0,
               onPrimaryAction: () {
                 if (isLive) {
-                  // Present QR Modal
+                  RotatingQrModal.show(
+                    context,
+                    performerName: contextState.activeContext.name,
+                    sessionId: contextState.activeSessionId ?? 'sess_live_solo',
+                    isBand: false,
+                    performerId: contextState.activeContext.id,
+                  );
                 } else {
-                  contextNotifier.setLiveStatus(true);
+                  LiveCheckinSheet.show(context);
                 }
               },
               onSecondaryAction: isLive
-                  ? () {
-                      contextNotifier.setLiveStatus(false);
-                    }
+                  ? () => _handleEndLiveSession(context, ref)
                   : null,
             ),
             const SizedBox(height: 16),
@@ -122,6 +173,28 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            // Trust & Escrow Transparency Caption
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0x1A10B981),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0x3310B981)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.shield_outlined, size: 14, color: CbColors.tealGas),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Only settled funds marked "Available" can be paid out. Escrow secured by Stripe Connect.',
+                      style: TextStyle(color: CbColors.tealGas, fontSize: 11, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
 
             // 4. Action Items Requiring Attention
@@ -162,9 +235,7 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
               cityState: 'San Diego, CA',
               startTime: '8:00 PM Tonight',
               countdownText: 'Starts in 45 min',
-              onCheckInNow: () {
-                contextNotifier.setLiveStatus(true);
-              },
+              onCheckInNow: () => LiveCheckinSheet.show(context),
             ),
 
             // 6. Quick Action Grid
@@ -173,7 +244,7 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
                 QuickActionItem(
                   label: 'Check In',
                   icon: Icons.location_on,
-                  onTap: () => contextNotifier.setLiveStatus(true),
+                  onTap: () => LiveCheckinSheet.show(context),
                 ),
                 QuickActionItem(
                   label: 'Analytics',
@@ -191,17 +262,33 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
                 QuickActionItem(
                   label: 'Present QR',
                   icon: Icons.qr_code_2,
-                  onTap: () {},
+                  onTap: () {
+                    if (isLive) {
+                      RotatingQrModal.show(
+                        context,
+                        performerName: contextState.activeContext.name,
+                        sessionId: contextState.activeSessionId ?? 'sess_live_solo',
+                        isBand: false,
+                        performerId: contextState.activeContext.id,
+                      );
+                    } else {
+                      LiveCheckinSheet.show(context);
+                    }
+                  },
                 ),
                 QuickActionItem(
                   label: 'Campaign',
                   icon: Icons.rocket_launch,
-                  onTap: () {},
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const CreatorBalancesScreen()),
+                  ),
                 ),
                 QuickActionItem(
                   label: 'Edit EPK',
                   icon: Icons.edit_note,
-                  onTap: () {},
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const CreatorEpkEditorScreen()),
+                  ),
                 ),
               ],
             ),

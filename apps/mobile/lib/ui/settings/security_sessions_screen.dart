@@ -50,7 +50,7 @@ class _SecuritySessionsScreenState extends ConsumerState<SecuritySessionsScreen>
 
   Future<void> _revokeAllSessions() async {
     setState(() => _revoking = true);
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await ref.read(userSettingsProvider.notifier).revokeAllOtherSessions();
     if (!mounted) return;
     setState(() => _revoking = false);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -60,7 +60,6 @@ class _SecuritySessionsScreenState extends ConsumerState<SecuritySessionsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authStateProvider);
     final settings = ref.watch(userSettingsProvider);
     final security = settings.security;
     final notifier = ref.read(userSettingsProvider.notifier);
@@ -88,6 +87,15 @@ class _SecuritySessionsScreenState extends ConsumerState<SecuritySessionsScreen>
                     icon: Icons.lock_reset_outlined,
                     iconColor: CbColors.purpleLight,
                     onTap: _changePassword,
+                  ),
+                  CbSettingsRow(
+                    title: 'Two-Factor Authentication (2FA)',
+                    subtitle: 'Require authenticator app verification code on new devices',
+                    icon: Icons.shield_outlined,
+                    iconColor: CbColors.purpleLight,
+                    isSwitch: true,
+                    switchValue: security.twoFactorEnabled,
+                    onSwitchChanged: (val) => notifier.setTwoFactor(val),
                   ),
                   CbSettingsRow(
                     title: 'Biometric App Lock',
@@ -128,45 +136,115 @@ class _SecuritySessionsScreenState extends ConsumerState<SecuritySessionsScreen>
 
               // Active Device Sessions
               CbSettingsSection(
-                title: 'Active Sessions',
+                title: 'Active Sessions & Devices',
                 children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E2032),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: CbColors.purpleMain, width: 1.5),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.phone_android, color: CbColors.purpleLight, size: 20),
-                            SizedBox(width: 8),
-                            Text('Current Device', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                            Spacer(),
-                            Text('Active Now', style: TextStyle(color: CbColors.liveGreen, fontSize: 12, fontWeight: FontWeight.w600)),
-                          ],
+                  ...settings.activeSessions.map((session) {
+                    final isCurrent = session['isCurrent'] == true;
+                    final device = session['device'] as String? ?? 'Device';
+                    final location = session['location'] as String? ?? 'Unknown Location';
+                    final lastActive = session['lastActive'] as String? ?? 'Active';
+                    final client = session['client'] as String? ?? 'Crowdbeats App';
+                    final sessionId = session['id'] as String? ?? '';
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E2032),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isCurrent ? CbColors.purpleMain : CbColors.borderSubtle,
+                          width: isCurrent ? 1.5 : 1.0,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Authenticated via ${auth.email ?? "Firebase"}',
-                          style: const TextStyle(color: CbColors.textSecondary, fontSize: 12),
-                        ),
-                      ],
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isCurrent ? Icons.phone_android : Icons.laptop_chromebook,
+                            color: isCurrent ? CbColors.purpleLight : Colors.white70,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      device,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.5,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    if (isCurrent)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: CbColors.liveGreen.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: const Text(
+                                          'Current Device',
+                                          style: TextStyle(
+                                            color: CbColors.liveGreen,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '$location • $client',
+                                  style: const TextStyle(color: CbColors.textSecondary, fontSize: 11.5),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  lastActive,
+                                  style: TextStyle(
+                                    color: isCurrent ? CbColors.liveGreen : Colors.white38,
+                                    fontSize: 11,
+                                    fontWeight: isCurrent ? FontWeight.w600 : FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (!isCurrent)
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                foregroundColor: CbColors.errorRed,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              ),
+                              onPressed: () async {
+                                await notifier.revokeSession(sessionId);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('$device session revoked.')),
+                                  );
+                                }
+                              },
+                              child: const Text('Revoke', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                        ],
+                      ),
+                    );
+                  }),
+                  if (settings.activeSessions.any((s) => s['isCurrent'] != true))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: CbButton(
+                        label: 'Sign Out from All Other Devices',
+                        variant: CbButtonVariant.secondary,
+                        isLoading: _revoking,
+                        onPressed: _revokeAllSessions,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: CbButton(
-                      label: 'Sign Out from All Other Devices',
-                      variant: CbButtonVariant.secondary,
-                      isLoading: _revoking,
-                      onPressed: _revokeAllSessions,
-                    ),
-                  ),
                 ],
               ),
             ],

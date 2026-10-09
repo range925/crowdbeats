@@ -133,6 +133,124 @@ class CreatorContextNotifier extends StateNotifier<CreatorContextState> {
     return true;
   }
 
+  /// Adds a band context when an invitation is accepted.
+  void joinBand(CreatorContextItem bandContext) {
+    if (!state.availableContexts.any((c) => c.id == bandContext.id)) {
+      state = state.copyWith(
+        availableContexts: [...state.availableContexts, bandContext],
+      );
+    }
+  }
+
+  /// Leaves a band context subject to ownership, active campaign, and balance constraints.
+  bool leaveBand(
+    String bandId, {
+    bool hasActiveCampaign = false,
+    bool hasUnpaidBalance = false,
+  }) {
+    if (state.activeContext.hasActiveLiveSession && state.activeContext.id == bandId) {
+      state = state.copyWith(
+        conflictError: 'Cannot leave band while a live stage session is active. End set first.',
+      );
+      return false;
+    }
+
+    final targetBand = state.availableContexts.firstWhere(
+      (c) => c.id == bandId,
+      orElse: () => state.activeContext,
+    );
+
+    if (targetBand.role == 'BAND_FOUNDER') {
+      state = state.copyWith(
+        conflictError: 'Cannot leave band as the sole founder. Transfer ownership first.',
+      );
+      return false;
+    }
+
+    if (hasActiveCampaign) {
+      state = state.copyWith(
+        conflictError: 'Cannot leave band while an active crowdfunding campaign is in progress.',
+      );
+      return false;
+    }
+
+    if (hasUnpaidBalance) {
+      state = state.copyWith(
+        conflictError: 'Cannot leave band with unsettled treasury balance allocations.',
+      );
+      return false;
+    }
+
+    final updatedAvailable = state.availableContexts.where((c) => c.id != bandId).toList();
+    if (state.activeContext.id == bandId) {
+      final solo = updatedAvailable.firstWhere(
+        (c) => c.isSolo,
+        orElse: () => updatedAvailable.isNotEmpty
+            ? updatedAvailable.first
+            : const CreatorContextItem(
+                id: 'solo_default',
+                name: 'Elena Cruz (Solo)',
+                type: 'solo',
+                role: 'SOLO_ARTIST',
+              ),
+      );
+      state = state.copyWith(
+        activeContext: solo,
+        availableContexts: updatedAvailable,
+        conflictError: null,
+      );
+    } else {
+      state = state.copyWith(
+        availableContexts: updatedAvailable,
+        conflictError: null,
+      );
+    }
+    return true;
+  }
+
+  /// Transfers ownership of the band from the founder to a designated member.
+  bool transferBandOwnership(String bandId, String targetUid, String confirmationPhrase) {
+    if (confirmationPhrase.trim() != 'TRANSFER OWNERSHIP') {
+      state = state.copyWith(
+        conflictError: 'Confirmation phrase must match "TRANSFER OWNERSHIP" exactly.',
+      );
+      return false;
+    }
+
+    final updatedAvailable = state.availableContexts.map((c) {
+      if (c.id == bandId) {
+        return CreatorContextItem(
+          id: c.id,
+          name: c.name,
+          type: c.type,
+          role: 'BAND_MEMBER',
+          photoUrl: c.photoUrl,
+          hasActiveLiveSession: c.hasActiveLiveSession,
+        );
+      }
+      return c;
+    }).toList();
+
+    CreatorContextItem updatedActive = state.activeContext;
+    if (state.activeContext.id == bandId) {
+      updatedActive = CreatorContextItem(
+        id: state.activeContext.id,
+        name: state.activeContext.name,
+        type: state.activeContext.type,
+        role: 'BAND_MEMBER',
+        photoUrl: state.activeContext.photoUrl,
+        hasActiveLiveSession: state.activeContext.hasActiveLiveSession,
+      );
+    }
+
+    state = state.copyWith(
+      activeContext: updatedActive,
+      availableContexts: updatedAvailable,
+      conflictError: null,
+    );
+    return true;
+  }
+
   /// Called after a successful [startSession] callable response.
   ///
   /// Stores the server-assigned [sessionId] and server-authoritative [endsAt],

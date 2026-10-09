@@ -546,6 +546,40 @@ class PendingTipContext {
   final String? message;
 }
 
+class DiscoveryCampaign {
+  const DiscoveryCampaign({
+    required this.id,
+    required this.creatorId,
+    required this.creatorName,
+    required this.creatorType,
+    this.creatorPhotoUrl,
+    required this.title,
+    required this.description,
+    required this.goalCents,
+    required this.pledgedCents,
+    required this.backerCount,
+    required this.daysRemaining,
+    this.currency = 'USD',
+  });
+
+  final String id;
+  final String creatorId;
+  final String creatorName;
+  final String creatorType;
+  final String? creatorPhotoUrl;
+  final String title;
+  final String description;
+  final int goalCents;
+  final int pledgedCents;
+  final int backerCount;
+  final int daysRemaining;
+  final String currency;
+
+  double get progressFraction =>
+      goalCents > 0 ? (pledgedCents / goalCents).clamp(0.0, 1.0) : 0.0;
+  int get percentFunded => (progressFraction * 100).toInt();
+}
+
 // ─── Phase 8 Two-Way Discovery Filter & Supporter Models ─────────────────────
 
 class DiscoveryFilterState {

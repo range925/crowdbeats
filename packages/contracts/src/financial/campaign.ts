@@ -17,6 +17,8 @@ export const CampaignStatus = {
   APPROVED: 'approved',    // Phase 7: approved, not yet published
   ACTIVE: 'active',
   COMPLETED: 'completed',  // Phase 7: goal met and closed
+  REJECTED: 'rejected',    // Phase 11/13: rejected during moderation
+  FLAGGED: 'flagged',      // Phase 11/13: flagged for Trust & Safety review
   FUNDED: 'funded',        // Legacy alias
   ENDED: 'ended',
   CANCELLED: 'cancelled',

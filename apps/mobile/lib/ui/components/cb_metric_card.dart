@@ -60,28 +60,36 @@ class CbMetricCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 14, color: accentColor),
-                    const SizedBox(width: 6),
-                  ],
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: CbColors.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.2,
+              Expanded(
+                child: Row(
+                  children: [
+                    if (icon != null) ...[
+                      Icon(icon, size: 14, color: accentColor),
+                      const SizedBox(width: 6),
+                    ],
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: CbColors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              if (definition != null)
+              if (definition != null) ...[
+                const SizedBox(width: 4),
                 GestureDetector(
                   onTap: () => _showDefinitionDialog(context),
                   child: const Icon(Icons.info_outline, size: 14, color: CbColors.textMuted),
                 ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -102,15 +110,19 @@ class CbMetricCard extends StatelessWidget {
             Row(
               children: [
                 if (timeframe != null) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0x228B5CF6),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      timeframe!,
-                      style: const TextStyle(color: CbColors.purpleLight, fontSize: 10, fontWeight: FontWeight.w600),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0x228B5CF6),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        timeframe!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: CbColors.purpleLight, fontSize: 10, fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -119,8 +131,9 @@ class CbMetricCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       subtitle!,
-                      style: const TextStyle(color: CbColors.textMuted, fontSize: 11),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: CbColors.textMuted, fontSize: 10),
                     ),
                   ),
               ],

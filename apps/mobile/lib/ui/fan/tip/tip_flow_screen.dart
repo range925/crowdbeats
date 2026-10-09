@@ -217,6 +217,12 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
       );
       return;
     }
+    if (_selectedAmountCents > 50000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Maximum tip amount is \$500.00')),
+      );
+      return;
+    }
 
     final authState = ref.read(authStateProvider);
     if (authState.status != CbAuthStatus.authenticated) {

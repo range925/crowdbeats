@@ -37,10 +37,12 @@ class SocialRelationshipState {
 }
 
 class SocialService {
-  SocialService._();
+  SocialService({FirebaseFunctions? functions}) : _injectedFunctions = functions;
+  SocialService._() : _injectedFunctions = null;
   static final SocialService instance = SocialService._();
 
-  FirebaseFunctions get _functions => FirebaseFunctions.instance;
+  final FirebaseFunctions? _injectedFunctions;
+  FirebaseFunctions get _functions => _injectedFunctions ?? FirebaseFunctions.instance;
 
   // ── Follow Operations ───────────────────────────────────────────────────────
 

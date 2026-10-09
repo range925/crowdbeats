@@ -1,9 +1,9 @@
-// Crowdbeats V2 — Stitch Authoritative Tip Preset Card (Project 5326179813018056505)
-// Amount selector tile ($5, $10, $20, Custom) with glowing selected purple border and heart/star icons.
-
 import 'package:flutter/material.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
+import '../theme/cb_theme.dart';
+import '../theme/cb_typography.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CbTipPresetCard extends StatelessWidget {
   const CbTipPresetCard({
@@ -25,6 +25,8 @@ class CbTipPresetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
+
     return Semantics(
       button: true,
       selected: isSelected,
@@ -39,19 +41,19 @@ class CbTipPresetCard extends StatelessWidget {
             vertical: CbSpacing.s3_5,
           ),
           decoration: BoxDecoration(
-            color: CbColors.surface2,
+            color: isSelected ? ext.surfaceOverlay : ext.surfaceCard,
             borderRadius: BorderRadius.circular(CbSpacing.radiusLg),
             border: Border.all(
-              color: isSelected ? CbColors.purpleMain : CbColors.borderSubtle,
+              color: isSelected ? ext.borderFocus : ext.borderSubtle,
               width: isSelected ? 2.0 : 1.0,
             ),
             boxShadow: isSelected
-                ? const [
+                ? [
                     BoxShadow(
-                      color: CbColors.purpleGlow,
+                      color: ext.borderFocus.withAlpha(60),
                       blurRadius: 16,
                       spreadRadius: -2,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ]
                 : null,
@@ -66,12 +68,12 @@ class CbTipPresetCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: CbColors.purpleMain,
+                      color: ext.borderFocus,
                       borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
                     ),
                     child: Text(
                       badgeText!,
-                      style: const TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         color: Colors.white,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
@@ -85,10 +87,8 @@ class CbTipPresetCard extends StatelessWidget {
                   children: [
                     Text(
                       amountLabel,
-                      style: TextStyle(
-                        color: isSelected ? CbColors.textPrimary : CbColors.textSecondary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      style: CbTypography.monoNumberMd(
+                        color: isSelected ? ext.textPrimary : ext.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -96,7 +96,7 @@ class CbTipPresetCard extends StatelessWidget {
                         Icon(
                           isSelected ? Icons.favorite : Icons.favorite_border,
                           size: 16,
-                          color: isSelected ? CbColors.purpleLight : CbColors.textMuted,
+                          color: isSelected ? ext.borderFocus : ext.textTertiary,
                         ),
                   ],
                 ),
@@ -108,3 +108,4 @@ class CbTipPresetCard extends StatelessWidget {
     );
   }
 }
+

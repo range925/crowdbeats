@@ -101,6 +101,7 @@ class _UniversalOnboardingWizardState
   }
 
   Future<void> _completeOnboarding() async {
+    if (_isSaving) return;
     if (!_termsAccepted || !_privacyAccepted || !_isAdultConfirmed) {
       setState(() => _errorMessage = 'Please confirm legal age and accept Terms & Privacy Policy.');
       return;
@@ -155,14 +156,25 @@ class _UniversalOnboardingWizardState
       });
 
       await AuthService.instance.getIdTokenResult(forceRefresh: true);
-      await ref.read(authNotifierProvider.notifier).reloadUser();
+      await ref.read(authNotifierProvider.notifier).refreshProfile();
 
       if (mounted) {
-        context.go('/' + _selectedPersona!);
+        String? from;
+        try {
+          from = GoRouterState.of(context).uri.queryParameters['from'];
+        } catch (_) {}
+        if (from != null && from.isNotEmpty && from.startsWith('/') && !from.startsWith('/auth') && !from.startsWith('/onboarding')) {
+          context.go(from);
+        } else {
+          context.go('/' + _selectedPersona!);
+        }
       }
     } catch (e) {
       if (mounted) {
-        context.go('/' + (_selectedPersona ?? 'fan'));
+        setState(() {
+          _errorMessage = 'Profile creation could not be completed. Please check your connection and try again.';
+          _isSaving = false;
+        });
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

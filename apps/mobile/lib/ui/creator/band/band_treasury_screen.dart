@@ -1,5 +1,6 @@
-// Crowdbeats V2 — Band Treasury & Member Payout Ledger Screen (Phase 7)
-// Collective band treasury balance, member distribution claims & split payout history.
+// Crowdbeats V2 — Band Treasury & Member Payout Ledger Screen (Phase 10)
+// Collective band treasury balance, member distribution claims, split payout history,
+// and deterministic Largest Remainder Method (OD-09) penny reconciliation.
 
 import 'package:flutter/material.dart';
 import 'package:crowdbeats_mobile/ui/components/components.dart';
@@ -99,6 +100,37 @@ class _BandTreasuryScreenState extends State<BandTreasuryScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+
+          // Largest Remainder Method (OD-09) Mathematical Transparency Card
+          const CbGlassCard(
+            padding: EdgeInsets.all(14),
+            backgroundColor: Color(0x1803DAC6),
+            borderColor: Color(0x3303DAC6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.calculate_outlined, color: CbColors.tealGas, size: 20),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Largest Remainder Method (OD-09)',
+                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Odd-cent allocations and rounding differences are allocated deterministically to avoid fractional cent accumulation or escrow drift across member wallets.',
+                        style: TextStyle(color: CbColors.textSecondary, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
 
           // Member Distribution Breakdown
@@ -127,6 +159,7 @@ class _BandTreasuryScreenState extends State<BandTreasuryScreen> {
                   ),
                 ),
               )),
+          const SizedBox(height: 24),
         ],
       ),
     );

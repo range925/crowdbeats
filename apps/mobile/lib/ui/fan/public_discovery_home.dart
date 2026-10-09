@@ -21,6 +21,7 @@ import 'widgets/crowdbeats_location_search.dart';
 import 'widgets/compact_google_map.dart';
 import 'widgets/nearby_creator_card.dart';
 import 'widgets/popular_creator_card.dart';
+import 'widgets/discovery_campaign_card.dart';
 import 'views/nearby_secondary_view.dart';
 import 'views/popular_secondary_view.dart';
 
@@ -82,9 +83,10 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
     final loc = discoveryState.discoveryLocation;
     final performers = discoveryState.performers;
 
-    // Exactly three cards per section (Section 0, Rule 5-7)
-    final topNearby = performers.take(3).toList();
+    // Top 5 Nearby performers matching map markers (Phase 6), Top 3 Popular, and Top Campaigns
+    final topNearby = performers.take(5).toList();
     final topPopular = performers.skip(0).take(3).toList();
+    final topCampaigns = discoveryState.campaigns;
     final topSuggested = performers.skip(topNearby.length).take(3).toList().isNotEmpty
         ? performers.skip(topNearby.length).take(3).toList()
         : performers.take(3).toList();
@@ -306,6 +308,14 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                       _selectedPerformer = p;
                     });
                   },
+                  onSearchThisArea: () {
+                    discoveryNotifier.onViewportChanged(
+                      minLat: loc.latitude - 0.02,
+                      maxLat: loc.latitude + 0.02,
+                      minLng: loc.longitude - 0.02,
+                      maxLng: loc.longitude + 0.02,
+                    );
+                  },
                 ),
               ),
 
@@ -371,12 +381,13 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                       if (topNearby.isEmpty)
                         _buildEmptyState('No live or scheduled musicians found in ${loc.city}.')
                       else
-                        ...topNearby.map((p) => NearbyCreatorCard(
-                              performer: p,
-                              isSelected: _selectedPerformer?.id == p.id,
+                        ...topNearby.asMap().entries.map((entry) => NearbyCreatorCard(
+                              performer: entry.value,
+                              rank: entry.key + 1,
+                              isSelected: _selectedPerformer?.id == entry.value.id,
                               onTap: () {
                                 setState(() {
-                                  _selectedPerformer = p;
+                                  _selectedPerformer = entry.value;
                                 });
                               },
                             )),
@@ -464,7 +475,51 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
 
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-              // 6. EXACTLY THREE SUGGESTED FOR YOU (YOU MAY LIKE) CARDS
+              // 6. TOP CAMPAIGNS (CROWDFUNDING)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Top Campaigns',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          Text(
+                            'Support local music projects & tours',
+                            style: TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      if (topCampaigns.isEmpty)
+                        _buildEmptyState('No active crowdfunding campaigns recorded for this region.')
+                      else
+                        ...topCampaigns.map((camp) => DiscoveryCampaignCard(
+                              campaign: camp,
+                            )),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+              // 7. EXACTLY THREE SUGGESTED FOR YOU (YOU MAY LIKE) CARDS
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverToBoxAdapter(

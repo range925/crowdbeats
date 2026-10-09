@@ -56,7 +56,9 @@ import 'ui/settings/blocked_accounts_screen.dart';
 import 'ui/settings/support_center_screen.dart';
 import 'ui/settings/legal_disclosures_screen.dart';
 import 'ui/settings/account_deletion_screen.dart';
+import 'ui/settings/accessibility_appearance_screen.dart';
 import 'ui/preview/fan_mobile_preview_hub.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ui/sponsor/sponsor_shell.dart';
 
 void main() async {
@@ -88,9 +90,22 @@ void main() async {
     debugPrint('[Firebase] Initialization error: $e');
   }
 
+  String initialThemeMode = 'system';
+  try {
+    final sp = await SharedPreferences.getInstance();
+    initialThemeMode = sp.getString('cb_theme_mode') ?? 'system';
+  } catch (e) {
+    debugPrint('[Theme] SharedPreferences init error: $e');
+  }
+
   runApp(
-    const ProviderScope(
-      child: CrowdbeatsV2App(),
+    ProviderScope(
+      overrides: [
+        userSettingsProvider.overrideWith(
+          (ref) => UserSettingsNotifier(initialThemeMode: initialThemeMode),
+        ),
+      ],
+      child: const CrowdbeatsV2App(),
     ),
   );
 }
@@ -105,81 +120,90 @@ final routerProvider = Provider<GoRouter>((ref) {
   return _buildRouter(ref);
 });
 
+String? cbAuthRedirect(CbAuthState authState, GoRouterState state) {
+  final loc = state.matchedLocation;
+
+  // Allow unrestricted public discovery, tipping, legal disclosures, and developer preview routes
+  if (loc == '/fan' ||
+      loc == '/preview' ||
+      loc.startsWith('/preview') ||
+      loc == '/gallery' ||
+      loc == '/legal' ||
+      loc == '/terms' ||
+      loc == '/privacy' ||
+      loc == '/account/legal' ||
+      loc == '/tip' ||
+      loc.startsWith('/tip/') ||
+      loc.startsWith('/artist/') ||
+      loc.startsWith('/band/')) {
+    return null;
+  }
+
+  switch (authState.status) {
+    case CbAuthStatus.loading:
+      return loc == '/splash' ? null : null; // Allow unauthenticated browsing immediately
+    case CbAuthStatus.unauthenticated:
+      if (loc.startsWith('/auth') || loc == '/splash') return null;
+      // Protect account and creator/sponsor management dashboards
+      if (loc.startsWith('/account') ||
+          loc == '/artist' ||
+          loc == '/musician' ||
+          loc == '/creator' ||
+          loc.startsWith('/creator') ||
+          loc == '/band' ||
+          loc == '/band_member' ||
+          loc == '/venue_manager' ||
+          loc == '/sponsor' ||
+          loc == '/sponsor_rep' ||
+          loc.startsWith('/sponsor')) {
+        final targetUri = state.uri.toString();
+        return '/auth?from=${Uri.encodeComponent(targetUri)}';
+      }
+      return null; // Default: allow public exploration
+    case CbAuthStatus.unverified:
+      if (loc == '/auth/verify-email') return null;
+      final fromUnverified = state.uri.queryParameters['from'];
+      if (fromUnverified != null && fromUnverified.isNotEmpty) {
+        return '/auth/verify-email?from=${Uri.encodeComponent(fromUnverified)}';
+      }
+      return '/auth/verify-email';
+    case CbAuthStatus.unonboarded:
+      if (loc.startsWith('/onboarding')) return null;
+      final fromOnboarding = state.uri.queryParameters['from'];
+      if (fromOnboarding != null && fromOnboarding.isNotEmpty) {
+        return '/onboarding?from=${Uri.encodeComponent(fromOnboarding)}';
+      }
+      return '/onboarding';
+    case CbAuthStatus.suspended:
+      return loc == '/suspended' ? null : '/suspended';
+    case CbAuthStatus.deleted:
+      return loc == '/deleted' ? null : '/deleted';
+    case CbAuthStatus.revoked:
+      return loc == '/session-revoked' ? null : '/session-revoked';
+    case CbAuthStatus.expired:
+      return loc == '/session-expired' ? null : '/session-expired';
+    case CbAuthStatus.authenticated:
+      // Allow account settings hub and subroutes
+      if (loc.startsWith('/account')) return null;
+      // Redirect to persona dashboard or return destination if on auth/splash/onboarding
+      if (loc.startsWith('/auth') || loc == '/splash' || loc.startsWith('/onboarding')) {
+        final from = state.uri.queryParameters['from'];
+        if (from != null && from.isNotEmpty && from.startsWith('/') && !from.startsWith('/auth')) {
+          return from;
+        }
+        return '/${authState.personaType ?? "fan"}';
+      }
+      return null;
+  }
+}
+
 GoRouter _buildRouter(Ref ref) {
   final refreshNotifier = _GoRouterRefreshNotifier(ref);
   ref.onDispose(refreshNotifier.dispose);
   return GoRouter(
     refreshListenable: refreshNotifier,
     initialLocation: kIsWeb ? '/preview' : '/fan',
-    redirect: (context, state) {
-      final authState = ref.read(authStateProvider);
-      final loc = state.matchedLocation;
-
-      // Allow unrestricted public discovery, tipping, legal disclosures, and developer preview routes
-      if (loc == '/fan' ||
-          loc == '/preview' ||
-          loc.startsWith('/preview') ||
-          loc == '/gallery' ||
-          loc == '/legal' ||
-          loc == '/terms' ||
-          loc == '/privacy' ||
-          loc == '/account/legal' ||
-          loc == '/tip' ||
-          loc.startsWith('/tip/') ||
-          loc.startsWith('/artist/') ||
-          loc.startsWith('/band/')) {
-        return null;
-      }
-
-      switch (authState.status) {
-        case CbAuthStatus.loading:
-          return loc == '/splash' ? null : null; // Allow unauthenticated browsing immediately
-        case CbAuthStatus.unauthenticated:
-          if (loc.startsWith('/auth') || loc == '/splash') return null;
-          // Protect account and creator/sponsor management dashboards
-          if (loc.startsWith('/account') ||
-              loc == '/artist' ||
-              loc == '/musician' ||
-              loc == '/creator' ||
-              loc.startsWith('/creator') ||
-              loc == '/band' ||
-              loc == '/band_member' ||
-              loc == '/venue_manager' ||
-              loc == '/sponsor' ||
-              loc == '/sponsor_rep' ||
-              loc.startsWith('/sponsor')) {
-            final targetUri = state.uri.toString();
-            return '/auth?from=${Uri.encodeComponent(targetUri)}';
-          }
-          return null; // Default: allow public exploration
-        case CbAuthStatus.unverified:
-          if (loc == '/auth/verify-email') return null;
-          return '/auth/verify-email';
-        case CbAuthStatus.unonboarded:
-          if (loc.startsWith('/onboarding')) return null;
-          return '/onboarding';
-        case CbAuthStatus.suspended:
-          return loc == '/suspended' ? null : '/suspended';
-        case CbAuthStatus.deleted:
-          return loc == '/deleted' ? null : '/deleted';
-        case CbAuthStatus.revoked:
-          return loc == '/session-revoked' ? null : '/session-revoked';
-        case CbAuthStatus.expired:
-          return loc == '/session-expired' ? null : '/session-expired';
-        case CbAuthStatus.authenticated:
-          // Allow account settings hub and subroutes
-          if (loc.startsWith('/account')) return null;
-          // Redirect to persona dashboard or return destination if on auth/splash/onboarding
-          if (loc.startsWith('/auth') || loc == '/splash' || loc.startsWith('/onboarding')) {
-            final from = state.uri.queryParameters['from'];
-            if (from != null && from.isNotEmpty && from.startsWith('/') && !from.startsWith('/auth')) {
-              return from;
-            }
-            return '/${authState.personaType ?? "fan"}';
-          }
-          return null;
-      }
-    },
+    redirect: (context, state) => cbAuthRedirect(ref.read(authStateProvider), state),
     routes: [
       GoRoute(path: '/splash',                        builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/auth',                          builder: (_, _) => const AuthScreen()),
@@ -208,6 +232,7 @@ GoRouter _buildRouter(Ref ref) {
       GoRoute(path: '/account/tipping-preferences',   builder: (_, _) => const TippingPreferencesScreen()),
       GoRoute(path: '/account/notifications',         builder: (_, _) => const NotificationsSettingsScreen()),
       GoRoute(path: '/account/privacy',               builder: (_, _) => const PrivacyLocationScreen()),
+      GoRoute(path: '/account/accessibility',         builder: (_, _) => const AccessibilityAppearanceScreen()),
       GoRoute(path: '/account/security',              builder: (_, _) => const SecuritySessionsScreen()),
       GoRoute(path: '/account/blocked',               builder: (_, _) => const BlockedAccountsScreen()),
       GoRoute(path: '/account/support',               builder: (_, _) => const SupportCenterScreen()),
@@ -286,6 +311,8 @@ class CrowdbeatsV2App extends ConsumerWidget {
       _ => ThemeMode.system,
     };
 
+    final a11y = settings.accessibility;
+
     return MaterialApp.router(
       title:                      'Crowdbeats',
       debugShowCheckedModeBanner: false,
@@ -293,6 +320,15 @@ class CrowdbeatsV2App extends ConsumerWidget {
       darkTheme:                  CbTheme.dark(),
       themeMode:                  themeMode,
       routerConfig:               router,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(a11y.fontScale),
+            boldText: a11y.highContrastMode,
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

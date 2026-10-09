@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
+import '../theme/cb_theme.dart';
 
 enum CbButtonVariant { primary, secondary, ghost, destructive }
 
@@ -58,34 +59,47 @@ class _CbButtonState extends State<CbButton>
     CbButtonSize.lg => CbSpacing.s6,
   };
 
-  (Color bg, Color fg, Color border) get _colors => switch (widget.variant) {
-    CbButtonVariant.primary => (
-      CbColors.accentPrimary,
-      CbColors.textOnPrimary,
-      Colors.transparent,
-    ),
-    CbButtonVariant.secondary => (
-      Colors.transparent,
-      CbColors.accentPrimary,
-      CbColors.accentPrimary,
-    ),
-    CbButtonVariant.ghost => (
-      Colors.transparent,
-      CbColors.accentSecondary,
-      Colors.transparent,
-    ),
-    CbButtonVariant.destructive => (
-      Colors.transparent,
-      CbColors.statusError,
-      CbColors.statusError,
-    ),
-  };
+  (Color bg, Color fg, Color border) _resolveColors(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
+
+    return switch (widget.variant) {
+      CbButtonVariant.primary => isDark
+          ? (
+              CbColors.brandCoralPink,
+              const Color(0xFF131315),
+              Colors.transparent,
+            )
+          : (
+              CbColors.accentPrimary,
+              Colors.white,
+              Colors.transparent,
+            ),
+      CbButtonVariant.secondary => (
+          Colors.transparent,
+          isDark ? CbColors.accentSecondary : CbColors.accentPrimary,
+          isDark ? CbColors.brandElectricViolet : CbColors.accentPrimary,
+        ),
+      CbButtonVariant.ghost => (
+          Colors.transparent,
+          ext.textSecondary,
+          Colors.transparent,
+        ),
+      CbButtonVariant.destructive => (
+          Colors.transparent,
+          ext.statusError,
+          ext.statusError,
+        ),
+    };
+  }
 
   bool get _disabled => widget.onPressed == null || widget.isLoading;
 
   @override
   Widget build(BuildContext context) {
-    final (bg, fg, border) = _colors;
+    final (bg, fg, border) = _resolveColors(context);
+    final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
 
     Widget child = Row(
       mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
@@ -106,7 +120,7 @@ class _CbButtonState extends State<CbButton>
           const SizedBox(width: CbSpacing.s2),
         Text(
           widget.isLoading ? 'Loading…' : widget.label,
-          style: GoogleFonts.dmSans(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: _fontSize,
             fontWeight: FontWeight.w600,
             color: fg,
@@ -169,7 +183,7 @@ class _CbButtonState extends State<CbButton>
                       borderRadius: BorderRadius.circular(CbSpacing.radiusSm + 2),
                       boxShadow: [
                         BoxShadow(
-                          color: CbColors.borderFocus.withAlpha(153),
+                          color: ext.borderFocus.withAlpha(153),
                           blurRadius: 0,
                           spreadRadius: 3,
                         ),

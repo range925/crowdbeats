@@ -15,8 +15,9 @@ import '../data/services/active_subscription_tracker.dart';
 import 'location_provider_state.dart';
 
 class _CachedBatch {
-  _CachedBatch(this.performers, this.cachedAt);
+  _CachedBatch(this.performers, this.cachedAt, [this.campaigns = const []]);
   final List<PublicPerformer> performers;
+  final List<DiscoveryCampaign> campaigns;
   final DateTime cachedAt;
 
   bool get isExpired => DateTime.now().difference(cachedAt).inSeconds > 120;
@@ -43,6 +44,7 @@ class DiscoveryState {
     this.locationMode = LocationMode.off,
     this.performers = const [],
     this.venues = const [],
+    this.campaigns = const [],
     this.selectedPerformer,
     this.selectedVenue,
     this.viewModeIndex = 0, // 0: Map, 1: List, 2: Venues
@@ -67,6 +69,7 @@ class DiscoveryState {
   final LocationMode locationMode;
   final List<PublicPerformer> performers;
   final List<PublicVenue> venues;
+  final List<DiscoveryCampaign> campaigns;
   final PublicPerformer? selectedPerformer;
   final PublicVenue? selectedVenue;
   final int viewModeIndex;
@@ -91,6 +94,7 @@ class DiscoveryState {
     LocationMode? locationMode,
     List<PublicPerformer>? performers,
     List<PublicVenue>? venues,
+    List<DiscoveryCampaign>? campaigns,
     PublicPerformer? selectedPerformer,
     bool clearSelectedPerformer = false,
     PublicVenue? selectedVenue,
@@ -117,6 +121,7 @@ class DiscoveryState {
       locationMode: locationMode ?? this.locationMode,
       performers: performers ?? this.performers,
       venues: venues ?? this.venues,
+      campaigns: campaigns ?? this.campaigns,
       selectedPerformer: clearSelectedPerformer ? null : (selectedPerformer ?? this.selectedPerformer),
       selectedVenue: clearSelectedVenue ? null : (selectedVenue ?? this.selectedVenue),
       viewModeIndex: viewModeIndex ?? this.viewModeIndex,
@@ -282,7 +287,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
   void onLocationSearchInput(String query) {
     state = state.copyWith(locationSearchQuery: query);
 
-    if (query.trim().isEmpty) {
+    if (query.trim().length < 3) {
       state = state.copyWith(autocompleteSuggestions: []);
       return;
     }
@@ -382,6 +387,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
       _tracker?.recordCacheHit();
       state = state.copyWith(
         performers: cached.performers,
+        campaigns: cached.campaigns,
         cacheHitsCount: state.cacheHitsCount + 1,
         selectedPerformer: cached.performers.isNotEmpty ? cached.performers.first : null,
       );
@@ -499,6 +505,62 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
         longitude: lng - 0.007,
         photoUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=400&auto=format&fit=crop&q=80',
       ),
+      PublicPerformer(
+        id: 'maya_lin_6',
+        slug: 'maya-lin',
+        name: 'Maya Lin',
+        type: 'artist',
+        bio: 'Neo-soul pianist and vocalist with jazzy grooves.',
+        aiCardSummary: 'Neo-soul keyboardist and vocalist performing jazz-infused originals and intimate acoustic sets.',
+        genres: const ['R&B', 'Soul', 'Jazz'],
+        isVerified: true,
+        isLive: true,
+        currentVenueName: 'The Loft Lounge',
+        distanceMiles: 1.1,
+        latitude: lat + 0.005,
+        longitude: lng + 0.003,
+        liveFansCount: 94,
+        timeRemaining: '55 min left',
+        photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+      ),
+      PublicPerformer(
+        id: 'sol_patrol_7',
+        slug: 'sol-patrol',
+        name: 'Sol Patrol',
+        type: 'band',
+        bio: 'Reggae-dub collective spreading positive coastal vibrations.',
+        aiCardSummary: 'Five-piece reggae and dub ensemble delivering horn-driven basslines and high-vibe summer shows.',
+        genres: const ['Reggae', 'Alternative'],
+        isVerified: true,
+        isLive: true,
+        memberCount: 5,
+        currentVenueName: 'Beachside Amphitheatre',
+        distanceMiles: 1.5,
+        latitude: lat - 0.005,
+        longitude: lng - 0.005,
+        liveFansCount: 172,
+        timeRemaining: '1h 40m left',
+        photoUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=400&auto=format&fit=crop&q=80',
+      ),
+      PublicPerformer(
+        id: 'rio_trio_8',
+        slug: 'rio-trio',
+        name: 'Rio Trio',
+        type: 'band',
+        bio: 'Latin jazz and bossa nova trio.',
+        aiCardSummary: 'Instrumental Latin jazz trio blending classical Spanish guitar with Brazilian samba rhythms.',
+        genres: const ['Jazz', 'Acoustic'],
+        isVerified: false,
+        isLive: true,
+        memberCount: 3,
+        currentVenueName: 'Plaza Courtyard',
+        distanceMiles: 2.3,
+        latitude: lat + 0.007,
+        longitude: lng + 0.006,
+        liveFansCount: 65,
+        timeRemaining: '35 min left',
+        photoUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
+      ),
     ];
 
     final List<PublicVenue> sampleVenues = [
@@ -592,14 +654,54 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
       return true;
     }).take(maxResultsLimit).toList();
 
+    // Sort performers: Live performers first, then sorted by distance ascending
+    filteredPerformers.sort((a, b) {
+      if (a.isLive != b.isLive) {
+        return a.isLive ? -1 : 1;
+      }
+      final distA = a.distanceMiles ?? 999.0;
+      final distB = b.distanceMiles ?? 999.0;
+      return distA.compareTo(distB);
+    });
+
+    final List<DiscoveryCampaign> sampleCampaigns = [
+      DiscoveryCampaign(
+        id: 'camp_jake_ep',
+        creatorId: isTorrance ? 'jake_rios_torrance' : 'jake_rios_1',
+        creatorName: 'Jake Rios',
+        creatorType: 'Solo Musician',
+        creatorPhotoUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&auto=format&fit=crop&q=80',
+        title: 'Debut Studio EP — "Pacific Dusk"',
+        description: 'Funding production, mixing, and vinyl pressings for my 5-track acoustic indie folk EP.',
+        goalCents: 500000,
+        pledgedCents: 415000,
+        backerCount: 78,
+        daysRemaining: 12,
+      ),
+      DiscoveryCampaign(
+        id: 'camp_velvet_tour',
+        creatorId: isNashville ? 'velvet_nashville' : 'velvet_horizon_2',
+        creatorName: 'Velvet Horizon',
+        creatorType: 'Band',
+        creatorPhotoUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80',
+        title: 'West Coast Summer Tour Van Fund',
+        description: 'Help us repair our touring van and finance fuel/lodging for our 12-city club run.',
+        goalCents: 850000,
+        pledgedCents: 520000,
+        backerCount: 114,
+        daysRemaining: 18,
+      ),
+    ];
+
     _tracker?.recordDocumentReads(filteredPerformers.length);
 
     // Save to 2-minute memory cache
-    _cache[cellKey] = _CachedBatch(filteredPerformers, DateTime.now());
+    _cache[cellKey] = _CachedBatch(filteredPerformers, DateTime.now(), sampleCampaigns);
 
     state = state.copyWith(
       performers: filteredPerformers,
       venues: sampleVenues,
+      campaigns: sampleCampaigns,
       deduplicatedCount: state.deduplicatedCount + deduplicatedDiff,
       selectedPerformer: filteredPerformers.isNotEmpty ? filteredPerformers.first : null,
     );

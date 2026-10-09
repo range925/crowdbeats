@@ -11,7 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/services/social_service.dart';
+import '../../state/auth_state.dart';
+import '../../state/tip_state.dart';
+import '../components/cb_safety_action_sheet.dart';
 import '../theme/cb_colors.dart';
+import '../theme/cb_spacing.dart';
+import 'tip/tip_confirmation_sheet.dart';
 
 class SocialMessagingScreen extends ConsumerStatefulWidget {
   const SocialMessagingScreen({
@@ -223,14 +228,27 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
       return;
     }
 
-    setState(() {
-      _isSending = true;
-    });
-
     final otherParticipant =
         (_selectedConversation!['otherParticipant'] as Map<dynamic, dynamic>).cast<String, dynamic>();
     final recipientId = otherParticipant['id'] as String;
     final recipientType = otherParticipant['type'] as String;
+
+    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
+    final currentUserId = ref.read(authStateProvider).user?.uid ?? 'me';
+    final optimisticMsg = <String, dynamic>{
+      'id': tempId,
+      'senderId': currentUserId,
+      'text': text,
+      'createdAt': DateTime.now().toIso8601String(),
+      'status': 'sending',
+    };
+
+    setState(() {
+      _messages.add(optimisticMsg);
+      _isSending = true;
+    });
+    _textController.clear();
+    _scrollToBottom();
 
     try {
       final res = await ref.read(socialServiceProvider).sendMessage(
@@ -241,8 +259,15 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
         actingAsArtistId: widget.actingAsArtistId,
       );
 
-      _textController.clear();
       final convId = res['conversationId'] as String;
+      if (mounted) {
+        setState(() {
+          final idx = _messages.indexWhere((m) => m['id'] == tempId);
+          if (idx != -1) {
+            _messages[idx]['status'] = 'sent';
+          }
+        });
+      }
 
       await _fetchConversations();
       final updatedConv = _conversations.firstWhere(
@@ -252,14 +277,67 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
       await _selectConversation(updatedConv);
     } catch (e) {
       if (mounted) {
+        setState(() {
+          final idx = _messages.indexWhere((m) => m['id'] == tempId);
+          if (idx != -1) {
+            _messages[idx]['status'] = 'failed';
+          }
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send message: $e')),
+          SnackBar(
+            content: Text('Failed to send message: $e'),
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: const Color(0xFF00E5FF),
+              onPressed: () => _retryMessage(optimisticMsg),
+            ),
+          ),
         );
       }
     } finally {
-      setState(() {
-        _isSending = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSending = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _retryMessage(Map<String, dynamic> msg) async {
+    final text = msg['text'] as String? ?? '';
+    if (text.isEmpty || _selectedConversation == null) return;
+
+    setState(() {
+      msg['status'] = 'sending';
+    });
+
+    final otherParticipant =
+        (_selectedConversation!['otherParticipant'] as Map<dynamic, dynamic>).cast<String, dynamic>();
+    final recipientId = otherParticipant['id'] as String;
+    final recipientType = otherParticipant['type'] as String;
+
+    try {
+      await ref.read(socialServiceProvider).sendMessage(
+        recipientId: recipientId,
+        recipientType: recipientType,
+        text: text,
+        actingAsBandId: widget.actingAsBandId,
+        actingAsArtistId: widget.actingAsArtistId,
+      );
+      if (mounted) {
+        setState(() {
+          msg['status'] = 'sent';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          msg['status'] = 'failed';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Retry failed: $e')),
+        );
+      }
     }
   }
 
@@ -302,94 +380,6 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
     }
   }
 
-  void _showReportDialog() {
-    if (_selectedConversation == null) return;
-    final otherParticipant =
-        (_selectedConversation!['otherParticipant'] as Map<dynamic, dynamic>).cast<String, dynamic>();
-    final otherName = otherParticipant['name'] as String? ?? 'User';
-
-    String selectedCategory = 'harassment';
-    final descController = TextEditingController();
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: CbColors.surfaceCard,
-          title: Text('Report $otherName', style: const TextStyle(color: Colors.white)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                initialValue: selectedCategory,
-                dropdownColor: CbColors.surfaceCard,
-                style: const TextStyle(color: Colors.white),
-                items: const [
-                  DropdownMenuItem(value: 'harassment', child: Text('Harassment or Bullying')),
-                  DropdownMenuItem(value: 'hate_speech', child: Text('Hate Speech')),
-                  DropdownMenuItem(value: 'spam', child: Text('Spam or Scam')),
-                  DropdownMenuItem(value: 'other', child: Text('Other Violation')),
-                ],
-                onChanged: (v) {
-                  if (v != null) selectedCategory = v;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: descController,
-                maxLines: 3,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  hintText: 'Describe what happened...',
-                  hintStyle: TextStyle(color: Colors.white38),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              onPressed: () async {
-                Navigator.pop(ctx);
-                final convId = _selectedConversation!['id'] as String;
-                try {
-                  await ref.read(socialServiceProvider).respondToMessageRequest(
-                    conversationId: convId,
-                    action: 'report',
-                    actingAsBandId: widget.actingAsBandId,
-                    actingAsArtistId: widget.actingAsArtistId,
-                    reportReason: selectedCategory,
-                    reportDescription: descController.text.trim(),
-                  );
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Report submitted to Admin Support.')),
-                    );
-                    setState(() {
-                      _selectedConversation = null;
-                    });
-                    await _fetchConversations();
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to submit report: $e')),
-                    );
-                  }
-                }
-              },
-              child: const Text('Submit Report'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _showSafetyMenu() {
     if (_selectedConversation == null) return;
     final otherParticipant =
@@ -397,90 +387,29 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
     final otherId = otherParticipant['id'] as String;
     final otherType = otherParticipant['type'] as String;
     final otherName = otherParticipant['name'] as String? ?? 'User';
+    final isBlocked = _selectedConversation!['isBlocked'] as bool? ?? false;
+    final isRestricted = _selectedConversation!['isRestricted'] as bool? ?? false;
 
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: CbColors.surfaceCard,
-      builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.shield, color: Colors.blue),
-                title: Text('Restrict $otherName', style: const TextStyle(color: Colors.white)),
-                subtitle: const Text('Quietly moves messages to Restricted tab without notifications',
-                    style: TextStyle(color: Colors.white54, fontSize: 11)),
-                onTap: () async {
-                  Navigator.pop(ctx);
-                  try {
-                    await ref.read(socialServiceProvider).restrictEntity(
-                      targetId: otherId,
-                      targetType: otherType,
-                      actingAsBandId: widget.actingAsBandId,
-                      actingAsArtistId: widget.actingAsArtistId,
-                    );
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$otherName restricted.')),
-                      );
-                      setState(() {
-                        _selectedConversation = null;
-                      });
-                      await _fetchConversations();
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed: $e')),
-                      );
-                    }
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.block, color: Colors.red),
-                title: Text('Block $otherName', style: const TextStyle(color: Colors.red)),
-                subtitle: const Text('Removes follow edges in both directions and disables messages',
-                    style: TextStyle(color: Colors.white54, fontSize: 11)),
-                onTap: () async {
-                  Navigator.pop(ctx);
-                  try {
-                    await ref.read(socialServiceProvider).blockEntity(
-                      targetId: otherId,
-                      targetType: otherType,
-                      actingAsBandId: widget.actingAsBandId,
-                      actingAsArtistId: widget.actingAsArtistId,
-                    );
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$otherName blocked.')),
-                      );
-                      setState(() {
-                        _selectedConversation = null;
-                      });
-                      await _fetchConversations();
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed: $e')),
-                      );
-                    }
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.flag, color: Colors.orange),
-                title: Text('Report $otherName', style: const TextStyle(color: Colors.orange)),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showReportDialog();
-                },
-              ),
-            ],
-          ),
-        );
+    CbSafetyActionSheet.show(
+      context,
+      targetId: otherId,
+      targetType: otherType,
+      targetName: otherName,
+      actingAsBandId: widget.actingAsBandId,
+      actingAsArtistId: widget.actingAsArtistId,
+      isBlocked: isBlocked,
+      isRestricted: isRestricted,
+      onRelationshipChanged: ({required bool isBlocked, required bool isRestricted}) {
+        if (mounted) {
+          setState(() {
+            _selectedConversation!['isBlocked'] = isBlocked;
+            _selectedConversation!['isRestricted'] = isRestricted;
+            if (isBlocked) {
+              _selectedConversation = null;
+            }
+          });
+          _fetchConversations();
+        }
       },
     );
   }
@@ -640,11 +569,13 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
     final name = other['name'] as String? ?? 'Chat';
     final status = _selectedConversation!['status'] as String? ?? 'accepted';
     final isRestricted = _selectedConversation!['isRestricted'] as bool? ?? false;
+    final isBlocked = _selectedConversation!['isBlocked'] as bool? ?? false;
 
     return Scaffold(
-      backgroundColor: CbColors.bgApp,
+      backgroundColor: const Color(0xFF0A0E17),
       appBar: AppBar(
-        backgroundColor: CbColors.surfaceBase,
+        backgroundColor: const Color(0xFF151C2C),
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -654,7 +585,27 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
             _fetchConversations();
           },
         ),
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            Text(
+              isBlocked
+                  ? 'Blocked'
+                  : isRestricted
+                      ? 'Restricted Mode'
+                      : 'End-to-End Moderated',
+              style: TextStyle(
+                color: isBlocked
+                    ? CbColors.statusError
+                    : isRestricted
+                        ? const Color(0xFF00E5FF)
+                        : Colors.white54,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -664,20 +615,57 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
       ),
       body: Column(
         children: [
-          // Restricted banner
-          if (isRestricted)
+          // Blocked notice banner
+          if (isBlocked)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: Colors.blue.withValues(alpha: 0.2),
+              color: const Color(0x33EF4444),
               child: const Row(
                 children: [
-                  Icon(Icons.shield, color: Colors.blue, size: 16),
+                  Icon(Icons.block, color: Color(0xFFEF4444), size: 16),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Account is blocked. Messaging is disabled.',
+                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          // Restricted banner
+          else if (isRestricted)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: const Color(0x3300E5FF),
+              child: const Row(
+                children: [
+                  Icon(Icons.shield_outlined, color: Color(0xFF00E5FF), size: 16),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Restricted Thread: Messages routed quietly without read receipts.',
                       style: TextStyle(color: Colors.white70, fontSize: 11),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else if (status != 'pending_request')
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              color: const Color(0xFF151C2C),
+              child: const Row(
+                children: [
+                  Icon(Icons.lock_outline, color: Color(0xFF00E5FF), size: 14),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Mutual follow active · End-to-end moderated conversation',
+                      style: TextStyle(color: Colors.white60, fontSize: 11),
                     ),
                   ),
                 ],
@@ -688,7 +676,7 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
           if (status == 'pending_request')
             Container(
               padding: const EdgeInsets.all(14),
-              color: CbColors.surfaceCard,
+              color: const Color(0xFF151C2C),
               child: Column(
                 children: [
                   Text(
@@ -703,15 +691,20 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.redAccent,
                           side: const BorderSide(color: Colors.redAccent),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CbSpacing.radiusFull)),
                         ),
                         onPressed: () => _respondToRequest('decline'),
                         child: const Text('Decline'),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: CbColors.purpleLight),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00E5FF),
+                          foregroundColor: const Color(0xFF0A0E17),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CbSpacing.radiusFull)),
+                        ),
                         onPressed: () => _respondToRequest('accept'),
-                        child: const Text('Accept Message'),
+                        child: const Text('Accept Message', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -722,7 +715,7 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
           // Messages List
           Expanded(
             child: _isLoadingMessages
-                ? const Center(child: CircularProgressIndicator(color: CbColors.purpleLight))
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF00E5FF)))
                 : _messages.isEmpty
                     ? Center(
                         child: Text(
@@ -750,10 +743,14 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
                                 maxWidth: MediaQuery.of(context).size.width * 0.75,
                               ),
                               decoration: BoxDecoration(
-                                color: isMe ? CbColors.purpleDark : CbColors.surfaceCard,
+                                color: isMe ? const Color(0xFF1E2638) : const Color(0xFF151C2C),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: isMe ? const Color(0x338B5CF6) : const Color(0x1AFFFFFF),
+                                  color: isMe
+                                      ? (deliveryStatus == 'failed'
+                                          ? const Color(0xFFEF4444)
+                                          : const Color(0x3300E5FF))
+                                      : const Color(0x1AFFFFFF),
                                 ),
                               ),
                               child: Column(
@@ -762,15 +759,60 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
                                 children: [
                                   Text(text, style: const TextStyle(color: Colors.white, fontSize: 14)),
                                   if (isMe) ...[
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      deliveryStatus == 'read'
-                                          ? 'Read'
-                                          : deliveryStatus == 'delivered'
-                                              ? 'Delivered'
-                                              : 'Sent',
-                                      style: const TextStyle(color: Colors.white38, fontSize: 9),
-                                    ),
+                                    if (deliveryStatus == 'failed') ...[
+                                      const SizedBox(height: 4),
+                                      GestureDetector(
+                                        onTap: () => _retryMessage(msg),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0x33EF4444),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 12),
+                                              SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text(
+                                                  'Failed to send · Tap to retry',
+                                                  style: TextStyle(color: Color(0xFFEF4444), fontSize: 10, fontWeight: FontWeight.bold),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ] else if (deliveryStatus == 'sending') ...[
+                                      const SizedBox(height: 3),
+                                      const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                            height: 10,
+                                            child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white38),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text('Sending…', style: TextStyle(color: Colors.white38, fontSize: 9)),
+                                        ],
+                                      ),
+                                    ] else ...[
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        deliveryStatus == 'read'
+                                            ? 'Read ✓✓'
+                                            : deliveryStatus == 'delivered'
+                                                ? 'Delivered ✓'
+                                                : 'Sent',
+                                        style: TextStyle(
+                                          color: deliveryStatus == 'read' ? const Color(0xFF00E5FF) : Colors.white38,
+                                          fontSize: 9,
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ],
                               ),
@@ -780,41 +822,58 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
                       ),
           ),
 
-          // Input Bar
+          // Input Bar (Safe Area aware with Quick Tip button)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            color: CbColors.surfaceBase,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            color: const Color(0xFF151C2C),
             child: SafeArea(
               child: Row(
                 children: [
+                  // Quick Tip Attachment Button
+                  IconButton(
+                    icon: const Icon(Icons.attach_money, color: Color(0xFF00E5FF), size: 22),
+                    tooltip: 'Send tip to $name',
+                    onPressed: isBlocked
+                        ? null
+                        : () {
+                            ref.read(tipFlowProvider.notifier).prepare(
+                              recipientId: other['id'] as String? ?? '',
+                              recipientName: name,
+                              recipientType: other['type'] as String? ?? 'artist',
+                              amountCents: 500,
+                            );
+                            TipConfirmationSheet.show(context);
+                          },
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _textController,
+                      enabled: !isBlocked,
                       style: const TextStyle(color: Colors.white),
                       maxLines: null,
                       decoration: InputDecoration(
-                        hintText: 'Message $name...',
+                        hintText: isBlocked ? 'Messaging disabled (Blocked)' : 'Message $name...',
                         hintStyle: const TextStyle(color: Colors.white38),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
-                        fillColor: CbColors.surfaceCard,
+                        fillColor: const Color(0xFF0A0E17),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   IconButton(
                     icon: _isSending
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: CbColors.purpleLight),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00E5FF)),
                           )
-                        : const Icon(Icons.send, color: CbColors.purpleLight),
-                    onPressed: _isSending ? null : _sendMessage,
+                        : const Icon(Icons.send, color: Color(0xFF00E5FF)),
+                    onPressed: (_isSending || isBlocked) ? null : _sendMessage,
                   ),
                 ],
               ),

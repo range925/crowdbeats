@@ -46,6 +46,7 @@ class CbAuthState {
   String? get email => user?.email;
   String? get displayName => user?.displayName;
   bool get isAuthenticated => status == CbAuthStatus.authenticated;
+  bool get isLoading => status == CbAuthStatus.loading;
 
   CbAuthState copyWith({
     CbAuthStatus? status,
@@ -154,24 +155,55 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
         return CbAuthState(status: CbAuthStatus.suspended, user: user);
       }
 
-      final personaType = record?['personaType'] as String?;
+      // Check email verification for password accounts
+      final isPasswordUser = user.providerData.any((p) => p.providerId == 'password');
+      if (isPasswordUser && !user.emailVerified) {
+        return CbAuthState(
+          status: CbAuthStatus.unverified,
+          user: user,
+        );
+      }
+
+      var personaType = record?['personaType'] as String?;
+      if (personaType == null) {
+        // Fallback: check custom claims on ID token
+        final tokenResult = await user.getIdTokenResult();
+        personaType = tokenResult.claims?['personaType'] as String? ??
+            tokenResult.claims?['role'] as String?;
+      }
+
       return CbAuthState(
-        status:      personaType != null ? CbAuthStatus.authenticated : CbAuthStatus.unonboarded,
-        user:        user,
+        status: personaType != null ? CbAuthStatus.authenticated : CbAuthStatus.unonboarded,
+        user: user,
         personaType: personaType,
       );
     } catch (_) {
-      // Firestore unavailable — optimistic fallback
+      // Offline / fallback: preserve known profile if UID matches
+      final current = state.valueOrNull;
+      if (current != null && current.user?.uid == user.uid && current.personaType != null) {
+        return current;
+      }
       return CbAuthState(
-        status:      CbAuthStatus.authenticated,
-        user:        user,
+        status: CbAuthStatus.unonboarded,
+        user: user,
       );
+    }
+  }
+
+  /// Manually re-resolve auth state and Firestore profile.
+  /// Critical after completing onboarding or changing roles to avoid route loops.
+  Future<void> refreshProfile() async {
+    final user = AuthService.instance.currentUser;
+    if (user != null) {
+      final newState = await _resolveAuthState(user);
+      state = AsyncData(newState);
     }
   }
 
   // ── Auth operations ────────────────────────────────────────────────────────
 
   Future<void> signIn(String email, String password) async {
+    if (state.isLoading) return;
     state = const AsyncLoading();
     try {
       await AuthService.instance.signIn(email, password);
@@ -185,10 +217,11 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
   }
 
   Future<void> register(String email, String password) async {
+    if (state.isLoading) return;
     state = const AsyncLoading();
     try {
       await AuthService.instance.register(email, password);
-      // Will go to unverified after authStateChanges
+      // Will go to unverified or unonboarded after authStateChanges
     } on FirebaseAuthException catch (e) {
       state = AsyncData(CbAuthState(
         status:       CbAuthStatus.unauthenticated,
@@ -198,6 +231,7 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
   }
 
   Future<void> signInWithGoogle() async {
+    if (state.isLoading) return;
     state = const AsyncLoading();
     try {
       await AuthService.instance.signInWithGoogle();
@@ -215,6 +249,7 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
   }
 
   Future<void> signInWithApple() async {
+    if (state.isLoading) return;
     state = const AsyncLoading();
     try {
       await AuthService.instance.signInWithApple();

@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
+import '../theme/cb_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CbFormField extends StatefulWidget {
   const CbFormField({
@@ -66,13 +68,14 @@ class _CbFormFieldState extends State<CbFormField> {
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor = CbColors.borderSubtle;
+    final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
+    Color borderColor = ext.borderSubtle;
     if (_isFocused) {
-      borderColor = CbColors.purpleMain;
+      borderColor = ext.borderFocus;
     } else if (widget.isValid == false) {
-      borderColor = CbColors.errorRed;
+      borderColor = ext.statusError;
     } else if (widget.isValid == true) {
-      borderColor = CbColors.liveGreen;
+      borderColor = ext.statusSuccess;
     }
 
     return Column(
@@ -82,30 +85,34 @@ class _CbFormFieldState extends State<CbFormField> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              widget.label,
-              style: const TextStyle(
-                color: CbColors.textSecondary,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                widget.label,
+                style: GoogleFonts.plusJakartaSans(
+                  color: ext.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            if (widget.validationText != null)
+            if (widget.validationText != null) ...[
+              const SizedBox(width: 8),
               Text(
                 widget.validationText!,
-                style: TextStyle(
-                  color: widget.isValid == true ? CbColors.liveGreen : CbColors.errorRed,
+                style: GoogleFonts.plusJakartaSans(
+                  color: widget.isValid == true ? ext.statusSuccess : ext.statusError,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
               ),
+            ],
           ],
         ),
         const SizedBox(height: 6),
         AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
-            color: CbColors.surface2,
+            color: ext.surfaceCard,
             borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
             border: Border.all(color: borderColor, width: _isFocused ? 1.5 : 1.0),
           ),
@@ -119,15 +126,15 @@ class _CbFormFieldState extends State<CbFormField> {
             maxLength: widget.maxLength,
             onChanged: widget.onChanged,
             validator: widget.validator,
-            style: const TextStyle(
-              color: CbColors.textPrimary,
+            style: GoogleFonts.plusJakartaSans(
+              color: ext.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: const TextStyle(
-                color: CbColors.textMuted,
+              hintStyle: GoogleFonts.plusJakartaSans(
+                color: ext.textTertiary,
                 fontSize: 14,
               ),
               prefixIcon: widget.leadingIcon != null
@@ -139,9 +146,9 @@ class _CbFormFieldState extends State<CbFormField> {
               prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 40),
               suffixIcon: widget.trailing ??
                   (widget.isValid == true
-                      ? const Padding(
-                          padding: EdgeInsets.only(right: 12),
-                          child: Icon(Icons.check_circle, color: CbColors.liveGreen, size: 20),
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: Icon(Icons.check_circle, color: ext.statusSuccess, size: 20),
                         )
                       : null),
               suffixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 40),

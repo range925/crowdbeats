@@ -100,9 +100,35 @@ class CbColors {
   static const Color creatorAmber       = Color(0xFFD97706); // Amber #D97706
   static const Color communityBlue      = Color(0xFF2563EB); // Blue #2563EB
   static const Color expressivePink     = Color(0xFFDB2777); // Pink #DB2777
-  static const Color lightCanvas        = Color(0xFFF7F8FC); // Light canvas #F7F8FC
-  static const Color darkCanvas         = Color(0xFF101218); // Dark canvas #101218
-  static const Color darkCard           = Color(0xFF1B1E28); // Dark card #1B1E28
+  static const Color lightCanvas        = Color(0xFFF8F9FA); // Light canvas #F8F9FA
+  static const Color darkCanvas         = Color(0xFF131315); // Dark canvas #131315
+  static const Color darkCard           = Color(0xFF27272A); // Dark card #27272A
+  static const Color darkRaised         = Color(0xFF1C1C1F); // Dark navigation & header
+  static const Color darkOverlay        = Color(0xFF222226); // Dark sliding sheet
+  static const Color darkPressed        = Color(0xFF2E2E32); // Dark pressed feedback
+  static const Color darkBorderSubtle   = Color(0x14FFFFFF); // rgba(255,255,255,0.08)
+  static const Color darkBorderStrong   = Color(0x28FFFFFF); // rgba(255,255,255,0.16)
+
+  static const Color lightRaised        = Color(0xFFFFFFFF); // Light navigation & header
+  static const Color lightOverlay       = Color(0xFFF3F4F6); // Light sheet background
+  static const Color lightCard          = Color(0xFFFFFFFF); // Light card
+  static const Color lightPressed       = Color(0xFFE5E7EB); // Light pressed feedback
+  static const Color lightBorderSubtle  = Color(0xFFE5E7EB); // Light subtle border
+  static const Color lightBorderStrong  = Color(0xFFD1D5DB); // Light input resting border
+  static const Color lightTextPrimary   = Color(0xFF111827); // Slate-900 primary titles
+  static const Color lightTextSecondary = Color(0xFF4B5563); // Gray-600 secondary metadata
+  static const Color lightTextTertiary  = Color(0xFF6B7280); // Gray-500 helper copy
+  static const Color lightStatusLive    = Color(0xFF0D9488); // Teal-600 daylight live badge
+  static const Color lightStatusLiveBg  = Color(0x1A0D9488); // 10% Teal fill
+  static const Color lightStatusError   = Color(0xFFDC2626); // Red-600
+  static const Color lightStatusWarning = Color(0xFFD97706); // Amber-600
+  static const Color lightStatusSuccess = Color(0xFF059669); // Emerald-600
+
+  // ── Stitch Direction B Core Brand Tokens ──────────────────────────────────
+  static const Color brandCoralPink     = Color(0xFFFF97BA); // "Moments of Joy", primary CTA fills
+  static const Color brandElectricViolet= Color(0xFF8B5CF6); // Focus rings, interactive outlines
+  static const Color brandAquaMint      = Color(0xFF2DD4BF); // "Live Now" badge text, live stage dot
+  static const Color brandObsidian      = Color(0xFF131315); // Default dark canvas
 
 
   // ── Gradients ──────────────────────────────────────────────────────────────

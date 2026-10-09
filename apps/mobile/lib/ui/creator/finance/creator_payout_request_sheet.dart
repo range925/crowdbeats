@@ -1,25 +1,33 @@
-// Crowdbeats V2 — Direct Payout Request Bottom Sheet (Phase 6)
-// Amount input, min $10 validation, over-balance guard, fee disclosure ($0) & submit.
+// Crowdbeats V2 — Direct Payout Request Bottom Sheet (Phase 11)
+// Standard ACH vs Instant Payout, live fee breakdown, failure simulation & recovery.
 
 import 'package:flutter/material.dart';
 import 'package:crowdbeats_mobile/ui/components/components.dart';
 import 'package:crowdbeats_mobile/ui/theme/cb_colors.dart';
 import 'package:crowdbeats_mobile/ui/theme/cb_spacing.dart';
 
+enum PayoutSpeed {
+  standardAch,
+  instant,
+}
+
 class CreatorPayoutRequestSheet extends StatefulWidget {
   const CreatorPayoutRequestSheet({
     super.key,
     required this.availableBalanceDollars,
     required this.onPayoutSubmitted,
+    this.initialFail = false,
   });
 
   final double availableBalanceDollars;
   final ValueChanged<double> onPayoutSubmitted;
+  final bool initialFail;
 
   static Future<void> show(
     BuildContext context, {
     required double availableBalanceDollars,
     required ValueChanged<double> onPayoutSubmitted,
+    bool initialFail = false,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -30,6 +38,7 @@ class CreatorPayoutRequestSheet extends StatefulWidget {
         child: CreatorPayoutRequestSheet(
           availableBalanceDollars: availableBalanceDollars,
           onPayoutSubmitted: onPayoutSubmitted,
+          initialFail: initialFail,
         ),
       ),
     );
@@ -43,11 +52,16 @@ class _CreatorPayoutRequestSheetState extends State<CreatorPayoutRequestSheet> {
   late final TextEditingController _amountController;
   String? _errorText;
   bool _isSubmitting = false;
+  String? _payoutFailureMessage;
+  PayoutSpeed _selectedSpeed = PayoutSpeed.standardAch;
 
   @override
   void initState() {
     super.initState();
     _amountController = TextEditingController(text: widget.availableBalanceDollars.toStringAsFixed(2));
+    if (widget.initialFail) {
+      _payoutFailureMessage = 'Previous settlement failed: Expired debit card credentials. Please update or retry.';
+    }
   }
 
   @override
@@ -55,6 +69,10 @@ class _CreatorPayoutRequestSheetState extends State<CreatorPayoutRequestSheet> {
     _amountController.dispose();
     super.dispose();
   }
+
+  double get _currentAmount => double.tryParse(_amountController.text.trim()) ?? 0.0;
+  double get _transferFee => _selectedSpeed == PayoutSpeed.instant ? (_currentAmount * 0.01) : 0.0;
+  double get _netPayout => (_currentAmount - _transferFee).clamp(0.0, double.infinity);
 
   void _validateAndSubmit() {
     final amount = double.tryParse(_amountController.text.trim());
@@ -69,16 +87,32 @@ class _CreatorPayoutRequestSheetState extends State<CreatorPayoutRequestSheet> {
 
     setState(() {
       _errorText = null;
+      _payoutFailureMessage = null;
       _isSubmitting = true;
     });
 
-    Future.delayed(const Duration(milliseconds: 700), () {
+    // If amount is exactly 999.0, simulate recoverable failure
+    if (amount == 999.0) {
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) {
+          setState(() {
+            _isSubmitting = false;
+            _payoutFailureMessage = 'Settlement Declined: Bank network rejected instant transfer. Please retry via Standard ACH.';
+          });
+        }
+      });
+      return;
+    }
+
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) {
         widget.onPayoutSubmitted(amount);
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Payout of \$${amount.toStringAsFixed(2)} initiated to Chase Checking (•••• 4821)'),
+            content: Text(
+              'Payout of \$${amount.toStringAsFixed(2)} initiated to Chase Checking (•••• 4821) via ${_selectedSpeed == PayoutSpeed.instant ? "Instant Payout" : "Standard ACH"}',
+            ),
             backgroundColor: CbColors.statusLive,
           ),
         );
@@ -116,7 +150,7 @@ class _CreatorPayoutRequestSheetState extends State<CreatorPayoutRequestSheet> {
           ),
           const SizedBox(height: 12),
 
-          // Destination Card
+          // Destination Bank Card
           const CbGlassCard(
             padding: EdgeInsets.all(12),
             child: Row(
@@ -127,21 +161,96 @@ class _CreatorPayoutRequestSheetState extends State<CreatorPayoutRequestSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Chase Checking (•••• 4821)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                      Text('Standard ACH Transfer · Estimated 1-2 business days', style: TextStyle(color: CbColors.textSecondary, fontSize: 11)),
+                      Row(
+                        children: [
+                          Text('Chase Checking (•••• 4821)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                          SizedBox(width: 6),
+                          Icon(Icons.verified, size: 12, color: CbColors.statusLive),
+                        ],
+                      ),
+                      Text('Stripe Express Connected · Direct Payouts Active', style: TextStyle(color: CbColors.textSecondary, fontSize: 11)),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+
+          // Payout Speed Selectors
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedSpeed = PayoutSpeed.standardAch),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: _selectedSpeed == PayoutSpeed.standardAch ? const Color(0x2210B981) : CbColors.surfaceBase,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _selectedSpeed == PayoutSpeed.standardAch ? CbColors.statusLive : Colors.white12,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Standard ACH', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                            if (_selectedSpeed == PayoutSpeed.standardAch)
+                              const Icon(Icons.check_circle, size: 14, color: CbColors.statusLive),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(r'1-2 days · Free ($0 fee)', style: TextStyle(color: CbColors.tealGas, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedSpeed = PayoutSpeed.instant),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: _selectedSpeed == PayoutSpeed.instant ? const Color(0x228B5CF6) : CbColors.surfaceBase,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _selectedSpeed == PayoutSpeed.instant ? CbColors.purpleLight : Colors.white12,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Instant Payout', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                            if (_selectedSpeed == PayoutSpeed.instant)
+                              const Icon(Icons.check_circle, size: 14, color: CbColors.purpleLight),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        const Text('Within 30 mins · 1.0% fee', style: TextStyle(color: CbColors.purpleLight, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
 
           // Amount Input
           const Text('PAYOUT AMOUNT (USD)', style: TextStyle(color: CbColors.textSecondary, fontSize: 11, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           TextField(
             controller: _amountController,
+            onChanged: (_) => setState(() {}),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             decoration: InputDecoration(
@@ -158,48 +267,93 @@ class _CreatorPayoutRequestSheetState extends State<CreatorPayoutRequestSheet> {
             'Available to withdraw: \$${widget.availableBalanceDollars.toStringAsFixed(2)}',
             style: const TextStyle(color: CbColors.textMuted, fontSize: 11),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Fee Disclosure Table
+          // Live Settlement Breakdown
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: const Color(0x0AFFFFFF), borderRadius: BorderRadius.circular(8)),
-            child: const Column(
+            child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Transfer Fee:', style: TextStyle(color: CbColors.textSecondary, fontSize: 12)),
-                    Text(r'$0.00 (Standard ACH)', style: TextStyle(color: CbColors.statusLive, fontWeight: FontWeight.bold, fontSize: 12)),
+                    const Text('Gross Cash-Out:', style: TextStyle(color: CbColors.textSecondary, fontSize: 12)),
+                    Text('\$${_currentAmount.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                   ],
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Crowdbeats Platform Payout Fee:', style: TextStyle(color: CbColors.textSecondary, fontSize: 12)),
-                    Text(r'$0.00', style: TextStyle(color: CbColors.statusLive, fontWeight: FontWeight.bold, fontSize: 12)),
+                    const Text('Platform Fee:', style: TextStyle(color: CbColors.textSecondary, fontSize: 12)),
+                    const Text(r'$0.00', style: TextStyle(color: CbColors.statusLive, fontWeight: FontWeight.bold, fontSize: 12)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(_selectedSpeed == PayoutSpeed.instant ? 'Instant Payout Fee (1.0%):' : 'ACH Transfer Fee:', style: const TextStyle(color: CbColors.textSecondary, fontSize: 12)),
+                    Text(
+                      _selectedSpeed == PayoutSpeed.instant ? '-\$${_transferFee.toStringAsFixed(2)}' : r'$0.00',
+                      style: TextStyle(color: _selectedSpeed == PayoutSpeed.instant ? Colors.white70 : CbColors.statusLive, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ],
+                ),
+                const Divider(color: Colors.white12, height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Net Amount to Bank:', style: TextStyle(color: CbColors.tealGas, fontWeight: FontWeight.bold, fontSize: 12)),
+                    Text('\$${_netPayout.toStringAsFixed(2)}', style: const TextStyle(color: CbColors.tealGas, fontWeight: FontWeight.w900, fontSize: 14)),
                   ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
 
-          // Submit Button
+          // Failure Recovery Notice if any
+          if (_payoutFailureMessage != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0x22EF4444),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0x66EF4444)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Color(0xFFF87171), size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(_payoutFailureMessage!, style: const TextStyle(color: Color(0xFFF87171), fontSize: 11)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 16),
+
+          // Submit / Retry Action Button
           SizedBox(
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: CbColors.tealGas,
+                backgroundColor: _payoutFailureMessage != null ? const Color(0xFFF59E0B) : CbColors.tealGas,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CbSpacing.radiusMd)),
               ),
               onPressed: _isSubmitting ? null : _validateAndSubmit,
               child: _isSubmitting
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                  : const Text('Confirm & Transfer Funds', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  : Text(
+                      _payoutFailureMessage != null ? 'Retry Settlement' : 'Confirm & Transfer Funds',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
             ),
           ),
         ],

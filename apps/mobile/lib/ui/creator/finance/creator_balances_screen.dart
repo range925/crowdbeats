@@ -39,11 +39,13 @@ class CreatorBalancesScreen extends StatefulWidget {
     this.isBand = false,
     this.entityId = 'solo_default',
     this.entityName = 'Elena Cruz',
+    this.role = 'SOLO_ARTIST',
   });
 
   final bool isBand;
   final String entityId;
   final String entityName;
+  final String role;
 
   @override
   State<CreatorBalancesScreen> createState() => _CreatorBalancesScreenState();
@@ -52,6 +54,7 @@ class CreatorBalancesScreen extends StatefulWidget {
 class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
   late double _availableBalance;
   late double _pendingBalance;
+  late double _heldEscrowBalance;
   late double _lifetimeEarnings;
   late double _totalDebits;
   late double _totalCredits;
@@ -61,6 +64,11 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
 
   late List<LedgerEntryItem> _ledgerEntries;
 
+  double get _grossTipsReceived => widget.isBand ? 12450.0 : 5420.0;
+  double get _platformFee6Percent => _grossTipsReceived * 0.06;
+  double get _stripeProcessingFee => _grossTipsReceived * 0.029 + (widget.isBand ? 15.0 : 8.5);
+  double get _netCreatorProceeds => _grossTipsReceived - _platformFee6Percent - _stripeProcessingFee;
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +76,7 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
     if (widget.isBand) {
       _availableBalance = 1850.0;
       _pendingBalance = 340.0;
+      _heldEscrowBalance = 1350.0;
       _lifetimeEarnings = 12450.0;
       _totalDebits = 12450.0;
       _totalCredits = 12450.0;
@@ -122,6 +131,7 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
     } else {
       _availableBalance = 480.0;
       _pendingBalance = 125.0;
+      _heldEscrowBalance = 375.0;
       _lifetimeEarnings = 4820.0;
       _totalDebits = 5425.0;
       _totalCredits = 5425.0;
@@ -198,6 +208,9 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
           }
           if (summary['pendingBalanceDollars'] is double) {
             _pendingBalance = summary['pendingBalanceDollars'] as double;
+          }
+          if (summary['heldEscrowDollars'] is double) {
+            _heldEscrowBalance = summary['heldEscrowDollars'] as double;
           }
           if (summary['lifetimeEarningsDollars'] is double) {
             _lifetimeEarnings = summary['lifetimeEarningsDollars'] as double;
@@ -428,20 +441,42 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.account_balance_wallet, size: 16),
-                    label: const Text('Request Payout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CbColors.tealGas,
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CbSpacing.radiusMd)),
+                if (widget.role.toUpperCase() == 'FAN')
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0x22EF4444),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0x66EF4444)),
                     ),
-                    onPressed: _availableBalance >= 10.0 ? _handleOpenPayout : null,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.lock_outline, color: Color(0xFFF87171), size: 18),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Fan accounts cannot initiate bank cash-outs. Direct withdrawals are restricted to verified Solo Artists and Band Founders.',
+                            style: TextStyle(color: Color(0xFFF87171), fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.account_balance_wallet, size: 16),
+                      label: const Text('Request Payout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CbColors.tealGas,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CbSpacing.radiusMd)),
+                      ),
+                      onPressed: _availableBalance >= 10.0 ? _handleOpenPayout : null,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -468,6 +503,88 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
                   'Debits: \$${_totalDebits.toStringAsFixed(0)} | Credits: \$${_totalCredits.toStringAsFixed(0)}',
                   style: const TextStyle(color: CbColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w600),
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Status Allocation Summary (Available, Pending, Held in Escrow)
+          _sectionHeader('LEDGER BALANCE STATUS ALLOCATION', Icons.account_balance_outlined),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBalanceAllocationCard(
+                  title: 'AVAILABLE (SETTLED)',
+                  amount: '\$${_availableBalance.toStringAsFixed(2)} Net',
+                  subtitle: 'Withdrawable now',
+                  color: CbColors.statusLive,
+                  icon: Icons.check_circle_outline,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildBalanceAllocationCard(
+                  title: 'PENDING CLEARANCE',
+                  amount: '\$${_pendingBalance.toStringAsFixed(2)} Hold',
+                  subtitle: '24h settlement hold',
+                  color: CbColors.rankGold,
+                  icon: Icons.schedule,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildBalanceAllocationCard(
+                  title: 'HELD IN ESCROW',
+                  amount: '\$${_heldEscrowBalance.toStringAsFixed(2)} Locked',
+                  subtitle: 'Campaign milestones',
+                  color: CbColors.purpleLight,
+                  icon: Icons.lock_outline,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Trust & Transparency Disclaimer Banner
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0x1A10B981),
+              borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+              border: Border.all(color: const Color(0x4410B981)),
+            ),
+            child: const Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.shield_outlined, color: CbColors.tealGas, size: 18),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Only settled funds marked "Available" can be withdrawn. Pending tips clear within 24 hours. Campaign escrow funds release upon milestone completion.',
+                    style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Ledger Fee & Proceeds Accounting Card
+          _sectionHeader('LEDGER PROCEEDS & FEE ACCOUNTING', Icons.calculate_outlined),
+          const SizedBox(height: 8),
+          CbGlassCard(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _feeRow('Total Gross Tips Received', 'Gross: \$${_grossTipsReceived.toStringAsFixed(2)}', isBold: true),
+                const Divider(color: Color(0x11FFFFFF), height: 16),
+                _feeRow('Platform Service Fee (6%)', 'Fee: -\$${_platformFee6Percent.toStringAsFixed(2)}', isNegative: true),
+                const Divider(color: Color(0x11FFFFFF), height: 16),
+                _feeRow('Payment Processing Fee (Stripe)', 'Stripe: -\$${_stripeProcessingFee.toStringAsFixed(2)}', isNegative: true),
+                const Divider(color: Color(0x33FFFFFF), height: 16),
+                _feeRow('Net Creator Proceeds', 'Net: \$${_netCreatorProceeds.toStringAsFixed(2)}', isHighlight: true),
               ],
             ),
           ),
@@ -797,6 +914,76 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _feeRow(String label, String amount, {bool isBold = false, bool isNegative = false, bool isHighlight = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: isHighlight ? Colors.white : (isBold ? Colors.white : CbColors.textSecondary),
+            fontSize: isHighlight ? 13 : 12,
+            fontWeight: (isBold || isHighlight) ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            color: isHighlight ? CbColors.tealGas : (isNegative ? CbColors.statusError : Colors.white),
+            fontSize: isHighlight ? 14 : 12,
+            fontWeight: (isBold || isHighlight) ? FontWeight.bold : FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBalanceAllocationCard({
+    required String title,
+    required String amount,
+    required String subtitle,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141724),
+        borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 12, color: color),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(color: color, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            amount,
+            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: const TextStyle(color: CbColors.textMuted, fontSize: 9),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
