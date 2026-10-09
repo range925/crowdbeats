@@ -9,6 +9,8 @@ import {
   CreditCardIcon,
   ShieldBadgeIcon,
   LivePulseDot,
+  PauseIcon,
+  PlayIcon,
 } from './AdminIcons';
 
 export interface PulseEvent {
@@ -72,13 +74,33 @@ interface LivePlatformPulseStreamProps {
   events?: PulseEvent[];
   className?: string;
   style?: React.CSSProperties;
+  initialPaused?: boolean;
+  onTogglePause?: (isPaused: boolean) => void;
 }
 
 export const LivePlatformPulseStream: React.FC<LivePlatformPulseStreamProps> = ({
   events = DEFAULT_EVENTS,
   className = '',
   style,
+  initialPaused = false,
+  onTogglePause,
 }) => {
+  const [isPaused, setIsPaused] = React.useState<boolean>(initialPaused);
+  const [selectedType, setSelectedType] = React.useState<string>('ALL');
+
+  const handleTogglePause = () => {
+    const nextState = !isPaused;
+    setIsPaused(nextState);
+    if (onTogglePause) {
+      onTogglePause(nextState);
+    }
+  };
+
+  const filteredEvents = React.useMemo(() => {
+    if (selectedType === 'ALL') return events;
+    return events.filter((e) => e.type === selectedType);
+  }, [events, selectedType]);
+
   const getEventMeta = (type: PulseEvent['type']) => {
     switch (type) {
       case 'TIP':
@@ -170,23 +192,76 @@ export const LivePlatformPulseStream: React.FC<LivePlatformPulseStreamProps> = (
             </h2>
           </div>
 
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              background: 'var(--admin-status-success-bg, rgba(16, 185, 129, 0.10))',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              padding: '3px 10px',
-              borderRadius: 12,
-              fontSize: 11,
-              fontWeight: 700,
-              color: 'var(--admin-status-success, #10B981)',
-              letterSpacing: '0.03em',
-            }}
-          >
-            <LivePulseDot size={7} color="var(--admin-status-success, #10B981)" />
-            <span>STREAMING LIVE</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: isPaused
+                  ? 'var(--admin-status-warning-bg, rgba(245, 158, 11, 0.12))'
+                  : 'var(--admin-status-success-bg, rgba(16, 185, 129, 0.10))',
+                border: isPaused
+                  ? '1px solid rgba(245, 158, 11, 0.3)'
+                  : '1px solid rgba(16, 185, 129, 0.25)',
+                padding: '3px 10px',
+                borderRadius: 12,
+                fontSize: 11,
+                fontWeight: 700,
+                color: isPaused
+                  ? 'var(--admin-status-warning, #D97706)'
+                  : 'var(--admin-status-success, #10B981)',
+                letterSpacing: '0.03em',
+              }}
+            >
+              {isPaused ? (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: 'var(--admin-status-warning, #D97706)',
+                  }}
+                />
+              ) : (
+                <LivePulseDot size={7} color="var(--admin-status-success, #10B981)" />
+              )}
+              <span>{isPaused ? 'FEED PAUSED' : 'STREAMING LIVE'}</span>
+            </div>
+
+            {/* Pause / Resume Button */}
+            <button
+              type="button"
+              onClick={handleTogglePause}
+              aria-label={isPaused ? 'Resume live feed' : 'Pause live feed'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                background: 'var(--admin-surface-raised, #F1F5F9)',
+                border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                borderRadius: 8,
+                padding: '4px 10px',
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'var(--admin-text-secondary, #64748B)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {isPaused ? (
+                <>
+                  <PlayIcon size={12} strokeWidth={2.2} />
+                  <span>Resume</span>
+                </>
+              ) : (
+                <>
+                  <PauseIcon size={12} strokeWidth={2.2} />
+                  <span>Pause</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
@@ -194,17 +269,127 @@ export const LivePlatformPulseStream: React.FC<LivePlatformPulseStreamProps> = (
           style={{
             fontSize: 12,
             color: 'var(--admin-text-secondary, var(--text-secondary, #64748B))',
-            margin: '0 0 16px 0',
+            margin: '0 0 12px 0',
           }}
         >
           Multi-tenant event telemetry stream across live stages, tip splits, and security perimeters.
         </p>
 
+        {/* Filter Pills */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            marginBottom: 14,
+            overflowX: 'auto',
+            paddingBottom: 2,
+          }}
+          role="group"
+          aria-label="Filter events by type"
+        >
+          {['ALL', 'TIP', 'CHECKIN', 'CAMPAIGN', 'PAYOUT', 'SECURITY'].map((cat) => {
+            const isSelected = selectedType === cat;
+            const count = cat === 'ALL' ? events.length : events.filter((e) => e.type === cat).length;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedType(cat)}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: 6,
+                  border: isSelected
+                    ? '1px solid var(--admin-accent-primary, #7C3AED)'
+                    : '1px solid var(--admin-border-subtle, #E2E8F0)',
+                  background: isSelected
+                    ? 'var(--admin-accent-subtle, rgba(124, 58, 237, 0.10))'
+                    : 'transparent',
+                  color: isSelected
+                    ? 'var(--admin-accent-primary, #7C3AED)'
+                    : 'var(--admin-text-secondary, #64748B)',
+                  fontSize: 11,
+                  fontWeight: isSelected ? 700 : 500,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span>{cat}</span>
+                <span
+                  style={{
+                    fontSize: 9,
+                    padding: '0 4px',
+                    borderRadius: 4,
+                    background: isSelected ? 'var(--admin-accent-primary, #7C3AED)' : '#E2E8F0',
+                    color: isSelected ? '#FFFFFF' : '#475569',
+                    fontWeight: 700,
+                  }}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {isPaused && (
+          <div
+            style={{
+              padding: '8px 12px',
+              borderRadius: 6,
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              color: '#B45309',
+              fontSize: 11,
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 10,
+            }}
+          >
+            <span>Live updates paused. {events.length} total events buffered.</span>
+            <button
+              type="button"
+              onClick={handleTogglePause}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#B45309',
+                fontSize: 11,
+                fontWeight: 700,
+                textDecoration: 'underline',
+                cursor: 'pointer',
+              }}
+            >
+              Resume Now
+            </button>
+          </div>
+        )}
+
         {/* Event List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {events.map((ev) => {
-            const meta = getEventMeta(ev.type);
-            const Icon = meta.icon;
+          {filteredEvents.length === 0 ? (
+            <div
+              style={{
+                padding: '24px 16px',
+                textAlign: 'center',
+                color: 'var(--admin-text-secondary, #64748B)',
+                fontSize: 12,
+                borderRadius: 8,
+                background: 'var(--admin-surface-raised, #F8FAFC)',
+                border: '1px dashed var(--admin-border-subtle, #E2E8F0)',
+              }}
+            >
+              No {selectedType} events recorded in current telemetry buffer.
+            </div>
+          ) : (
+            filteredEvents.map((ev) => {
+              const meta = getEventMeta(ev.type);
+              const Icon = meta.icon;
 
             return (
               <div
@@ -306,7 +491,7 @@ export const LivePlatformPulseStream: React.FC<LivePlatformPulseStreamProps> = (
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
 

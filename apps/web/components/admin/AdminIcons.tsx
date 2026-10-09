@@ -525,6 +525,17 @@ export const SendIcon = createAdminIcon('SendIcon', (
   </>
 ));
 
+export const PauseIcon = createAdminIcon('PauseIcon', (
+  <>
+    <rect x="6" y="4" width="4" height="16" rx="1" />
+    <rect x="14" y="4" width="4" height="16" rx="1" />
+  </>
+));
+
+export const PlayIcon = createAdminIcon('PlayIcon', (
+  <polygon points="5 3 19 12 5 21 5 3" />
+));
+
 // Semantic aliases matching Admin Layout structure
 export const CrmIcon = UsersIcon;
 export const StaffRolesIcon = StaffIcon;

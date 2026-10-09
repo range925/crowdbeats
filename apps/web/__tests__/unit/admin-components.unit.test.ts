@@ -289,7 +289,20 @@ describe('Enterprise Admin Component Suite', () => {
     const html = renderToStaticMarkup(React.createElement(LivePlatformPulseStream));
     expect(html).toContain('Live Telemetry &amp; Activity Pulse');
     expect(html).toContain('STREAMING LIVE');
+    expect(html).toContain('Pause');
     expect(html).toContain('Fan @sarah_m');
     expect(html).toContain('Tipped $25.00');
+    expect(html).toContain('ALL');
+    expect(html).toContain('TIP');
+    expect(html).toContain('CHECKIN');
+  });
+
+  test('LivePlatformPulseStream supports initialPaused state and resume action', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(LivePlatformPulseStream, { initialPaused: true })
+    );
+    expect(html).toContain('FEED PAUSED');
+    expect(html).toContain('Resume');
+    expect(html).toContain('Live updates paused');
   });
 });
