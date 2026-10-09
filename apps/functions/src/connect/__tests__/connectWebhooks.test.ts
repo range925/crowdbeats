@@ -13,24 +13,52 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 const store: Record<string, Record<string, unknown>> = {};
 
+const resolveIncrements = (obj: any, current: any = {}) => {
+  const result: any = { ...obj };
+  for (const [k, v] of Object.entries(result)) {
+    if (v && typeof v === 'object' && (v as any)._type === 'increment') {
+      result[k] = (current[k] || 0) + (v as any).n;
+    }
+  }
+  return result;
+};
+
 const _mockDoc = (cId: string, dId?: string) => {
   const docId = dId || `doc_${Math.random()}`;
   return {
     id: docId,
-    ref: { id: docId },
+    ref: {
+      id: docId,
+      update: jest.fn().mockImplementation(async (updates: any) => {
+        const current = store[`${cId}/${docId}`] || {};
+        store[`${cId}/${docId}`] = { ...current, ...resolveIncrements(updates, current) };
+      }),
+      set: jest.fn().mockImplementation(async (data: any, options?: any) => {
+        const current = store[`${cId}/${docId}`] || {};
+        const resolved = resolveIncrements(data, current);
+        if (options?.merge && store[`${cId}/${docId}`]) {
+          store[`${cId}/${docId}`] = { ...store[`${cId}/${docId}`], ...resolved };
+        } else {
+          store[`${cId}/${docId}`] = resolved;
+        }
+      }),
+    },
     get: jest.fn().mockImplementation(async () => {
       const data = store[`${cId}/${docId}`];
       return { exists: data !== undefined, data: () => data };
     }),
     set: jest.fn().mockImplementation(async (data: any, options?: any) => {
+      const current = store[`${cId}/${docId}`] || {};
+      const resolved = resolveIncrements(data, current);
       if (options?.merge && store[`${cId}/${docId}`]) {
-        store[`${cId}/${docId}`] = { ...store[`${cId}/${docId}`], ...data };
+        store[`${cId}/${docId}`] = { ...store[`${cId}/${docId}`], ...resolved };
       } else {
-        store[`${cId}/${docId}`] = data;
+        store[`${cId}/${docId}`] = resolved;
       }
     }),
     update: jest.fn().mockImplementation(async (updates: any) => {
-      store[`${cId}/${docId}`] = { ...(store[`${cId}/${docId}`] || {}), ...updates };
+      const current = store[`${cId}/${docId}`] || {};
+      store[`${cId}/${docId}`] = { ...current, ...resolveIncrements(updates, current) };
     }),
   };
 };
@@ -45,7 +73,7 @@ const mockQuery = (colPath: string, filters: Array<[string, any]>) => {
           const docId = key.split('/').pop();
           docs.push({
             id: docId,
-            ref: _mockDoc(colPath, docId),
+            ref: _mockDoc(colPath, docId).ref,
             data: () => val,
           });
         }
@@ -66,6 +94,17 @@ const mockFirestore = {
     doc: (dId?: string) => _mockDoc(cId, dId),
     where: (field: string, op: string, value: any) => mockQuery(cId, [[field, value]]),
   }),
+  runTransaction: jest.fn().mockImplementation(async (fn: any) => {
+    const tx = {
+      get: async (ref: any) => {
+        const doc = _mockDoc('payouts', ref.id);
+        return doc.get();
+      },
+      update: (ref: any, data: any) => ref.update(data),
+      set: (ref: any, data: any, opts: any) => ref.set(data, opts),
+    };
+    return fn(tx);
+  }),
   batch: () => {
     const ops: Array<() => void> = [];
     return {
@@ -76,14 +115,24 @@ const mockFirestore = {
       },
     };
   },
-  FieldValue: { serverTimestamp: () => 'SERVER_TS' },
+  FieldValue: {
+    serverTimestamp: () => 'SERVER_TS',
+    increment: (n: number) => ({ _type: 'increment', n }),
+  },
 };
 
 jest.mock('firebase-admin', () => ({
   apps: [true],
   initializeApp: jest.fn(),
   firestore: Object.assign(jest.fn(() => mockFirestore), {
-    FieldValue: { serverTimestamp: () => 'SERVER_TS' },
+    FieldValue: {
+      serverTimestamp: () => 'SERVER_TS',
+      increment: (n: number) => ({ _type: 'increment', n }),
+    },
+    Timestamp: {
+      fromMillis: (ms: number) => new Date(ms),
+      fromDate: (d: Date) => d,
+    },
   }),
 }));
 
@@ -91,8 +140,11 @@ jest.mock('firebase-admin', () => ({
 const {
   handleAccountUpdated,
   handleAccountApplicationDeauthorized,
+  handleCapabilityUpdated,
   handleDisputeCreated,
   handleChargeRefunded,
+  handlePayoutPaid,
+  handlePayoutFailed,
 } = require('../connectWebhookHandlers');
 
 describe('Stripe Connect & Dispute Webhooks (Phase 10)', () => {
@@ -201,6 +253,93 @@ describe('Stripe Connect & Dispute Webhooks (Phase 10)', () => {
       expect(ledgerKeys.length).toBe(1);
       expect(store[ledgerKeys[0]].entryType).toBe('TIP_REFUNDED');
       expect(store[ledgerKeys[0]].type).toBe('CREDIT_REVERSAL');
+    });
+  });
+
+  describe('handleCapabilityUpdated', () => {
+    it('updates capability and enables payouts when transfers capability becomes active', async () => {
+      await handleCapabilityUpdated(
+        mockFirestore as any,
+        {
+          id: 'transfers',
+          status: 'active',
+        },
+        'acct_pulse_123',
+      );
+
+      const user = store['users/creator_1'];
+      expect(user.stripePayoutsEnabled).toBe(true);
+      expect(user['capabilities.transfers']).toBe('active');
+    });
+  });
+
+  describe('handlePayoutPaid', () => {
+    it('marks payout as paid and logs audit record', async () => {
+      store['payouts/po_rec_1'] = {
+        payoutId: 'po_rec_1',
+        recipientId: 'creator_1',
+        amountCents: 4500,
+        currency: 'USD',
+        status: 'pending',
+        stripeTransferId: 'tr_456',
+      };
+
+      await handlePayoutPaid(mockFirestore as any, {
+        id: 'po_live_789',
+        transfer: 'tr_456',
+        amount: 4500,
+        arrival_date: 1729000000,
+      });
+
+      expect(store['payouts/po_rec_1'].status).toBe('paid');
+      expect(store['payouts/po_rec_1'].stripePayoutId).toBe('po_live_789');
+
+      const auditEntries = Object.values(store).filter(
+        (entry: any) => entry.action === 'PAYOUT_PAID' && entry.payoutId === 'po_rec_1',
+      );
+      expect(auditEntries.length).toBe(1);
+    });
+  });
+
+  describe('handlePayoutFailed', () => {
+    it('marks payout failed, reverses balance back to artist profile, and writes ledger reversal', async () => {
+      store['payouts/po_rec_fail'] = {
+        payoutId: 'po_rec_fail',
+        recipientId: 'creator_1',
+        amountCents: 3500,
+        currency: 'USD',
+        status: 'pending',
+        stripeTransferId: 'tr_fail_123',
+      };
+      store['artistProfiles/creator_1'] = {
+        artistId: 'creator_1',
+        availableBalanceCents: 500,
+        totalPaidOutCents: 3500,
+      };
+
+      await handlePayoutFailed(mockFirestore as any, {
+        id: 'po_fail_999',
+        transfer: 'tr_fail_123',
+        amount: 3500,
+        failure_code: 'account_closed',
+        failure_message: 'The bank account has been closed.',
+      });
+
+      expect(store['payouts/po_rec_fail'].status).toBe('failed');
+      expect(store['payouts/po_rec_fail'].failureReason).toBe('The bank account has been closed.');
+
+      // Check balance reversal
+      const profile = store['artistProfiles/creator_1'];
+      expect(profile.availableBalanceCents).toBe(4000); // 500 + 3500
+      expect(profile.totalPaidOutCents).toBe(0); // 3500 - 3500
+
+      // Check ledger reversal
+      const reversals = Object.values(store).filter(
+        (entry: any) => entry.entryType === 'PAYOUT_REVERSAL',
+      );
+      expect(reversals.length).toBe(1);
+      expect(reversals[0].amountCents).toBe(3500);
+      expect(reversals[0].uid).toBe('creator_1');
     });
   });
 });

@@ -22,112 +22,148 @@ import {
   handleAccountApplicationDeauthorized,
   handleDisputeCreated,
   handleChargeRefunded,
+  handlePayoutPaid,
+  handlePayoutFailed,
 } from '../connect/connectWebhookHandlers.js';
 
 const _db = () => admin.firestore();
 
-export const stripeWebhook = onRequest(
-  {
-    region: 'us-central1',
-    cors: false, // Stripe webhooks do not use browser CORS
-  },
-  async (req, res) => {
-    // ── Signature verification ─────────────────────────────────────────────
+async function _handleStripeWebhook(req: any, res: any): Promise<void> {
+  // ── Signature verification ─────────────────────────────────────────────
 
-    const sig = req.headers['stripe-signature'] as string | undefined;
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig = req.headers['stripe-signature'] as string | undefined;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const connectWebhookSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
 
-    let event: Record<string, unknown>;
-    try {
-      if (webhookSecret && sig) {
-        event = stripe.constructWebhookEvent(
-          req.rawBody as unknown as string,
-          sig,
-          webhookSecret,
-        ) as unknown as Record<string, unknown>;
-      } else if (!webhookSecret) {
-        // Emulator mode: accept without signature
-        event = req.body as Record<string, unknown>;
-      } else {
-        // Secret set but no sig header
-        res.status(400).send('Missing Stripe-Signature header');
-        return;
-      }
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err);
-      res.status(400).send('Webhook signature verification failed');
+  let event: Record<string, unknown> = {};
+  try {
+    if (!webhookSecret && !connectWebhookSecret) {
+      // Emulator mode: accept without signature
+      event = req.body as Record<string, unknown>;
+    } else if (!sig) {
+      // Secret set but no sig header
+      res.status(400).send('Missing Stripe-Signature header');
       return;
-    }
+    } else {
+      let verified = false;
+      let lastError: unknown = null;
 
-    const eventId = event['id'] as string | undefined;
-    const eventType = event['type'] as string;
-    const eventObject = (event['data'] as Record<string, unknown>)?.['object'] as Record<string, unknown>;
-
-    // ── Replay Attack Prevention / Idempotency Cache ───────────────────────
-    let eventRef: admin.firestore.DocumentReference | null = null;
-    let stripeEventRef: admin.firestore.DocumentReference | null = null;
-
-    if (eventId) {
-      eventRef = _db().collection('webhookEvents').doc(eventId);
-      const eventSnap = await eventRef.get();
-      if (eventSnap.exists) {
-        const existingData = eventSnap.data();
-        if (existingData?.status === 'COMPLETED' || !existingData?.status) {
-          res.status(200).send({ received: true, deduplicated: true });
-          return;
+      // Try STRIPE_WEBHOOK_SECRET first if configured
+      if (webhookSecret) {
+        try {
+          event = stripe.constructWebhookEvent(
+            req.rawBody as unknown as string,
+            sig,
+            webhookSecret,
+          ) as unknown as Record<string, unknown>;
+          verified = true;
+        } catch (err) {
+          lastError = err;
         }
       }
-      const now = admin.firestore.FieldValue.serverTimestamp();
-      await eventRef.set({
-        eventId,
-        type: eventType,
-        status: 'PROCESSING',
-        receivedAt: now,
-      }, { merge: true });
 
-      // Phase 15: Stripe Webhook Events collection
-      stripeEventRef = _db().collection('stripeWebhookEvents').doc(eventId);
-      await stripeEventRef.set({
-        stripeEventId: eventId,
-        eventType,
-        processingStatus: 'RECEIVED',
-        relatedObjectId: eventObject?.['id'] || null,
-        receivedAt: now,
-        processedAt: null,
-      }, { merge: true });
-    }
-
-    try {
-      switch (eventType) {
-        case 'payment_intent.succeeded':
-          await _handlePaymentSucceeded(eventObject);
-          break;
-        case 'payment_intent.payment_failed':
-          await _handlePaymentFailed(eventObject);
-          break;
-        case 'account.updated':
-          await handleAccountUpdated(_db(), eventObject);
-          break;
-        case 'account.application.deauthorized':
-          await handleAccountApplicationDeauthorized(_db(), eventObject);
-          break;
-        case 'charge.dispute.created':
-          await handleDisputeCreated(_db(), eventObject);
-          break;
-        case 'charge.refunded':
-          await handleChargeRefunded(_db(), eventObject);
-          break;
-        case 'application_fee.created':
-        case 'application_fee.refunded':
-        case 'application_fee.refund.updated':
-        case 'transfer.created':
-        case 'transfer.reversed':
-          await _handleApplicationFeeAndTransferEvents(eventType, eventObject);
-          break;
-        default:
-          // Gracefully ignore unhandled event types
-          break;
+      // If secret validation fails with STRIPE_WEBHOOK_SECRET and STRIPE_CONNECT_WEBHOOK_SECRET is defined, try it
+      if (!verified && connectWebhookSecret) {
+        try {
+          event = stripe.constructWebhookEvent(
+            req.rawBody as unknown as string,
+            sig,
+            connectWebhookSecret,
+          ) as unknown as Record<string, unknown>;
+          verified = true;
+        } catch (err) {
+          lastError = err;
+        }
       }
+
+      if (!verified) {
+        throw lastError || new Error('Webhook signature verification failed');
+      }
+    }
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err);
+    res.status(400).send('Webhook signature verification failed');
+    return;
+  }
+
+  const eventId = event['id'] as string | undefined;
+  const eventType = event['type'] as string;
+  const eventObject = (event['data'] as Record<string, unknown>)?.['object'] as Record<string, unknown>;
+
+  // ── Replay Attack Prevention / Idempotency Cache ───────────────────────
+  let eventRef: admin.firestore.DocumentReference | null = null;
+  let stripeEventRef: admin.firestore.DocumentReference | null = null;
+
+  if (eventId) {
+    eventRef = _db().collection('webhookEvents').doc(eventId);
+    const eventSnap = await eventRef.get();
+    if (eventSnap.exists) {
+      const existingData = eventSnap.data();
+      if (existingData?.status === 'COMPLETED' || !existingData?.status) {
+        res.status(200).send({ received: true, deduplicated: true });
+        return;
+      }
+    }
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    await eventRef.set({
+      eventId,
+      type: eventType,
+      status: 'PROCESSING',
+      receivedAt: now,
+    }, { merge: true });
+
+    // Phase 15: Stripe Webhook Events collection
+    stripeEventRef = _db().collection('stripeWebhookEvents').doc(eventId);
+    await stripeEventRef.set({
+      stripeEventId: eventId,
+      eventType,
+      processingStatus: 'RECEIVED',
+      relatedObjectId: eventObject?.['id'] || null,
+      receivedAt: now,
+      processedAt: null,
+    }, { merge: true });
+  }
+
+  try {
+    switch (eventType) {
+      case 'payment_intent.succeeded':
+        await _handlePaymentSucceeded(eventObject);
+        break;
+      case 'payment_intent.payment_failed':
+        await _handlePaymentFailed(eventObject);
+        break;
+      case 'account.updated':
+        await handleAccountUpdated(_db(), eventObject);
+        break;
+      case 'account.application.deauthorized':
+        await handleAccountApplicationDeauthorized(_db(), eventObject);
+        break;
+      case 'charge.dispute.created':
+        await handleDisputeCreated(_db(), eventObject);
+        break;
+      case 'charge.refunded':
+        await handleChargeRefunded(_db(), eventObject);
+        break;
+      case 'payout.paid':
+        await handlePayoutPaid(_db(), eventObject);
+        break;
+      case 'payout.failed':
+        await handlePayoutFailed(_db(), eventObject);
+        break;
+      case 'capability.updated':
+        await handleAccountUpdated(_db(), eventObject);
+        break;
+      case 'application_fee.created':
+      case 'application_fee.refunded':
+      case 'application_fee.refund.updated':
+      case 'transfer.created':
+      case 'transfer.reversed':
+        await _handleApplicationFeeAndTransferEvents(eventType, eventObject);
+        break;
+      default:
+        // Gracefully ignore unhandled event types
+        break;
+    }
 
       if (eventRef) {
         const now = admin.firestore.FieldValue.serverTimestamp();
@@ -156,7 +192,22 @@ export const stripeWebhook = onRequest(
     }
 
     res.status(200).send('OK');
+}
+
+export const stripeWebhook = onRequest(
+  {
+    region: 'us-central1',
+    cors: false, // Stripe webhooks do not use browser CORS
   },
+  _handleStripeWebhook,
+);
+
+export const stripeConnectWebhook = onRequest(
+  {
+    region: 'us-central1',
+    cors: false, // Stripe webhooks do not use browser CORS
+  },
+  _handleStripeWebhook,
 );
 
 // ── Event Handlers ─────────────────────────────────────────────────────────────

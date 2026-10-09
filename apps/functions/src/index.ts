@@ -127,6 +127,7 @@ export { generateQrToken } from './qr/generateQrToken.js';
 
 export { createConnectLink } from './connect/createConnectLink.js';
 export { getConnectStatus }  from './connect/getConnectStatus.js';
+export { stripeConnectWebhook } from './connect/stripeConnectWebhook.js';
 export { resolveCreatorBySlug } from './profiles/resolveCreatorBySlug.js';
 export { checkMonetizationEligibility } from './monetization/checkMonetizationEligibility.js';
 export { recordConsent } from './compliance/recordConsentCallable.js';

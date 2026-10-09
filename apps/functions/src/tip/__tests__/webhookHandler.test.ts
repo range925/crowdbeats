@@ -63,7 +63,21 @@ jest.mock('../../lib/stripe', () => ({
   },
 }));
 
-import { stripeWebhook } from '../webhookHandler';
+jest.mock('../../connect/connectWebhookHandlers', () => ({
+  handleAccountUpdated: jest.fn().mockResolvedValue(undefined),
+  handleAccountApplicationDeauthorized: jest.fn().mockResolvedValue(undefined),
+  handleDisputeCreated: jest.fn().mockResolvedValue(undefined),
+  handleChargeRefunded: jest.fn().mockResolvedValue(undefined),
+  handlePayoutPaid: jest.fn().mockResolvedValue(undefined),
+  handlePayoutFailed: jest.fn().mockResolvedValue(undefined),
+}));
+
+import { stripeWebhook, stripeConnectWebhook } from '../webhookHandler';
+import {
+  handleAccountUpdated,
+  handlePayoutPaid,
+  handlePayoutFailed,
+} from '../../connect/connectWebhookHandlers';
 import * as admin from 'firebase-admin';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,8 +160,9 @@ describe('stripeWebhook', () => {
     mockAdmin.__mockDocRef.set.mockResolvedValue(undefined);
     mockAdmin.__mockTransaction.update.mockReturnThis();
     mockAdmin.__mockTransaction.set.mockReturnThis();
-    // Ensure STRIPE_WEBHOOK_SECRET is not set for most tests
+    // Ensure webhook secrets are not set for most tests
     delete process.env['STRIPE_WEBHOOK_SECRET'];
+    delete process.env['STRIPE_CONNECT_WEBHOOK_SECRET'];
   });
 
   it('returns 400 when STRIPE_WEBHOOK_SECRET is set and constructWebhookEvent throws', async () => {
@@ -267,5 +282,87 @@ describe('stripeWebhook', () => {
       res as unknown as Record<string, unknown>,
     );
     expect(res.statusCode).toBe(200);
+  });
+
+  it('falls back to STRIPE_CONNECT_WEBHOOK_SECRET when STRIPE_WEBHOOK_SECRET verification fails', async () => {
+    process.env['STRIPE_WEBHOOK_SECRET'] = 'whsec_primary';
+    process.env['STRIPE_CONNECT_WEBHOOK_SECRET'] = 'whsec_connect';
+    const { stripe: s } = jest.requireMock('../../lib/stripe') as {
+      stripe: { constructWebhookEvent: jest.Mock };
+    };
+    s.constructWebhookEvent.mockImplementation((payload: string, _sig: string, secret: string) => {
+      if (secret === 'whsec_primary') {
+        throw new Error('primary secret signature mismatch');
+      }
+      return JSON.parse(payload) as unknown;
+    });
+
+    const body = makeEvent('payout.paid', { id: 'po_123', amount: 5000 });
+    const res = makeMockRes();
+    await handler(
+      makeMockReq(body, 'valid_connect_sig') as unknown as Record<string, unknown>,
+      res as unknown as Record<string, unknown>,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(s.constructWebhookEvent).toHaveBeenCalledTimes(2);
+    expect(handlePayoutPaid).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: 'po_123', amount: 5000 }),
+    );
+  });
+
+  it('verifies signature when only STRIPE_CONNECT_WEBHOOK_SECRET is configured', async () => {
+    delete process.env['STRIPE_WEBHOOK_SECRET'];
+    process.env['STRIPE_CONNECT_WEBHOOK_SECRET'] = 'whsec_connect';
+    const { stripe: s } = jest.requireMock('../../lib/stripe') as {
+      stripe: { constructWebhookEvent: jest.Mock };
+    };
+
+    const body = makeEvent('payout.failed', { id: 'po_fail', amount: 5000, failure_message: 'declined' });
+    const res = makeMockRes();
+    await handler(
+      makeMockReq(body, 'sig_connect_only') as unknown as Record<string, unknown>,
+      res as unknown as Record<string, unknown>,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(s.constructWebhookEvent).toHaveBeenCalledWith(
+      expect.any(String),
+      'sig_connect_only',
+      'whsec_connect',
+    );
+    expect(handlePayoutFailed).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: 'po_fail', failure_message: 'declined' }),
+    );
+  });
+
+  it('capability.updated: invokes handleAccountUpdated', async () => {
+    const body = makeEvent('capability.updated', { id: 'transfers', status: 'active', account: 'acct_123' });
+    const res = makeMockRes();
+    await handler(
+      makeMockReq(body) as unknown as Record<string, unknown>,
+      res as unknown as Record<string, unknown>,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(handleAccountUpdated).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: 'transfers', status: 'active', account: 'acct_123' }),
+    );
+  });
+
+  it('stripeConnectWebhook is exported and handles requests identically', async () => {
+    expect(stripeConnectWebhook).toBeDefined();
+    const connectHandler = stripeConnectWebhook as unknown as WebhookHandler;
+    const body = makeEvent('payout.paid', { id: 'po_connect_777', amount: 3000 });
+    const res = makeMockRes();
+    await connectHandler(
+      makeMockReq(body) as unknown as Record<string, unknown>,
+      res as unknown as Record<string, unknown>,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(handlePayoutPaid).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: 'po_connect_777' }),
+    );
   });
 });

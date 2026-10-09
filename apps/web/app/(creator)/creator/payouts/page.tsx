@@ -18,6 +18,23 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { calculateNetTipPayout } from '@/lib/financial/stripeDailyFeeService';
+import { callCallableFunction } from '@/lib/firebase/functions';
+
+export interface ConnectAccountStatus {
+  accountId: string | null;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  detailsSubmitted?: boolean;
+  disabledReason?: string | null;
+  requirementsDue?: string[];
+  eventuallyDue?: string[];
+  pastDue?: string[];
+  capabilities?: { cardPayments: string; transfers: string };
+  bankPayoutReadiness?: 'ready' | 'pending_verification' | 'action_required' | 'restricted' | 'not_created' | string;
+  creatorVerificationState?: 'unverified' | 'pending' | 'verified' | 'restricted' | 'rejected' | string;
+  requiresAction?: boolean;
+  actionType?: 'create_account' | 'complete_kyc' | 'update_information' | null | string;
+}
 
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
 const stripePromise = PUBLISHABLE_KEY ? loadStripe(PUBLISHABLE_KEY) : null;
@@ -131,52 +148,130 @@ function DemoTipForm() {
 }
 
 export default function CreatorPayoutsPage() {
+  const [accountStatus, setAccountStatus] = useState<ConnectAccountStatus | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+  const [statusError, setStatusError] = useState<string | null>(null);
+
   const [loadingConnect, setLoadingConnect] = useState(false);
   const [connectUrl, setConnectUrl] = useState('');
   const [connectStatus, setConnectStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [connectMsg, setConnectMsg] = useState('');
+
   const [payoutAmount, setPayoutAmount] = useState('50');
+  const [loadingPayout, setLoadingPayout] = useState(false);
+  const [payoutStatus, setPayoutStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [payoutMsg, setPayoutMsg] = useState('');
+
   const [calcGross, setCalcGross] = useState('25');
+
+  const fetchLiveStatus = async () => {
+    setLoadingStatus(true);
+    setStatusError(null);
+    try {
+      const res = await callCallableFunction<Record<string, never>, ConnectAccountStatus>('getConnectStatus', {});
+      setAccountStatus(res);
+      return res;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setStatusError(message || 'Failed to load Stripe Connect account status.');
+      return null;
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const p = new URLSearchParams(window.location.search);
-    if (p.get('connect') === 'success') {
+    if (p.get('connect') === 'success' || p.get('connect') === 'return') {
       setConnectStatus('success');
-      setConnectMsg('Stripe Connect onboarding complete! Your payout account is being verified.');
+      setConnectMsg('Stripe Connect onboarding return received! Verifying live status…');
     } else if (p.get('connect') === 'refresh') {
-      setConnectMsg('Link expired — please click Set Up Payout Account again.');
+      setConnectStatus('error');
+      setConnectMsg('Onboarding session expired or was refreshed — please click Set Up / Update Payout Account again.');
     }
+
+    fetchLiveStatus().then((res) => {
+      if (res && (p.get('connect') === 'success' || p.get('connect') === 'return')) {
+        if (res.chargesEnabled && res.payoutsEnabled) {
+          setConnectMsg('Stripe Connect onboarding complete! Your payout account is active and verified.');
+        } else {
+          setConnectMsg('Stripe Connect onboarding details received. Identity verification is in review.');
+        }
+      }
+    });
   }, []);
 
   const handleSetupConnect = async () => {
-    setLoadingConnect(true); setConnectStatus('idle'); setConnectMsg('');
+    setLoadingConnect(true);
+    setConnectStatus('idle');
+    setConnectMsg('');
     try {
-      const res = await fetch('/api/creator/connect', { method: 'POST' });
-      const data = await res.json() as { accountLinkUrl?: string; error?: string };
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://crowdbeats.ai';
+      const data = await callCallableFunction<
+        { creatorType?: string; refreshUrl?: string; returnUrl?: string },
+        { accountLinkUrl: string; accountId: string }
+      >('createConnectLink', {
+        creatorType: 'artist',
+        refreshUrl: `${origin}/creator/payouts?connect=refresh`,
+        returnUrl: `${origin}/creator/payouts?connect=success`,
+      });
+
       if (data.accountLinkUrl) {
         setConnectUrl(data.accountLinkUrl);
         setConnectStatus('success');
-        setConnectMsg('Onboarding link ready — click below to complete identity verification.');
+        setConnectMsg('Onboarding link ready — click below to complete identity verification in Stripe.');
       } else {
         setConnectStatus('error');
-        setConnectMsg(data.error ?? 'Failed to generate link. Please try again.');
+        setConnectMsg('Failed to generate onboarding link. Please try again.');
       }
-    } catch { setConnectStatus('error'); setConnectMsg('Network error. Please try again.'); }
-    finally { setLoadingConnect(false); }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setConnectStatus('error');
+      setConnectMsg(message || 'Network error generating onboarding link. Please try again.');
+    } finally {
+      setLoadingConnect(false);
+    }
   };
 
   const handleRequestPayout = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cents = parseInt(payoutAmount, 10) * 100;
-    if (isNaN(cents) || cents < 1000) { setPayoutMsg('Minimum payout request is $10.00.'); return; }
+    const dollars = parseFloat(payoutAmount);
+    const cents = Math.round(dollars * 100);
+    if (isNaN(cents) || cents < 1000) {
+      setPayoutStatus('error');
+      setPayoutMsg('Minimum payout request is $10.00.');
+      return;
+    }
+    setLoadingPayout(true);
+    setPayoutMsg('');
+    setPayoutStatus('idle');
     try {
-      const res = await fetch('/api/creator/payout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amountCents: cents }) });
-      const data = await res.json() as { error?: string };
-      setPayoutMsg(res.ok ? `Payout request for $${(cents / 100).toFixed(2)} submitted! Processing in 1-2 business days.` : (data.error ?? 'Failed to request payout.'));
-    } catch { setPayoutMsg('Network error submitting payout request.'); }
+      const data = await callCallableFunction<
+        { amountCents: number; currency?: string },
+        { payoutId: string; amountCents: number; stripeTransferId: string }
+      >('requestPayout', { amountCents: cents, currency: 'USD' });
+      setPayoutStatus('success');
+      setPayoutMsg(
+        `Payout of $${(data.amountCents / 100).toFixed(2)} submitted successfully! Payout ID: ${data.payoutId} · Transfer ID: ${data.stripeTransferId}. Processing in 1-2 business days.`
+      );
+      fetchLiveStatus();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setPayoutStatus('error');
+      setPayoutMsg(message || 'Failed to request payout.');
+    } finally {
+      setLoadingPayout(false);
+    }
   };
+
+  const isAccountActive = Boolean(accountStatus?.chargesEnabled && accountStatus?.payoutsEnabled);
+  const hasRequirementsDue = Boolean(
+    (accountStatus?.requirementsDue && accountStatus.requirementsDue.length > 0) ||
+      accountStatus?.disabledReason ||
+      accountStatus?.actionType === 'update_information' ||
+      accountStatus?.bankPayoutReadiness === 'action_required'
+  );
 
   return (
     <div style={{ padding: '24px 32px', maxWidth: 800, margin: '0 auto' }}>
@@ -186,23 +281,143 @@ export default function CreatorPayoutsPage() {
       {/* 1. Connect KYC */}
       <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 12, border: '1px solid var(--border-subtle)', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Stripe Connect Express Account</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Required to receive direct tip deposits and campaign payouts into your bank account.</div>
+          <div style={{ flex: 1, minWidth: 260 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Stripe Connect Express Account</span>
+              {loadingStatus ? (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'var(--surface-raised)', color: 'var(--text-tertiary)', border: '1px solid var(--border-subtle)' }}>
+                  Checking status…
+                </span>
+              ) : isAccountActive ? (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)', fontWeight: 700 }}>
+                  Active & Verified
+                </span>
+              ) : hasRequirementsDue ? (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(245,158,11,0.15)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.3)', fontWeight: 700 }}>
+                  Requirements Due
+                </span>
+              ) : (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(99,102,241,0.15)', color: '#818CF8', border: '1px solid rgba(99,102,241,0.3)', fontWeight: 700 }}>
+                  Onboarding Required
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {loadingStatus ? (
+                'Connecting to Stripe to verify your payout account status…'
+              ) : isAccountActive ? (
+                `Your Stripe Express account (${accountStatus?.accountId ?? 'connected'}) is active. Payouts and direct tips will be transferred to your bank.`
+              ) : hasRequirementsDue ? (
+                `Action required: Stripe needs additional verification details (${
+                  accountStatus?.requirementsDue && accountStatus.requirementsDue.length > 0
+                    ? accountStatus.requirementsDue.join(', ')
+                    : 'identity documentation'
+                }). Complete requirements to enable payouts.`
+              ) : (
+                'Required to receive direct tip deposits and campaign payouts into your bank account.'
+              )}
+            </div>
           </div>
-          <button onClick={handleSetupConnect} disabled={loadingConnect} style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: loadingConnect ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}>
-            {loadingConnect ? 'Generating...' : 'Set Up / Update Payout Account'}
+          <button
+            type="button"
+            onClick={handleSetupConnect}
+            disabled={loadingConnect}
+            aria-busy={loadingConnect}
+            style={{
+              background: 'var(--accent-primary)',
+              color: '#fff',
+              border: 'none',
+              padding: '10px 18px',
+              borderRadius: 8,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: loadingConnect ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+              opacity: loadingConnect ? 0.7 : 1,
+            }}
+          >
+            {loadingConnect
+              ? 'Generating…'
+              : isAccountActive
+                ? 'Update Payout Account'
+                : hasRequirementsDue
+                  ? 'Complete Requirements'
+                  : 'Set Up Payout Account'}
           </button>
         </div>
+
+        {statusError && (
+          <div
+            role="alert"
+            style={{
+              marginTop: 16,
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: 'rgba(239,68,68,0.1)',
+              color: '#EF4444',
+              fontSize: 13,
+              border: '1px solid rgba(239,68,68,0.25)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>{statusError}</span>
+            <button
+              type="button"
+              onClick={fetchLiveStatus}
+              style={{
+                background: 'transparent',
+                border: '1px solid #EF4444',
+                color: '#EF4444',
+                borderRadius: 6,
+                padding: '3px 8px',
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {connectMsg && (
-          <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 8, background: connectStatus === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', color: connectStatus === 'error' ? '#EF4444' : '#10B981', fontSize: 13 }}>
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              marginTop: 16,
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: connectStatus === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
+              color: connectStatus === 'error' ? '#EF4444' : '#10B981',
+              fontSize: 13,
+              border: `1px solid ${connectStatus === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`,
+            }}
+          >
             {connectMsg}
           </div>
         )}
         {connectUrl && (
           <div style={{ marginTop: 12 }}>
-            <a href={connectUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 8, background: '#635BFF', color: '#fff', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
-              Open Stripe Onboarding
+            <a
+              href={connectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 18px',
+                borderRadius: 8,
+                background: '#635BFF',
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: 13,
+                textDecoration: 'none',
+              }}
+            >
+              Open Stripe Onboarding ↗
             </a>
           </div>
         )}
@@ -296,16 +511,53 @@ export default function CreatorPayoutsPage() {
       <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 12, border: '1px solid var(--border-subtle)', marginBottom: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 12px' }}>Request Payout to Bank</h3>
         {payoutMsg && (
-          <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10B981', fontSize: 13, marginBottom: 12 }}>
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: payoutStatus === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
+              color: payoutStatus === 'error' ? '#EF4444' : '#10B981',
+              fontSize: 13,
+              marginBottom: 12,
+              border: `1px solid ${payoutStatus === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`,
+            }}
+          >
             {payoutMsg}
           </div>
         )}
         <form onSubmit={handleRequestPayout} style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative' }}>
             <span style={{ position: 'absolute', left: 12, top: 10, color: 'var(--text-tertiary)', fontSize: 14 }}>$</span>
-            <input type="number" min="10" value={payoutAmount} onChange={(e) => setPayoutAmount(e.target.value)} style={{ width: 140, padding: '10px 12px 10px 24px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-raised)', color: 'var(--text-primary)', fontSize: 14 }} />
+            <input
+              type="number"
+              min="10"
+              step="0.01"
+              value={payoutAmount}
+              onChange={(e) => setPayoutAmount(e.target.value)}
+              aria-label="Payout amount in USD"
+              style={{ width: 140, padding: '10px 12px 10px 24px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-raised)', color: 'var(--text-primary)', fontSize: 14 }}
+            />
           </div>
-          <button type="submit" style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Transfer to Bank</button>
+          <button
+            type="submit"
+            disabled={loadingPayout}
+            aria-busy={loadingPayout}
+            style={{
+              background: loadingPayout ? 'var(--border-subtle)' : 'var(--accent-primary)',
+              color: '#fff',
+              border: 'none',
+              padding: '10px 18px',
+              borderRadius: 8,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: loadingPayout ? 'not-allowed' : 'pointer',
+              opacity: loadingPayout ? 0.7 : 1,
+            }}
+          >
+            {loadingPayout ? 'Transferring…' : 'Transfer to Bank'}
+          </button>
         </form>
         <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 8 }}>Minimum payout: $10.00 - Processing time: 1-2 business days via Stripe Express</div>
       </div>

@@ -33,9 +33,18 @@ export class StripeAdapter {
     }
   }
 
+  get isMockMode(): boolean {
+    return this._stripe === null;
+  }
+
   private get _stripe(): Stripe | null {
-    if (!this._stripeInstance && process.env.STRIPE_SECRET_KEY) {
-      this._stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      this._stripeInstance = null;
+      return null;
+    }
+    if (!this._stripeInstance) {
+      this._stripeInstance = new Stripe(key, {
         apiVersion: '2026-07-29.dahlia' as unknown as Stripe.LatestApiVersion,
       });
     }
@@ -164,11 +173,13 @@ export class StripeAdapter {
     sig: string,
     secret: string,
   ): Stripe.Event {
-    if (this._stripe) {
-      return this._stripe.webhooks.constructEvent(payload, sig, secret);
+    if (sig.startsWith('sig_mock') || secret.startsWith('whsec_mock')) {
+      return JSON.parse(payload) as Stripe.Event;
     }
-    // Mock: parse JSON directly (emulator only, no signature verification)
-    return JSON.parse(payload) as Stripe.Event;
+    const client = this._stripe || new Stripe('mock_wh_key', {
+      apiVersion: '2026-07-29.dahlia' as unknown as Stripe.LatestApiVersion,
+    });
+    return client.webhooks.constructEvent(payload, sig, secret);
   }
 
   // ── Refund ─────────────────────────────────────────────────────────────────

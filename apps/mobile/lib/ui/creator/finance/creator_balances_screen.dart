@@ -10,6 +10,7 @@ import '../../theme/cb_colors.dart';
 import '../../theme/cb_spacing.dart';
 import 'creator_payout_request_sheet.dart';
 import 'creator_payout_history_screen.dart';
+import 'stripe_connect_kyc_screen.dart';
 import '../../../data/services/stripe_fee_service.dart';
 
 class LedgerEntryItem {
@@ -292,6 +293,13 @@ class _CreatorBalancesScreenState extends State<CreatorBalancesScreen> {
         backgroundColor: CbColors.surfaceBase,
         title: const Text('Balances & Financial Ledger', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.verified_user_outlined, color: CbColors.tealGas),
+            tooltip: 'Stripe Connect Status',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const StripeConnectKycScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.history, color: CbColors.tealGas),
             tooltip: 'Payout History',

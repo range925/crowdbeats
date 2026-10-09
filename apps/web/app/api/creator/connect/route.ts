@@ -28,7 +28,7 @@ async function _getSession(): Promise<SessionData | null> {
 }
 
 const ALLOWED_PERSONAS = new Set(['artist', 'band_member']);
-const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY ?? process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY ?? '';
+const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY ?? '';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://crowdbeats-01.web.app';
 
 export async function GET() {

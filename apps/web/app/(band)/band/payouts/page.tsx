@@ -13,6 +13,23 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { calculateNetTipPayout, calculateBandNetSplits } from '@/lib/financial/stripeDailyFeeService';
+import { callCallableFunction } from '@/lib/firebase/functions';
+
+export interface ConnectAccountStatus {
+  accountId: string | null;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  detailsSubmitted?: boolean;
+  disabledReason?: string | null;
+  requirementsDue?: string[];
+  eventuallyDue?: string[];
+  pastDue?: string[];
+  capabilities?: { cardPayments: string; transfers: string };
+  bankPayoutReadiness?: 'ready' | 'pending_verification' | 'action_required' | 'restricted' | 'not_created' | string;
+  creatorVerificationState?: 'unverified' | 'pending' | 'verified' | 'restricted' | 'rejected' | string;
+  requiresAction?: boolean;
+  actionType?: 'create_account' | 'complete_kyc' | 'update_information' | null | string;
+}
 
 const PK = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
 const stripePromise = PK ? loadStripe(PK) : null;
@@ -89,28 +106,92 @@ function BandCardForm() {
 }
 
 export default function BandPayoutsPage() {
+  const [accountStatus, setAccountStatus] = useState<ConnectAccountStatus | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+  const [statusError, setStatusError] = useState<string | null>(null);
+
   const [loadingConnect, setLoadingConnect] = useState(false);
   const [connectUrl, setConnectUrl] = useState('');
   const [connectMsg, setConnectMsg] = useState('');
   const [connectOk, setConnectOk] = useState(false);
   const [calcTip, setCalcTip] = useState('50');
 
+  const fetchLiveStatus = async () => {
+    setLoadingStatus(true);
+    setStatusError(null);
+    try {
+      const res = await callCallableFunction<Record<string, never>, ConnectAccountStatus>('getConnectStatus', {});
+      setAccountStatus(res);
+      return res;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setStatusError(message || 'Failed to load Stripe Connect account status.');
+      return null;
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const p = new URLSearchParams(window.location.search);
-    if (p.get('connect') === 'success') { setConnectOk(true); setConnectMsg('Stripe Connect onboarding complete!'); }
-    else if (p.get('connect') === 'refresh') { setConnectMsg('Link expired — click Set Up again.'); }
+    if (p.get('connect') === 'success' || p.get('connect') === 'return') {
+      setConnectOk(true);
+      setConnectMsg('Stripe Connect onboarding return received! Refreshing status…');
+    } else if (p.get('connect') === 'refresh') {
+      setConnectOk(false);
+      setConnectMsg('Onboarding session expired or was refreshed — click Set Up again.');
+    }
+
+    fetchLiveStatus().then((res) => {
+      if (res && (p.get('connect') === 'success' || p.get('connect') === 'return')) {
+        if (res.chargesEnabled && res.payoutsEnabled) {
+          setConnectOk(true);
+          setConnectMsg('Stripe Connect onboarding complete! Band payout account is active.');
+        } else {
+          setConnectMsg('Stripe Connect details submitted. Verification is pending with Stripe.');
+        }
+      }
+    });
   }, []);
 
   const handleConnect = async () => {
-    setLoadingConnect(true); setConnectMsg('');
+    setLoadingConnect(true);
+    setConnectMsg('');
+    setConnectOk(false);
     try {
-      const res = await fetch('/api/creator/connect', { method: 'POST' });
-      const data = await res.json() as { accountLinkUrl?: string; error?: string };
-      if (data.accountLinkUrl) { setConnectUrl(data.accountLinkUrl); setConnectOk(true); setConnectMsg('Onboarding link ready — click below.'); }
-      else { setConnectMsg(data.error ?? 'Failed to generate link.'); }
-    } catch { setConnectMsg('Network error.'); } finally { setLoadingConnect(false); }
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://crowdbeats.ai';
+      const data = await callCallableFunction<
+        { creatorType?: string; refreshUrl?: string; returnUrl?: string },
+        { accountLinkUrl: string; accountId: string }
+      >('createConnectLink', {
+        creatorType: 'band',
+        refreshUrl: `${origin}/band/payouts?connect=refresh`,
+        returnUrl: `${origin}/band/payouts?connect=success`,
+      });
+
+      if (data.accountLinkUrl) {
+        setConnectUrl(data.accountLinkUrl);
+        setConnectOk(true);
+        setConnectMsg('Onboarding link ready — click below to complete identity verification in Stripe.');
+      } else {
+        setConnectMsg('Failed to generate onboarding link. Please try again.');
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setConnectMsg(message || 'Network error generating onboarding link.');
+    } finally {
+      setLoadingConnect(false);
+    }
   };
+
+  const isAccountActive = Boolean(accountStatus?.chargesEnabled && accountStatus?.payoutsEnabled);
+  const hasRequirementsDue = Boolean(
+    (accountStatus?.requirementsDue && accountStatus.requirementsDue.length > 0) ||
+      accountStatus?.disabledReason ||
+      accountStatus?.actionType === 'update_information' ||
+      accountStatus?.bankPayoutReadiness === 'action_required'
+  );
 
   return (
     <div style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
@@ -120,16 +201,144 @@ export default function BandPayoutsPage() {
       {/* 1. Stripe Connect */}
       <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 14, border: '1px solid var(--border-subtle)', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Stripe Connect Express — Band Account</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Complete KYC to receive tip splits and campaign payouts directly into your bank.</div>
+          <div style={{ flex: 1, minWidth: 260 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Stripe Connect Express — Band Account</span>
+              {loadingStatus ? (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'var(--surface-raised)', color: 'var(--text-tertiary)', border: '1px solid var(--border-subtle)' }}>
+                  Checking status…
+                </span>
+              ) : isAccountActive ? (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)', fontWeight: 700 }}>
+                  Active & Verified
+                </span>
+              ) : hasRequirementsDue ? (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(245,158,11,0.15)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.3)', fontWeight: 700 }}>
+                  Requirements Due
+                </span>
+              ) : (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(99,102,241,0.15)', color: '#818CF8', border: '1px solid rgba(99,102,241,0.3)', fontWeight: 700 }}>
+                  Onboarding Required
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {loadingStatus ? (
+                'Connecting to Stripe to verify band payout account status…'
+              ) : isAccountActive ? (
+                `Band account (${accountStatus?.accountId ?? 'connected'}) is active. Tip splits and campaign distributions will be deposited into your bank.`
+              ) : hasRequirementsDue ? (
+                `Action required: Stripe needs additional verification details (${
+                  accountStatus?.requirementsDue && accountStatus.requirementsDue.length > 0
+                    ? accountStatus.requirementsDue.join(', ')
+                    : 'documentation'
+                }). Complete requirements to enable payouts.`
+              ) : (
+                'Complete KYC to receive tip splits and campaign payouts directly into your bank.'
+              )}
+            </div>
           </div>
-          <button onClick={handleConnect} disabled={loadingConnect} style={{ background: '#00F076', color: '#000', border: 'none', padding: '10px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: loadingConnect ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}>
-            {loadingConnect ? 'Generating…' : 'Set Up Band Payout Account'}
+          <button
+            type="button"
+            onClick={handleConnect}
+            disabled={loadingConnect}
+            aria-busy={loadingConnect}
+            style={{
+              background: '#00F076',
+              color: '#000',
+              border: 'none',
+              padding: '10px 18px',
+              borderRadius: 8,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: loadingConnect ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+              opacity: loadingConnect ? 0.7 : 1,
+            }}
+          >
+            {loadingConnect
+              ? 'Generating…'
+              : isAccountActive
+                ? 'Update Band Payout Account'
+                : hasRequirementsDue
+                  ? 'Complete Requirements'
+                  : 'Set Up Band Payout Account'}
           </button>
         </div>
-        {connectMsg && <div style={{ marginTop: 14, padding: '10px 14px', borderRadius: 8, background: connectOk ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', color: connectOk ? '#10B981' : '#EF4444', fontSize: 13 }}>{connectMsg}</div>}
-        {connectUrl && <div style={{ marginTop: 10 }}><a href={connectUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', padding: '10px 18px', borderRadius: 8, background: '#635BFF', color: '#fff', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>Open Stripe Onboarding ↗</a></div>}
+
+        {statusError && (
+          <div
+            role="alert"
+            style={{
+              marginTop: 14,
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: 'rgba(239,68,68,0.1)',
+              color: '#EF4444',
+              fontSize: 13,
+              border: '1px solid rgba(239,68,68,0.25)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>{statusError}</span>
+            <button
+              type="button"
+              onClick={fetchLiveStatus}
+              style={{
+                background: 'transparent',
+                border: '1px solid #EF4444',
+                color: '#EF4444',
+                borderRadius: 6,
+                padding: '3px 8px',
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {connectMsg && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              marginTop: 14,
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: connectOk ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+              color: connectOk ? '#10B981' : '#EF4444',
+              fontSize: 13,
+              border: `1px solid ${connectOk ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
+            }}
+          >
+            {connectMsg}
+          </div>
+        )}
+        {connectUrl && (
+          <div style={{ marginTop: 10 }}>
+            <a
+              href={connectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                padding: '10px 18px',
+                borderRadius: 8,
+                background: '#635BFF',
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: 13,
+                textDecoration: 'none',
+              }}
+            >
+              Open Stripe Onboarding ↗
+            </a>
+          </div>
+        )}
       </div>
 
       {/* 2. Card / Apple Pay / Google Pay */}
