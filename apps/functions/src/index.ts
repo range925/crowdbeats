@@ -393,3 +393,12 @@ export {
   getPlatformAnalyticsCallable,
   generateAnalyticsReportCallable,
 } from './analytics/businessIntelligenceService.js';
+
+// ─── Disaster Recovery & Reliability Callables (Phase 23) ────────────────────
+export {
+  redriveNotificationDlqCallable,
+  replayStripeWebhookCallable,
+  runDisasterRecoveryDrillCallable,
+  getReliabilityHealthSummaryCallable,
+} from './operations/disasterRecoveryCallables.js';
+

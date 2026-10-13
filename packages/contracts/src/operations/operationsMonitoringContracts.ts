@@ -155,3 +155,74 @@ export interface AcknowledgeIncidentAlertResponse {
   readonly status: 'ACKNOWLEDGED';
   readonly acknowledgedAt: IsoTimestamp;
 }
+
+// ─── Disaster Recovery & Reliability Contracts (Phase 23) ───────────────────
+
+export interface RedriveNotificationDlqRequest {
+  readonly dlqIds?: string[];
+  readonly maxItems?: number;
+}
+
+export interface RedriveNotificationDlqDetail {
+  readonly dlqId: string;
+  readonly status: 'resolved' | 'failed';
+  readonly error?: string;
+}
+
+export interface RedriveNotificationDlqResponse {
+  readonly ok: boolean;
+  readonly processedCount: number;
+  readonly resolvedCount: number;
+  readonly failedCount: number;
+  readonly details: RedriveNotificationDlqDetail[];
+}
+
+export interface ReplayWebhookEventRequest {
+  readonly eventId: string;
+  readonly force?: boolean;
+  readonly reason: string;
+}
+
+export interface ReplayWebhookEventResponse {
+  readonly ok: boolean;
+  readonly eventId: string;
+  readonly replayedAt: IsoTimestamp;
+  readonly status: 'REPLAYED' | 'ALREADY_COMPLETED' | 'FAILED';
+  readonly error?: string;
+  readonly details?: Record<string, unknown>;
+}
+
+export type DisasterRecoveryDrillType =
+  | 'WEBHOOK_OUTAGE_REPLAY'
+  | 'NOTIFICATION_DLQ_REDRIVE'
+  | 'BACKUP_SNAPSHOT_VERIFICATION'
+  | 'SCHEMA_COMPATIBILITY_CHECK';
+
+export interface DisasterRecoveryDrillRequest {
+  readonly drillType: DisasterRecoveryDrillType;
+  readonly dryRun?: boolean;
+  readonly targetEnvironment?: 'staging' | 'emulator';
+}
+
+export interface DisasterRecoveryVerificationCheck {
+  readonly checkName: string;
+  readonly passed: boolean;
+  readonly details?: string;
+}
+
+export interface DisasterRecoveryDrillResult {
+  readonly drillId: string;
+  readonly drillType: DisasterRecoveryDrillType;
+  readonly executedAt: IsoTimestamp;
+  readonly executedByUid: string;
+  readonly status: 'SUCCESS' | 'PARTIAL' | 'FAILED';
+  readonly durationMs: number;
+  readonly metrics: Record<string, unknown>;
+  readonly verificationChecks: DisasterRecoveryVerificationCheck[];
+}
+
+export interface RunDisasterRecoveryDrillResponse {
+  readonly ok: boolean;
+  readonly result: DisasterRecoveryDrillResult;
+}
+

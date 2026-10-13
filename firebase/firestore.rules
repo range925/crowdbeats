@@ -868,6 +868,11 @@ service cloud.firestore {
       allow write: if false; // Admin SDK / server-authoritative callables only
     }
 
+    match /disasterRecoveryDrills/{drillId} {
+      allow read: if isSuperAdmin() || hasPlatformRole('DEVELOPER');
+      allow write: if false; // Admin SDK / server-authoritative callables only
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
     // FOLLOWS — /follows/{followId}
     // Supports multi-entity (sourceId_targetId) and legacy (fanUid_artistId)

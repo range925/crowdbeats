@@ -432,6 +432,15 @@
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "failedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "_comment": "Phase 23 Reliability: Disaster recovery drills by drillType and execution timestamp",
+      "collectionGroup": "disasterRecoveryDrills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "drillType", "order": "ASCENDING" },
+        { "fieldPath": "executedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
