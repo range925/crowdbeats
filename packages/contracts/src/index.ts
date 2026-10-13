@@ -144,6 +144,9 @@ export * from './security/securityFraudContracts';
 // ─── Financial Oversight & Reconciliation (Phase 18) ───────────────────────
 export * from './financial/financialOversightContracts';
 
-export const CONTRACTS_VERSION = '0.31.0-financial-oversight-reconciliation' as const;
+// ─── Analytics & Business Intelligence (Phase 19) ──────────────────────────
+export * from './analytics/businessIntelligenceContracts';
+
+export const CONTRACTS_VERSION = '0.32.0-analytics-business-intelligence' as const;
 
 

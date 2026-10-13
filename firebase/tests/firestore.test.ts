@@ -936,3 +936,53 @@ describe('/venueProfiles — cross-venue isolation', () => {
     );
   });
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ANALYTICS AGGREGATES & REPORTS (Phase 19)
+// ══════════════════════════════════════════════════════════════════════════════
+
+describe('/analyticsAggregates & /analyticsReports (Phase 19)', () => {
+  beforeEach(async () => {
+    await seedDoc('analyticsAggregates/platform_overview_latest', {
+      rollupId: 'rollup_latest',
+      period: '30d',
+      generatedAt: '2026-10-13T00:00:00Z',
+    });
+    await seedDoc('analyticsReports/rep_100', {
+      reportId: 'rep_100',
+      reportTitle: 'Executive Snapshot',
+      format: 'JSON',
+    });
+  });
+
+  test('✅ SUPER_ADMIN and MARKETING can read analytics aggregates', async () => {
+    const ctxAdmin = asStaff('staff-root', 'SUPER_ADMIN');
+    await assertSucceeds(getDoc(doc(ctxAdmin.firestore(), 'analyticsAggregates/platform_overview_latest')));
+
+    const ctxMktg = asStaff('staff-mktg', 'MARKETING');
+    await assertSucceeds(getDoc(doc(ctxMktg.firestore(), 'analyticsAggregates/platform_overview_latest')));
+  });
+
+  test('❌ Regular fans and artists cannot read platform analytics aggregates', async () => {
+    const ctxFan = asFan('fan-alice');
+    await assertFails(getDoc(doc(ctxFan.firestore(), 'analyticsAggregates/platform_overview_latest')));
+
+    const ctxArtist = asArtist('artist-001');
+    await assertFails(getDoc(doc(ctxArtist.firestore(), 'analyticsAggregates/platform_overview_latest')));
+  });
+
+  test('❌ Direct client writes to analyticsAggregates or analyticsReports are forbidden', async () => {
+    const ctxAdmin = asStaff('staff-root', 'SUPER_ADMIN');
+    await assertFails(
+      setDoc(doc(ctxAdmin.firestore(), 'analyticsAggregates/fake_rollup'), {
+        rollupId: 'fake_rollup',
+      }),
+    );
+    await assertFails(
+      setDoc(doc(ctxAdmin.firestore(), 'analyticsReports/fake_report'), {
+        reportId: 'fake_report',
+      }),
+    );
+  });
+});
+

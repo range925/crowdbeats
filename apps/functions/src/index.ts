@@ -387,3 +387,9 @@ export {
   generateFinancialExportCallable,
   getFinancialLedgerSummaryCallable,
 } from './financial/financialExportService.js';
+
+// ─── Analytics & Business Intelligence Callables (Phase 19) ──────────────────
+export {
+  getPlatformAnalyticsCallable,
+  generateAnalyticsReportCallable,
+} from './analytics/businessIntelligenceService.js';

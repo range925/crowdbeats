@@ -223,7 +223,7 @@ describe('Phase 17 — Comprehensive Security, Fraud and Compliance Suite', () =
   // ════════════════════════════════════════════════════════════════════════════
   describe('RBAC & Privilege Escalation Defenses', () => {
     it('contracts exports compliant version (>=0.30.0)', () => {
-      expect(CONTRACTS_VERSION).toMatch(/^0\.(30|31)\./);
+      expect(CONTRACTS_VERSION).toMatch(/^0\.(3[0-9])\./);
     });
 
     it('rejects unauthenticated caller attempting to grant staff role', async () => {

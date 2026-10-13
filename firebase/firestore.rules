@@ -590,6 +590,32 @@ service cloud.firestore {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
+    // ANALYTICS AGGREGATES — /analyticsAggregates/{aggregateId} (Phase 19)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /analyticsAggregates/{aggregateId} {
+      allow read: if isSuperAdmin() ||
+        hasPlatformRole('EXECUTIVE') ||
+        hasPlatformRole('FINANCE_ADMIN') ||
+        hasPlatformRole('FINANCE_ANALYST') ||
+        hasPlatformRole('MARKETING');
+      allow write: if false; // Server-only rollups
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // ANALYTICS REPORTS — /analyticsReports/{reportId} (Phase 19)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /analyticsReports/{reportId} {
+      allow read: if isSuperAdmin() ||
+        hasPlatformRole('EXECUTIVE') ||
+        hasPlatformRole('FINANCE_ADMIN') ||
+        hasPlatformRole('FINANCE_ANALYST') ||
+        hasPlatformRole('MARKETING');
+      allow write: if false; // Server-only report snapshots
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
     // PAYOUTS — /payouts/{payoutId}
     // ══════════════════════════════════════════════════════════════════════════
 
