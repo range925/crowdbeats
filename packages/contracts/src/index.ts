@@ -138,6 +138,9 @@ export * from './sponsorship/sponsorCrmContracts';
 // ─── Campaign & Supporter Synchronization (Phase 14) ──────────────────────
 export * from './campaign/campaignSyncContracts';
 
-export const CONTRACTS_VERSION = '0.29.0-notifications-workflow-automation' as const;
+// ─── Security, Fraud & Compliance (Phase 17) ──────────────────────────────
+export * from './security/securityFraudContracts';
+
+export const CONTRACTS_VERSION = '0.30.0-security-fraud-compliance' as const;
 
 
