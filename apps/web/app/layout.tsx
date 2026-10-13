@@ -132,17 +132,15 @@ export default function RootLayout({ children }: Props) {
             __html: `
               (function() {
                 try {
-                  var stored = localStorage.getItem('crowdbeats-theme-preference');
-                  var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                  var resolved = (stored === 'dark' || (!stored && darkQuery.matches) || (stored === 'system' && darkQuery.matches)) ? 'dark' : 'light';
-                  document.documentElement.setAttribute('data-theme', resolved);
-                  document.documentElement.dataset.theme = resolved;
-                  document.documentElement.style.colorScheme = resolved;
-                  if (resolved === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
+                  // Crowdbeats V2 — Standardized Web Light Mode Policy
+                  // Enforces clean Apple-style light theme on all web viewports regardless of OS/browser prefers-color-scheme
+                  document.documentElement.setAttribute('data-theme', 'light');
+                  document.documentElement.dataset.theme = 'light';
+                  document.documentElement.style.colorScheme = 'light';
+                  document.documentElement.classList.remove('dark');
+                  localStorage.setItem('crowdbeats-theme-preference', 'light');
+                  localStorage.setItem('crowdbeats_admin_theme', 'light');
+                  localStorage.setItem('crowdbeats_theme', 'light');
                 } catch(e) {}
               })();
             `,
