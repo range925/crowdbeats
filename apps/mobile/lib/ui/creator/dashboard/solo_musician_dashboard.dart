@@ -129,7 +129,7 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
                     title: 'AVAILABLE BALANCE',
                     value: r'$480.00',
                     timeframe: 'Ready for payout',
-                    definition: 'Total settled funds available for instant withdrawal to your verified Stripe bank account.',
+                    definition: 'Total settled funds available for payout to your verified Stripe bank account (transfers in 2-3 business days).',
                     icon: Icons.account_balance_wallet,
                     accentColor: CbColors.purpleLight,
                   ),
@@ -203,7 +203,7 @@ class _SoloMusicianDashboardState extends ConsumerState<SoloMusicianDashboard> {
                 DashboardActionItem(
                   id: 'act_payout',
                   title: r'Withdraw Available Funds ($480.00)',
-                  subtitle: '1-click withdrawal to verified Chase checking ****4821',
+                  subtitle: 'Transfer to verified bank account (2-3 business days)',
                   icon: Icons.savings_outlined,
                   badgeText: 'READY',
                   onTap: () => Navigator.of(context).push(

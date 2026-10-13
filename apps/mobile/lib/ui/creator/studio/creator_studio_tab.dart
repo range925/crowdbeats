@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../state/creator_context_state.dart';
 import '../../components/components.dart';
 import '../profile/creator_epk_editor_screen.dart';
@@ -12,9 +13,14 @@ import '../media/creator_media_screen.dart';
 import '../finance/stripe_connect_kyc_screen.dart';
 import '../finance/creator_balances_screen.dart';
 import '../finance/creator_payout_history_screen.dart';
+import '../band/band_management_screen.dart';
 import '../band/band_split_editor_screen.dart';
 import '../fans/creator_fans_screen.dart';
 import '../analytics/creator_analytics_screen.dart';
+import '../../settings/notifications_settings_screen.dart';
+import '../../settings/security_sessions_screen.dart';
+import '../../settings/privacy_location_screen.dart';
+import '../../settings/support_center_screen.dart';
 import '../../theme/cb_colors.dart';
 import '../../theme/cb_spacing.dart';
 
@@ -261,6 +267,12 @@ class CreatorStudioTab extends ConsumerWidget {
             title: 'Share Tools & Stage QR Generator',
             subtitle: 'Printable stage tokens, profile links & flyers',
             phase: 5,
+            onTap: () => PersistentQrModal.show(
+              context,
+              performerName: contextState.activeContext.name,
+              performerId: contextState.activeContext.id,
+              isBand: isBand,
+            ),
           ),
           _menuTile(
             context,
@@ -279,6 +291,9 @@ class CreatorStudioTab extends ConsumerWidget {
               title: 'Band Members & Roles',
               subtitle: 'Founders, Admins, Members & invitation queue',
               phase: 10,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const BandManagementScreen()),
+              ),
             ),
             _menuTile(
               context,
@@ -304,6 +319,9 @@ class CreatorStudioTab extends ConsumerWidget {
             title: 'Notification Preferences',
             subtitle: 'Instant tip alerts, campaign milestones & messages',
             phase: 7,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const NotificationsSettingsScreen()),
+            ),
           ),
           _menuTile(
             context,
@@ -311,6 +329,9 @@ class CreatorStudioTab extends ConsumerWidget {
             title: 'Account Security & Sessions',
             subtitle: 'Biometrics, active device sessions & password',
             phase: 2,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SecuritySessionsScreen()),
+            ),
           ),
           _menuTile(
             context,
@@ -318,6 +339,9 @@ class CreatorStudioTab extends ConsumerWidget {
             title: 'Data Privacy & Exports',
             subtitle: 'GDPR / CCPA data export & retention settings',
             phase: 2,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const PrivacyLocationScreen()),
+            ),
           ),
           _menuTile(
             context,
@@ -325,6 +349,9 @@ class CreatorStudioTab extends ConsumerWidget {
             title: 'Help Center & Support Tickets',
             subtitle: 'Live creator support, dispute assistance & FAQ',
             phase: 2,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SupportCenterScreen()),
+            ),
           ),
           const SizedBox(height: 32),
         ],
@@ -337,7 +364,7 @@ class CreatorStudioTab extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 8, top: 4),
       child: Text(
         title,
-        style: const TextStyle(
+        style: GoogleFonts.dmSans(
           color: CbColors.textSecondary,
           fontSize: 11,
           fontWeight: FontWeight.w800,
@@ -379,11 +406,11 @@ class CreatorStudioTab extends ConsumerWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                    style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(color: CbColors.textMuted, fontSize: 11),
+                    style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 11),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
