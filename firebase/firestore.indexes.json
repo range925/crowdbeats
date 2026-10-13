@@ -340,6 +340,98 @@
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "effectiveDate", "order": "DESCENDING" }
       ]
+    },
+    {
+      "_comment": "Phase 22 Performance: CRM events timeline by target entity",
+      "collectionGroup": "crmEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "targetId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: CRM events filter by event type",
+      "collectionGroup": "crmEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "eventType", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Financial reconciliations by period",
+      "collectionGroup": "financialReconciliations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "period", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Financial export jobs by requester",
+      "collectionGroup": "financialExports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "requestedByUid", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Platform fee rules by status",
+      "collectionGroup": "platformFeeRules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Analytics aggregates rollup cache by period",
+      "collectionGroup": "analyticsAggregates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "period", "order": "ASCENDING" },
+        { "fieldPath": "computedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Sponsor opportunities directory by status",
+      "collectionGroup": "sponsorOpportunities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Sponsor applications by org and status",
+      "collectionGroup": "sponsorApplications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "orgId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Sponsorship deals by recipient and status",
+      "collectionGroup": "sponsorships",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recipientId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Phase 22 Performance: Notification DLQ queue by status",
+      "collectionGroup": "notificationDlq",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "failedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

@@ -12,6 +12,7 @@ import {
   getPopularMusicians,
   getTopCampaigns,
   subscribeToTop5NearestMusicians,
+  invalidateDiscoveryCache,
   CURATED_PERFORMERS_POOL,
   CURATED_CAMPAIGNS,
   type NearbyPerformer,
@@ -47,6 +48,7 @@ jest.mock('firebase/firestore', () => {
 describe('Discovery Data Service — Core Mathematical & Ranking Logic', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    invalidateDiscoveryCache();
   });
 
   describe('calculateHaversineDistanceMiles', () => {
@@ -201,6 +203,7 @@ describe('Discovery Data Service — Core Mathematical & Ranking Logic', () => {
 describe('Discovery Data Service — High-Level Async Functions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    invalidateDiscoveryCache();
   });
 
   describe('getTop5NearestMusicians', () => {

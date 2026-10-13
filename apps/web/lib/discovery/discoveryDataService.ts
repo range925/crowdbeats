@@ -835,16 +835,46 @@ export async function getTop5NearestMusicians(
   return getFallbackNearbyMusicians(lat, lng, 5);
 }
 
+// ── In-Memory Discovery Caching (Phase 22 Performance & Scaling) ────────────
+export const DISCOVERY_CACHE_TTL_MS = 60 * 1000; // 60-second in-memory cache
+
+interface DiscoveryCacheEntry<T> {
+  data: T;
+  expiresAt: number;
+  limit: number;
+}
+
+let _cachedPopularMusicians: DiscoveryCacheEntry<PopularMusician[]> | null = null;
+let _cachedTopCampaigns: DiscoveryCacheEntry<DiscoveryCampaign[]> | null = null;
+
+export function invalidateDiscoveryCache(): void {
+  _cachedPopularMusicians = null;
+  _cachedTopCampaigns = null;
+}
+
+export function getDiscoveryCacheStats(): { popularCached: boolean; campaignsCached: boolean } {
+  const now = Date.now();
+  return {
+    popularCached: !!(_cachedPopularMusicians && _cachedPopularMusicians.expiresAt > now),
+    campaignsCached: !!(_cachedTopCampaigns && _cachedTopCampaigns.expiresAt > now),
+  };
+}
+
 /**
  * Retrieves Popular Musicians and Bands:
  *   - Query top verified artists and bands ranked by popularityScore and followersCount.
  *   - Supports both solo musicians and bands.
+ *   - Uses in-memory 60s TTL cache to prevent duplicate Firestore collection scans.
  *   - Gracefully falls back to curated verified artists and bands if offline or empty.
  */
-export async function getPopularMusicians(limitCount = 5): Promise<PopularMusician[]> {
+export async function getPopularMusicians(limitCount = 5, forceRefresh = false): Promise<PopularMusician[]> {
+  if (!forceRefresh && _cachedPopularMusicians && _cachedPopularMusicians.limit >= limitCount && _cachedPopularMusicians.expiresAt > Date.now()) {
+    return _cachedPopularMusicians.data.slice(0, limitCount);
+  }
+
   try {
     if (typeof getFirebaseFirestore !== 'function') {
-      return CURATED_PERFORMERS_POOL.slice(0, limitCount).map((p, idx) => ({
+      const fallback = CURATED_PERFORMERS_POOL.slice(0, limitCount).map((p, idx) => ({
         id: p.id,
         name: p.name,
         type: p.type,
@@ -924,7 +954,7 @@ export async function getPopularMusicians(limitCount = 5): Promise<PopularMusici
     }
 
     if (candidates.length > 0) {
-      return candidates
+      const sorted = candidates
         .sort((a, b) => {
           if (b.popularityScore !== a.popularityScore) {
             return b.popularityScore - a.popularityScore;
@@ -934,8 +964,15 @@ export async function getPopularMusicians(limitCount = 5): Promise<PopularMusici
           }
           return a.name.localeCompare(b.name);
         })
-        .slice(0, limitCount)
         .map((m, idx) => ({ ...m, rank: idx + 1 }));
+
+      _cachedPopularMusicians = {
+        data: sorted,
+        expiresAt: Date.now() + DISCOVERY_CACHE_TTL_MS,
+        limit: Math.max(limitCount, sorted.length),
+      };
+
+      return sorted.slice(0, limitCount);
     }
   } catch (err) {
     console.warn('[getPopularMusicians] Firestore query bypassed/failed, using curated pool:', err);
@@ -976,9 +1013,14 @@ export async function getPopularMusicians(limitCount = 5): Promise<PopularMusici
  *   - Queries campaigns where status === 'active' or status === 'funded'.
  *   - Calculates percentFunded = Math.round((pledgedCents / goalCents) * 100).
  *   - Computes daysRemaining from deadline.
+ *   - Uses in-memory 60s TTL cache to prevent duplicate collection scans.
  *   - Gracefully falls back to curated campaigns when offline or empty.
  */
-export async function getTopCampaigns(limitCount = 5): Promise<DiscoveryCampaign[]> {
+export async function getTopCampaigns(limitCount = 5, forceRefresh = false): Promise<DiscoveryCampaign[]> {
+  if (!forceRefresh && _cachedTopCampaigns && _cachedTopCampaigns.limit >= limitCount && _cachedTopCampaigns.expiresAt > Date.now()) {
+    return _cachedTopCampaigns.data.slice(0, limitCount);
+  }
+
   try {
     if (typeof getFirebaseFirestore !== 'function') {
       return CURATED_CAMPAIGNS.slice(0, limitCount);
@@ -1019,15 +1061,22 @@ export async function getTopCampaigns(limitCount = 5): Promise<DiscoveryCampaign
     });
 
     if (campaigns.length > 0) {
-      return campaigns
+      const sorted = campaigns
         .sort((a, b) => {
           // Sort by progress descending, tie-break by backer count
           if (b.percentFunded !== a.percentFunded) {
             return b.percentFunded - a.percentFunded;
           }
           return b.backerCount - a.backerCount;
-        })
-        .slice(0, limitCount);
+        });
+
+      _cachedTopCampaigns = {
+        data: sorted,
+        expiresAt: Date.now() + DISCOVERY_CACHE_TTL_MS,
+        limit: Math.max(limitCount, sorted.length),
+      };
+
+      return sorted.slice(0, limitCount);
     }
   } catch (err) {
     console.warn('[getTopCampaigns] Firestore campaign query failed/offline, using curated pool:', err);
