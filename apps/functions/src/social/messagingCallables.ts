@@ -25,6 +25,10 @@ import type {
   ConversationStatus,
   SocialEntityType,
 } from '@crowdbeats/contracts';
+import { CRM_RETENTION_DAYS } from '@crowdbeats/contracts';
+import { recordCrmEvent } from '../crm/crmService.js';
+import { dispatchServerNotification } from '../notifications/dispatchNotification.js';
+import { logger } from '../lib/logger.js';
 import {
   db,
   verifySocialOperator,
@@ -32,6 +36,7 @@ import {
   checkRestriction,
   getDeterministicConversationId,
   fetchProfileSummary,
+  resolveNotificationUid,
 } from './helpers.js';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -239,6 +244,55 @@ export const sendMessage = onCall<SendMessageRequest>(
         ...(idempotencyKey ? { idempotencyKey } : {}),
       });
     });
+
+    // Record non-leaking CRM event
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_messaging',
+        action: finalStatus === 'pending_request' ? 'MESSAGE_REQUEST_SENT' : 'MESSAGE_SENT',
+        actorUid: uid,
+        actorRole: senderType,
+        targetId: recipientId,
+        targetType: recipientType === 'artist' ? 'artist' : (recipientType === 'band' ? 'band' : 'user'),
+        // STRICT INVARIANT: Do not leak private message text in CRM timeline
+        payload: {
+          conversationId: convId,
+          messageId,
+          senderId,
+          senderType,
+          recipientId,
+          recipientType,
+          status: finalStatus,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        idempotencyKey: `msg_crm:${messageId}`,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record message CRM event', { error: crmErr, messageId });
+    }
+
+    try {
+      const recipientUid = await resolveNotificationUid(recipientId, recipientType);
+      if (recipientUid && recipientUid !== uid && !isRestricted) {
+        const isRequest = finalStatus === 'pending_request';
+        await dispatchServerNotification({
+          recipientUid,
+          type: isRequest ? 'message_request' : 'new_message',
+          title: isRequest ? 'New Message Request' : 'New Message',
+          body: isRequest
+            ? `${senderContext.displayName} sent you a message request.`
+            : `${senderContext.displayName} sent you a message.`,
+          data: {
+            conversationId: convId,
+            senderId,
+            senderType,
+            clickAction: '/messages',
+          },
+        });
+      }
+    } catch (notifErr) {
+      logger.warn('Failed to dispatch message notification', { error: notifErr, recipientId });
+    }
 
     return {
       ok: true,
@@ -548,6 +602,45 @@ export const respondToMessageRequest = onCall<RespondToMessageRequest>(
         status: 'accepted',
         updatedAt: now,
       });
+
+      try {
+        await recordCrmEvent(db(), {
+          source: 'social_messaging',
+          action: 'MESSAGE_REQUEST_ACCEPTED',
+          actorUid: uid,
+          actorRole: callerContext.entityType,
+          targetId: otherId,
+          targetType: otherType === 'artist' ? 'artist' : (otherType === 'band' ? 'band' : 'user'),
+          payload: {
+            conversationId,
+            accepterId: callerId,
+            requesterId: otherId,
+          },
+          retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        });
+      } catch (crmErr) {
+        logger.warn('Failed to record accept CRM event', { error: crmErr, conversationId });
+      }
+
+      try {
+        const recipientUid = await resolveNotificationUid(otherId, otherType);
+        if (recipientUid && recipientUid !== uid) {
+          await dispatchServerNotification({
+            recipientUid,
+            type: 'message_request_accepted',
+            title: 'Message Request Accepted',
+            body: `${callerContext.displayName} accepted your message request.`,
+            data: {
+              conversationId,
+              accepterId: callerId,
+              clickAction: '/messages',
+            },
+          });
+        }
+      } catch (notifErr) {
+        logger.warn('Failed to dispatch accept notification', { error: notifErr, otherId });
+      }
+
       return { ok: true, status: 'accepted' };
     }
 
@@ -558,6 +651,26 @@ export const respondToMessageRequest = onCall<RespondToMessageRequest>(
         declineCooldownUntil: admin.firestore.Timestamp.fromDate(cooldownDate),
         updatedAt: now,
       });
+
+      try {
+        await recordCrmEvent(db(), {
+          source: 'social_messaging',
+          action: 'MESSAGE_REQUEST_DECLINED',
+          actorUid: uid,
+          actorRole: callerContext.entityType,
+          targetId: otherId,
+          targetType: otherType === 'artist' ? 'artist' : (otherType === 'band' ? 'band' : 'user'),
+          payload: {
+            conversationId,
+            declinerId: callerId,
+            requesterId: otherId,
+          },
+          retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        });
+      } catch (crmErr) {
+        logger.warn('Failed to record decline CRM event', { error: crmErr, conversationId });
+      }
+
       return { ok: true, status: 'declined' };
     }
 
@@ -591,6 +704,26 @@ export const respondToMessageRequest = onCall<RespondToMessageRequest>(
         });
       });
 
+      try {
+        await recordCrmEvent(db(), {
+          source: 'social_safety',
+          action: 'ENTITY_BLOCKED_VIA_CHAT',
+          actorUid: uid,
+          actorRole: callerContext.entityType,
+          targetId: otherId,
+          targetType: otherType === 'artist' ? 'artist' : (otherType === 'band' ? 'band' : 'user'),
+          payload: {
+            conversationId,
+            blockerId: callerId,
+            blockedId: otherId,
+            reason: 'USER_BLOCKED_VIA_CHAT',
+          },
+          retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        });
+      } catch (crmErr) {
+        logger.warn('Failed to record chat block CRM event', { error: crmErr, conversationId });
+      }
+
       return { ok: true, status: 'blocked' };
     }
 
@@ -617,6 +750,45 @@ export const respondToMessageRequest = onCall<RespondToMessageRequest>(
         createdAt: now,
         updatedAt: now,
       });
+
+      // Synchronize into Admin Moderation Queue
+      await db().collection('moderationQueue').doc(reportId).set({
+        itemId: reportId,
+        type: 'CHAT_ABUSE_REPORT',
+        priority: 'HIGH',
+        source: 'social_messaging',
+        reporterUid: uid,
+        reporterEntityId: callerId,
+        targetId: otherId,
+        targetType: otherType,
+        conversationId,
+        reason: reportReason || 'harassment',
+        status: 'PENDING_REVIEW',
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      // Record CRM event without leaking message texts
+      try {
+        await recordCrmEvent(db(), {
+          source: 'social_safety',
+          action: 'ABUSE_REPORTED',
+          actorUid: uid,
+          actorRole: callerContext.entityType,
+          targetId: otherId,
+          targetType: otherType === 'artist' ? 'artist' : (otherType === 'band' ? 'band' : 'user'),
+          payload: {
+            reportId,
+            conversationId,
+            reporterId: callerId,
+            reportedId: otherId,
+            reason: reportReason || 'harassment',
+          },
+          retentionDays: CRM_RETENTION_DAYS.EXTENDED,
+        });
+      } catch (crmErr) {
+        logger.warn('Failed to record abuse report CRM event', { error: crmErr, reportId });
+      }
 
       // Decline conversation with cooldown
       const cooldownDate = new Date(Date.now() + SEVEN_DAYS_MS);

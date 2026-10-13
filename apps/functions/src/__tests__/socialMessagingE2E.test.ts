@@ -114,6 +114,27 @@ const mockDb: any = {
     };
     return updateFunction(transaction);
   }),
+  batch: () => {
+    const ops: Array<() => Promise<void>> = [];
+    const b = {
+      set: (docRef: any, data: any, opts?: any) => {
+        ops.push(async () => docRef.set(data, opts));
+        return b;
+      },
+      update: (docRef: any, data: any) => {
+        ops.push(async () => docRef.update(data));
+        return b;
+      },
+      delete: (docRef: any) => {
+        ops.push(async () => docRef.delete());
+        return b;
+      },
+      commit: async () => {
+        for (const op of ops) await op();
+      },
+    };
+    return b;
+  },
 };
 
 // Mock firebase-admin

@@ -21,12 +21,17 @@ import type {
   ListFollowingResponse,
   SocialEntityType,
 } from '@crowdbeats/contracts';
+import { CRM_RETENTION_DAYS } from '@crowdbeats/contracts';
+import { recordCrmEvent } from '../crm/crmService.js';
+import { dispatchServerNotification } from '../notifications/dispatchNotification.js';
+import { logger } from '../lib/logger.js';
 import {
   db,
   verifySocialOperator,
   checkBidirectionalBlock,
   fetchProfileSummary,
   getRelationshipStateBetween,
+  resolveNotificationUid,
 } from './helpers.js';
 
 function getEntityDocRef(entityId: string, entityType: SocialEntityType): admin.firestore.DocumentReference {
@@ -49,7 +54,7 @@ export const followEntity = onCall<FollowEntityRequest>(
   async (request): Promise<FollowEntityResponse> => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Authentication required.');
     const uid = request.auth.uid;
-    const { targetId, targetType, actingAsBandId } = request.data ?? {};
+    const { targetId, targetType, actingAsBandId, actingAsArtistId } = request.data ?? {};
 
     if (!targetId || typeof targetId !== 'string' || !targetType) {
       throw new HttpsError('invalid-argument', 'targetId and targetType are required.');
@@ -59,8 +64,10 @@ export const followEntity = onCall<FollowEntityRequest>(
     const sourceContext = await verifySocialOperator(
       uid,
       undefined,
-      actingAsBandId ? 'band' : 'fan',
+      actingAsBandId ? 'band' : (actingAsArtistId ? 'artist' : 'fan'),
       actingAsBandId,
+      false,
+      actingAsArtistId,
     );
     const sourceId = sourceContext.entityId;
     const sourceType = sourceContext.entityType;
@@ -118,6 +125,50 @@ export const followEntity = onCall<FollowEntityRequest>(
       });
     });
 
+    // 6. Record CRM event & dispatch notification (non-blocking)
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_graph',
+        action: 'STARTED_FOLLOWING',
+        actorUid: uid,
+        actorRole: sourceType,
+        targetId,
+        targetType: targetType === 'artist' ? 'artist' : (targetType === 'band' ? 'band' : 'user'),
+        payload: {
+          sourceId,
+          sourceType,
+          targetId,
+          targetType,
+          followId,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        idempotencyKey: `follow:${sourceId}:${targetId}`,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record follow CRM event', { error: crmErr, followId });
+    }
+
+    try {
+      const recipientUid = await resolveNotificationUid(targetId, targetType);
+      if (recipientUid && recipientUid !== uid) {
+        await dispatchServerNotification({
+          recipientUid,
+          type: 'social_follow',
+          title: 'New Follower',
+          body: `${sourceContext.displayName} started following you.`,
+          data: {
+            sourceId,
+            sourceType,
+            targetId,
+            targetType,
+            clickAction: `/fan/profile/${sourceId}`,
+          },
+        });
+      }
+    } catch (notifErr) {
+      logger.warn('Failed to dispatch follow notification', { error: notifErr, targetId });
+    }
+
     const relationshipState = await getRelationshipStateBetween(sourceId, targetId);
     return { ok: true, relationshipState };
   },
@@ -131,7 +182,7 @@ export const unfollowEntity = onCall<UnfollowEntityRequest>(
   async (request): Promise<UnfollowEntityResponse> => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Authentication required.');
     const uid = request.auth.uid;
-    const { targetId, targetType, actingAsBandId } = request.data ?? {};
+    const { targetId, targetType, actingAsBandId, actingAsArtistId } = request.data ?? {};
 
     if (!targetId || typeof targetId !== 'string' || !targetType) {
       throw new HttpsError('invalid-argument', 'targetId and targetType are required.');
@@ -140,8 +191,10 @@ export const unfollowEntity = onCall<UnfollowEntityRequest>(
     const sourceContext = await verifySocialOperator(
       uid,
       undefined,
-      actingAsBandId ? 'band' : 'fan',
+      actingAsBandId ? 'band' : (actingAsArtistId ? 'artist' : 'fan'),
       actingAsBandId,
+      false,
+      actingAsArtistId,
     );
     const sourceId = sourceContext.entityId;
     const sourceType = sourceContext.entityType;
@@ -168,6 +221,28 @@ export const unfollowEntity = onCall<UnfollowEntityRequest>(
         followingCount: admin.firestore.FieldValue.increment(-1),
       });
     });
+
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_graph',
+        action: 'UNFOLLOWED',
+        actorUid: uid,
+        actorRole: sourceType,
+        targetId,
+        targetType: targetType === 'artist' ? 'artist' : (targetType === 'band' ? 'band' : 'user'),
+        payload: {
+          sourceId,
+          sourceType,
+          targetId,
+          targetType,
+          followId,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        idempotencyKey: `unfollow:${sourceId}:${targetId}:${Date.now()}`,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record unfollow CRM event', { error: crmErr, followId });
+    }
 
     const relationshipState = await getRelationshipStateBetween(sourceId, targetId);
     return { ok: true, relationshipState };
@@ -242,6 +317,26 @@ export const removeFollower = onCall<RemoveFollowerRequest>(
         followingCount: admin.firestore.FieldValue.increment(-1),
       });
     });
+
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_graph',
+        action: 'FOLLOWER_REMOVED_BY_TARGET',
+        actorUid: uid,
+        actorRole: targetType,
+        targetId: followerId,
+        targetType: followerType === 'artist' ? 'artist' : (followerType === 'band' ? 'band' : 'user'),
+        payload: {
+          targetId,
+          targetType,
+          removedFollowerId: followerId,
+          removedFollowerType: followerType,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record follower removal CRM event', { error: crmErr, followId });
+    }
 
     const relationshipState = await getRelationshipStateBetween(targetId, followerId);
     return { ok: true, relationshipState };

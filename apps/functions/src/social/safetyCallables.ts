@@ -20,6 +20,9 @@ import type {
   ListRestrictedEntitiesResponse,
   SocialEntityType,
 } from '@crowdbeats/contracts';
+import { CRM_RETENTION_DAYS } from '@crowdbeats/contracts';
+import { recordCrmEvent } from '../crm/crmService.js';
+import { logger } from '../lib/logger.js';
 import {
   db,
   verifySocialOperator,
@@ -124,6 +127,28 @@ export const blockEntity = onCall<BlockEntityRequest>(
       }
     });
 
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_safety',
+        action: 'ENTITY_BLOCKED',
+        actorUid: uid,
+        actorRole: blockerType,
+        targetId,
+        targetType: targetType === 'artist' ? 'artist' : (targetType === 'band' ? 'band' : 'user'),
+        payload: {
+          blockerId,
+          blockerType,
+          blockedId: targetId,
+          blockedType: targetType,
+          reason: reason || 'USER_BLOCKED',
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+        idempotencyKey: `block:${blockerId}:${targetId}`,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record block CRM event', { error: crmErr, blockId });
+    }
+
     return { ok: true, isBlocked: true };
   },
 );
@@ -176,6 +201,24 @@ export const unblockEntity = onCall<UnblockEntityRequest>(
       }
     });
 
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_safety',
+        action: 'ENTITY_UNBLOCKED',
+        actorUid: uid,
+        actorRole: callerEntity.entityType,
+        targetId,
+        targetType: 'user',
+        payload: {
+          blockerId,
+          blockedId: targetId,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record unblock CRM event', { error: crmErr, targetId });
+    }
+
     return { ok: true, isBlocked: false };
   },
 );
@@ -222,6 +265,26 @@ export const restrictEntity = onCall<RestrictEntityRequest>(
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_safety',
+        action: 'ENTITY_RESTRICTED',
+        actorUid: uid,
+        actorRole: restricterType,
+        targetId,
+        targetType: targetType === 'artist' ? 'artist' : (targetType === 'band' ? 'band' : 'user'),
+        payload: {
+          restricterId,
+          restricterType,
+          restrictedId: targetId,
+          restrictedType: targetType,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record restrict CRM event', { error: crmErr, restrictionId });
+    }
+
     return { ok: true, isRestricted: true };
   },
 );
@@ -256,6 +319,24 @@ export const unrestrictEntity = onCall<UnrestrictEntityRequest>(
     for (const rId of blockerIds) {
       const restrictionId = `${rId}_${targetId}`;
       await db().collection('socialRestrictions').doc(restrictionId).delete();
+    }
+
+    try {
+      await recordCrmEvent(db(), {
+        source: 'social_safety',
+        action: 'ENTITY_UNRESTRICTED',
+        actorUid: uid,
+        actorRole: callerEntity.entityType,
+        targetId,
+        targetType: 'user',
+        payload: {
+          restricterId,
+          restrictedId: targetId,
+        },
+        retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+      });
+    } catch (crmErr) {
+      logger.warn('Failed to record unrestrict CRM event', { error: crmErr, targetId });
     }
 
     return { ok: true, isRestricted: false };

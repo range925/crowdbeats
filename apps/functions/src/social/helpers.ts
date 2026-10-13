@@ -360,3 +360,31 @@ export async function getRelationshipStateBetween(
     isRestricted,
   };
 }
+
+/**
+ * Resolves the underlying user UID for notifications from any entity ID and type.
+ */
+export async function resolveNotificationUid(
+  entityId: string,
+  entityType: SocialEntityType,
+): Promise<string | null> {
+  if (entityType === 'fan') return entityId;
+  if (entityType === 'artist') {
+    const doc = await db().collection('artistProfiles').doc(entityId).get();
+    if (doc.exists) {
+      const data = doc.data() ?? {};
+      return (data.userId as string) || (data.ownerUid as string) || entityId;
+    }
+    return entityId;
+  }
+  if (entityType === 'band') {
+    const doc = await db().collection('bands').doc(entityId).get();
+    if (doc.exists) {
+      const data = doc.data() ?? {};
+      return (data.ownerUid as string) || (data.founderUid as string) || null;
+    }
+    return null;
+  }
+  return entityId;
+}
+

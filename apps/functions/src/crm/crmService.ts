@@ -116,17 +116,22 @@ export async function recordCrmEvent(
   }
 
   // 3. Generate deterministic eventId
-  const eventId = buildCrmEventId(source, targetType, targetId, timestampMs);
-  const eventRef = db.collection('crmEvents').doc(eventId);
+  let eventId = buildCrmEventId(source, targetType, targetId, timestampMs);
+  let eventRef = db.collection('crmEvents').doc(eventId);
 
   const existingDoc = await eventRef.get();
   if (existingDoc.exists) {
     const data = existingDoc.data() as CrmEvent;
-    return {
-      ok: true,
-      event: data,
-      isReplay: true,
-    };
+    if (data.idempotencyKey === idempotencyKey) {
+      return {
+        ok: true,
+        event: data,
+        isReplay: true,
+      };
+    }
+    // Millisecond timestamp collision with a distinct event — disambiguate eventId
+    eventId = `${eventId}_${Math.random().toString(36).substring(2, 7)}`;
+    eventRef = db.collection('crmEvents').doc(eventId);
   }
 
   const timestamp = new Date(timestampMs).toISOString();
