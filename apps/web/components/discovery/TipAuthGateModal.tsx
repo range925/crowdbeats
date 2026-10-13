@@ -78,9 +78,9 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 200,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -94,11 +94,11 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
         style={{
           width: '100%',
           maxWidth: 480,
-          backgroundColor: '#131315',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
+          backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+          border: '1px solid var(--cb-border-subtle, #E5E5EA)',
           borderRadius: 24,
           padding: 28,
-          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8)',
+          boxShadow: '0 20px 48px rgba(0, 0, 0, 0.15)',
           position: 'relative',
         }}
       >
@@ -112,10 +112,11 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
             right: 20,
             background: 'none',
             border: 'none',
-            color: 'var(--cb-text-muted)',
+            color: 'var(--cb-text-secondary, #636366)',
             fontSize: 20,
             cursor: 'pointer',
           }}
+          aria-label="Close modal"
         >
           ✕
         </button>
@@ -129,9 +130,9 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
               gap: 8,
               padding: '6px 16px',
               borderRadius: 9999,
-              backgroundColor: 'rgba(124, 58, 237, 0.15)',
-              border: '1px solid rgba(124, 58, 237, 0.35)',
-              color: '#A855F7',
+              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+              border: '1px solid rgba(124, 58, 237, 0.25)',
+              color: '#7C3AED',
               fontWeight: 700,
               fontSize: 14,
             }}
@@ -146,7 +147,7 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
           style={{
             fontSize: 22,
             fontWeight: 800,
-            color: '#FFFFFF',
+            color: 'var(--cb-text-primary, #1D1D1F)',
             textAlign: 'center',
             letterSpacing: '-0.02em',
             margin: '0 0 8px',
@@ -159,7 +160,7 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
         <p
           style={{
             fontSize: 13,
-            color: 'var(--cb-text-secondary)',
+            color: 'var(--cb-text-secondary, #636366)',
             textAlign: 'center',
             lineHeight: 1.5,
             margin: '0 0 20px',
@@ -170,7 +171,7 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
 
         {/* Preset Amount Selector */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, color: 'var(--cb-text-muted)', fontWeight: 600, marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: 'var(--cb-text-secondary, #636366)', fontWeight: 600, marginBottom: 8 }}>
             Select Tip Amount:
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 8 }}>
@@ -191,9 +192,9 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
                   style={{
                     padding: '10px 0',
                     borderRadius: 12,
-                    backgroundColor: isSelected ? 'var(--cb-purple-main)' : 'rgba(255, 255, 255, 0.06)',
-                    border: isSelected ? '1px solid #A855F7' : '1px solid rgba(255, 255, 255, 0.1)',
-                    color: isSelected ? '#FFFFFF' : 'var(--cb-text-secondary)',
+                    backgroundColor: isSelected ? 'var(--cb-purple-main, #7C3AED)' : '#F2F2F7',
+                    border: isSelected ? '1px solid #7C3AED' : '1px solid #E5E5EA',
+                    color: isSelected ? '#FFFFFF' : 'var(--cb-text-primary, #1D1D1F)',
                     fontWeight: 700,
                     fontSize: 15,
                     cursor: 'pointer',
@@ -218,13 +219,13 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
           return (
             <div
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: '#F8F9FA',
+                border: '1px solid #E5E5EA',
                 borderRadius: 12,
                 padding: '12px 14px',
                 marginBottom: 20,
                 fontSize: 12,
-                color: '#94A3B8',
+                color: '#4B5563',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 6,
@@ -232,36 +233,36 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Gross Contribution:</span>
-                <span style={{ color: '#FFFFFF', fontWeight: 600 }}>${grossDollars}</span>
+                <span style={{ color: '#111827', fontWeight: 600 }}>${grossDollars}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Crowdbeats Platform Fee (6%):</span>
-                <span style={{ color: '#F87171' }}>−${platformDollars}</span>
+                <span style={{ color: '#DC2626' }}>−${platformDollars}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Stripe Processing & Connect Fees (Daily Rate: 2.9% + 30¢):</span>
-                <span style={{ color: '#F87171' }}>−${stripeDollars}</span>
+                <span style={{ color: '#DC2626' }}>−${stripeDollars}</span>
               </div>
               <div
                 style={{
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderTop: '1px solid #E5E5EA',
                   paddingTop: 6,
                   display: 'flex',
                   justifyContent: 'space-between',
                   fontWeight: 700,
-                  color: '#34D399',
+                  color: '#059669',
                 }}
               >
                 <span>Est. {performerName} Net Proceeds:</span>
                 <span>${netDollars}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#10B981' }} />
-                <span style={{ fontSize: 10, color: '#10B981', fontWeight: 600 }}>
+                <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#059669' }} />
+                <span style={{ fontSize: 10, color: '#059669', fontWeight: 600 }}>
                   Daily Stripe Rate Verified ({breakdown.effectiveDate}) • 6% Platform Fee Deducted
                 </span>
               </div>
-              <div style={{ fontSize: 11, color: '#64748B', marginTop: 2, lineHeight: 1.4 }}>
+              <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2, lineHeight: 1.4 }}>
                 “Crowdbeats charges a 6% platform fee. Stripe payment-processing and applicable Stripe Connect fees are additional.”
               </div>
             </div>
@@ -273,6 +274,7 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
           <button
             type="button"
             onClick={handleProceedToAuth}
+            aria-label="Continue with Google to confirm tip"
             style={{
               width: '100%',
               padding: '14px',
@@ -296,9 +298,9 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
               width: '100%',
               padding: '14px',
               borderRadius: 12,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              color: '#FFFFFF',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #D1D5DB',
+              color: '#1D1D1F',
               fontSize: 15,
               fontWeight: 600,
               cursor: 'pointer',
@@ -315,7 +317,7 @@ export const TipAuthGateModal: React.FC<TipAuthGateModalProps> = ({
               padding: '12px',
               background: 'none',
               border: 'none',
-              color: '#A855F7',
+              color: '#7C3AED',
               fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',

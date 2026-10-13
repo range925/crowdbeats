@@ -7,9 +7,11 @@
  * responsive mobile menu, and smart auth action gates.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useMobileDrawer } from '@/lib/hooks/useMobileDrawer';
+import { ResponsiveMobileDrawer } from '@/components/navigation/ResponsiveMobileDrawer';
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 import type { DiscoveryLocation } from '@crowdbeats/contracts';
 
@@ -26,7 +28,13 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
 }) => {
   const { user, status } = useAuth();
   const isAuthenticated = status === 'authenticated' && !!user;
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const {
+    isOpen: isMobileMenuOpen,
+    close: closeMobileMenu,
+    triggerProps,
+    drawerRef,
+    closeButtonRef,
+  } = useMobileDrawer({ drawerId: 'cb-discovery-mobile-drawer' });
 
   return (
     <header
@@ -36,8 +44,8 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
         zIndex: 50,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        backgroundColor: 'rgba(11, 12, 16, 0.90)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: 'rgba(255, 255, 255, 0.88)',
+        borderBottom: '1px solid var(--cb-border-subtle, rgba(0, 0, 0, 0.08))',
         padding: '12px clamp(16px, 3vw, 28px)',
       }}
     >
@@ -63,7 +71,7 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
             }}
             aria-label="Crowdbeats home"
           >
-            <CrowdbeatsLogo variant="horizontal" height={28} surface="dark" priority />
+            <CrowdbeatsLogo variant="horizontal" height={28} surface="light" priority />
           </Link>
 
           {/* Location Badge */}
@@ -75,12 +83,12 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
                 gap: 5,
                 padding: '4px 10px',
                 borderRadius: 9999,
-                backgroundColor: 'rgba(124, 58, 237, 0.12)',
-                border: '1px solid rgba(124, 58, 237, 0.3)',
+                backgroundColor: 'rgba(124, 58, 237, 0.08)',
+                border: '1px solid rgba(124, 58, 237, 0.25)',
                 fontSize: 'clamp(11px, 2vw, 13px)',
-                color: '#A855F7',
+                color: '#7C3AED',
                 fontWeight: 600,
-                maxWidth: 'clamp(140px, 30vw, 280px)',
+                maxWidth: 'clamp(100px, 22vw, 240px)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -98,9 +106,9 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
                     marginLeft: 4,
                     padding: '2px 6px',
                     borderRadius: 9999,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.12)',
                     border: 'none',
-                    color: '#FFFFFF',
+                    color: '#7C3AED',
                     fontSize: 10,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -124,15 +132,15 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
         >
           <Link
             href="/preview"
+            className="hidden lg:inline-flex"
             style={{
-              display: 'inline-flex',
               alignItems: 'center',
               gap: 5,
               padding: '5px 12px',
               borderRadius: 8,
-              backgroundColor: 'rgba(124, 58, 237, 0.15)',
-              border: '1px solid rgba(124, 58, 237, 0.35)',
-              color: '#C084FC',
+              backgroundColor: 'rgba(124, 58, 237, 0.08)',
+              border: '1px solid rgba(124, 58, 237, 0.25)',
+              color: '#7C3AED',
               fontSize: 13,
               fontWeight: 700,
               textDecoration: 'none',
@@ -145,7 +153,7 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
           </Link>
           <Link
             href="/#nearby"
-            className="hidden md:inline-block"
+            className="hidden lg:inline-block"
             style={{
               color: 'var(--cb-text-secondary)',
               fontSize: 14,
@@ -199,6 +207,7 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
           {isAuthenticated ? (
             <Link
               href="/fan/dashboard"
+              className="hidden sm:inline-flex"
               style={{
                 padding: '8px 18px',
                 borderRadius: 10,
@@ -214,12 +223,11 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
               My Dashboard
             </Link>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="hidden sm:flex" style={{ alignItems: 'center', gap: 8 }}>
               <Link
                 href="/auth"
-                className="hidden sm:inline-block"
                 style={{
-                  color: '#FFFFFF',
+                  color: 'var(--cb-text-primary, #1D1D1F)',
                   fontSize: 13,
                   fontWeight: 600,
                   padding: '6px 12px',
@@ -251,21 +259,22 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
           {/* Mobile Menu Toggle Button */}
           <button
             type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden"
-            aria-label="Toggle Navigation Menu"
+            {...triggerProps}
+            className="lg:hidden cb-touch-target"
             style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: 'rgba(0, 0, 0, 0.04)',
+              border: '1px solid rgba(0, 0, 0, 0.10)',
               borderRadius: 8,
-              color: '#FFFFFF',
-              width: 36,
-              height: 36,
+              color: 'var(--cb-text-primary, #1D1D1F)',
+              width: 44,
+              height: 44,
+              minWidth: 44,
+              minHeight: 44,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              fontSize: 18,
+              fontSize: 20,
             }}
           >
             {isMobileMenuOpen ? '✕' : '☰'}
@@ -273,32 +282,75 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
         </div>
       </div>
 
-      {/* Mobile Dropdown Drawer */}
-      {isMobileMenuOpen && (
-        <div
-          style={{
-            marginTop: 12,
-            paddingTop: 12,
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-          }}
-        >
+      {/* Accessible Responsive Mobile Navigation Drawer */}
+      <ResponsiveMobileDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={closeMobileMenu}
+        drawerRef={drawerRef}
+        closeButtonRef={closeButtonRef}
+        drawerId="cb-discovery-mobile-drawer"
+        title="Discovery Navigation"
+        personaLabel="Live Map & Stages"
+        footer={
+          isAuthenticated ? (
+            <Link
+              href="/fan/dashboard"
+              onClick={() => closeMobileMenu(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 16px',
+                borderRadius: 10,
+                background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+                color: '#FFFFFF',
+                fontSize: 13,
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              My Dashboard →
+            </Link>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <Link
+                href="/auth"
+                onClick={() => closeMobileMenu(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 16px',
+                  borderRadius: 10,
+                  background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+                  color: '#FFFFFF',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                }}
+              >
+                Sign In / Register →
+              </Link>
+            </div>
+          )
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <Link
             href="/preview"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => closeMobileMenu(false)}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              padding: '10px 14px',
-              borderRadius: 10,
-              backgroundColor: 'rgba(124, 58, 237, 0.15)',
-              color: '#C084FC',
-              fontSize: 14,
+              padding: '10px 12px',
+              borderRadius: 8,
+              backgroundColor: 'rgba(124, 58, 237, 0.08)',
+              color: '#7C3AED',
+              fontSize: 13,
               fontWeight: 700,
               textDecoration: 'none',
+              marginBottom: 4,
             }}
           >
             <span>🎭</span>
@@ -306,71 +358,66 @@ export const DiscoveryNav: React.FC<DiscoveryNavProps> = ({
           </Link>
           <Link
             href="/#nearby"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => closeMobileMenu(false)}
             style={{
-              color: '#E2E8F0',
+              color: 'var(--cb-text-primary, #1D1D1F)',
               fontSize: 14,
               fontWeight: 600,
-              padding: '8px 14px',
+              padding: '10px 12px',
+              borderRadius: 8,
               textDecoration: 'none',
+              transition: 'background-color 0.15s ease',
             }}
           >
             Live Nearby Stages
           </Link>
           <Link
             href="/#artists"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => closeMobileMenu(false)}
             style={{
-              color: '#E2E8F0',
+              color: 'var(--cb-text-primary, #1D1D1F)',
               fontSize: 14,
               fontWeight: 600,
-              padding: '8px 14px',
+              padding: '10px 12px',
+              borderRadius: 8,
               textDecoration: 'none',
+              transition: 'background-color 0.15s ease',
             }}
           >
             Featured Solo Artists &amp; Bands
           </Link>
           <Link
             href="/#venues"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => closeMobileMenu(false)}
             style={{
-              color: '#E2E8F0',
+              color: 'var(--cb-text-primary, #1D1D1F)',
               fontSize: 14,
               fontWeight: 600,
-              padding: '8px 14px',
+              padding: '10px 12px',
+              borderRadius: 8,
               textDecoration: 'none',
+              transition: 'background-color 0.15s ease',
             }}
           >
             Live Stages &amp; Venues
           </Link>
           <Link
             href="/legal/support"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => closeMobileMenu(false)}
             style={{
-              color: '#E2E8F0',
+              color: 'var(--cb-text-primary, #1D1D1F)',
               fontSize: 14,
               fontWeight: 600,
-              padding: '8px 14px',
+              padding: '10px 12px',
+              borderRadius: 8,
               textDecoration: 'none',
+              transition: 'background-color 0.15s ease',
             }}
           >
             Help &amp; Support
           </Link>
-          <Link
-            href="/auth"
-            onClick={() => setIsMobileMenuOpen(false)}
-            style={{
-              color: '#A855F7',
-              fontSize: 14,
-              fontWeight: 700,
-              padding: '8px 14px',
-              textDecoration: 'none',
-            }}
-          >
-            Sign In / Register →
-          </Link>
         </div>
-      )}
+      </ResponsiveMobileDrawer>
     </header>
   );
 };
