@@ -22,6 +22,12 @@ import type {
   GetCrmFinancialReferencesResponse,
   AddCrmInternalNoteRequest,
   AddCrmInternalNoteResponse,
+  SearchCrmDirectoryRequest,
+  SearchCrmDirectoryResponse,
+  GetCrmCaseHistoryRequest,
+  GetCrmCaseHistoryResponse,
+  UpdateCrmVerificationStatusRequest,
+  UpdateCrmVerificationStatusResponse,
 } from '@crowdbeats/contracts';
 import {
   getCrmCustomerProfile,
@@ -29,6 +35,9 @@ import {
   getCrmRelationships,
   getCrmFinancialReferences,
   addCrmInternalNote,
+  searchCrmDirectory,
+  getCrmCaseHistory,
+  updateCrmVerificationStatus,
   isStaffCaller,
 } from './crmService';
 
@@ -201,3 +210,88 @@ export const addCrmInternalNoteCallable = onCall<AddCrmInternalNoteRequest>(
     return result;
   }
 );
+
+/**
+ * searchCrmDirectoryCallable
+ * Allows authorized staff to search the unified CRM directory across fans, solo musicians, bands, and sponsors.
+ */
+export const searchCrmDirectoryCallable = onCall<SearchCrmDirectoryRequest>(
+  { region: 'us-central1' },
+  async (request): Promise<SearchCrmDirectoryResponse> => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+
+    const { uid, token } = request.auth;
+    const caller = {
+      uid,
+      platformRole: (token.platformRole as string) || null,
+      isAdmin: token.admin === true || token.isAdmin === true,
+    };
+
+    if (!isStaffCaller(caller)) {
+      throw new HttpsError('permission-denied', 'Only authorized staff members may query CRM directories.');
+    }
+
+    const filter = request.data?.filter || {};
+    const result = await searchCrmDirectory(db(), filter, caller);
+    return result;
+  }
+);
+
+/**
+ * getCrmCaseHistoryCallable
+ * Retrieves case history (support tickets, reports, payout holds) for a target user.
+ */
+export const getCrmCaseHistoryCallable = onCall<GetCrmCaseHistoryRequest>(
+  { region: 'us-central1' },
+  async (request): Promise<GetCrmCaseHistoryResponse> => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+
+    const { uid, token } = request.auth;
+    const { targetUid } = request.data || {};
+
+    if (!targetUid || typeof targetUid !== 'string') {
+      throw new HttpsError('invalid-argument', 'Target UID is required.');
+    }
+
+    const caller = {
+      uid,
+      platformRole: (token.platformRole as string) || null,
+      isAdmin: token.admin === true || token.isAdmin === true,
+    };
+
+    const result = await getCrmCaseHistory(db(), targetUid, caller);
+    return result;
+  }
+);
+
+/**
+ * updateCrmVerificationStatusCallable
+ * Updates verification status for a user, artist, band, or sponsor with audit logging.
+ */
+export const updateCrmVerificationStatusCallable = onCall<UpdateCrmVerificationStatusRequest>(
+  { region: 'us-central1' },
+  async (request): Promise<UpdateCrmVerificationStatusResponse> => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+
+    const { uid, token } = request.auth;
+    const caller = {
+      uid,
+      platformRole: (token.platformRole as string) || null,
+      isAdmin: token.admin === true || token.isAdmin === true,
+    };
+
+    if (!isStaffCaller(caller)) {
+      throw new HttpsError('permission-denied', 'Only authorized staff may update verification status.');
+    }
+
+    const result = await updateCrmVerificationStatus(db(), request.data, caller);
+    return result;
+  }
+);
+

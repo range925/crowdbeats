@@ -27,6 +27,17 @@ import type {
   GetAdminCommandCenterDataRequest,
   GetAdminCommandCenterDataResponse,
   PendingActionException,
+  CrmDirectoryFilter,
+  CrmDirectoryItem,
+  SearchCrmDirectoryRequest,
+  SearchCrmDirectoryResponse,
+  CrmCaseHistoryItem,
+  GetCrmCaseHistoryRequest,
+  GetCrmCaseHistoryResponse,
+  UpdateCrmVerificationStatusRequest,
+  UpdateCrmVerificationStatusResponse,
+  AddCrmInternalNoteRequest,
+  AddCrmInternalNoteResponse,
 } from '@crowdbeats/contracts';
 import { firebaseApp } from '../firebase/app';
 
@@ -1394,3 +1405,236 @@ export function useAdminCommandCenter() {
 
   return { data, loading, error, refresh };
 }
+
+// ── Phase 8: Unified Administration CRM Hooks & Services ─────────────────────
+
+/**
+ * useAdminCrmDirectory
+ * Queries the unified CRM directory across fans, solo musicians, bands, and sponsors.
+ * Uses server-authoritative searchCrmDirectoryCallable with automatic client fallback.
+ */
+export function useAdminCrmDirectory(filter: CrmDirectoryFilter = {}) {
+  const [items, setItems] = useState<CrmDirectoryItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // 1. Try server-authoritative Cloud Function
+      const searchFn = httpsCallable<SearchCrmDirectoryRequest, SearchCrmDirectoryResponse>(
+        fns(),
+        'searchCrmDirectoryCallable'
+      );
+      const res = await searchFn({ filter });
+      if (res.data?.ok && Array.isArray(res.data.items)) {
+        setItems(res.data.items);
+        setTotalCount(res.data.totalCount ?? res.data.items.length);
+        setLoading(false);
+        return;
+      }
+    } catch (callErr: any) {
+      console.warn('searchCrmDirectoryCallable unavailable, using fallback:', callErr?.message);
+    }
+
+    // 2. Client fallback querying users collection
+    try {
+      const firestore = db();
+      const snap = await getDocs(query(collection(firestore, 'users'), limit(200)));
+      const fallbackItems: CrmDirectoryItem[] = [];
+
+      for (const d of snap.docs) {
+        const data = d.data();
+        const personaRaw = (data.personaType || '').toLowerCase();
+
+        if (filter.entityType === 'fan') {
+          if (personaRaw !== 'fan' && (personaRaw || data.stripeAccountId || data.stageName)) continue;
+        } else if (filter.entityType === 'solo_musician') {
+          if (!personaRaw.includes('solo') && personaRaw !== 'artist') continue;
+        } else if (filter.entityType === 'band') {
+          if (!personaRaw.includes('band')) continue;
+        } else if (filter.entityType === 'sponsor') {
+          if (!personaRaw.includes('sponsor')) continue;
+        }
+
+        const isVerified = data.verified === true || data.isVerified === true || data.verificationStatus === 'verified';
+        if (filter.verificationStatus === 'verified' && !isVerified) continue;
+        if (filter.verificationStatus === 'unverified' && isVerified) continue;
+
+        const isSuspended = data.isSuspended === true || !!data.suspendedAt;
+        if (filter.accountStatus === 'active' && isSuspended) continue;
+        if (filter.accountStatus === 'suspended' && !isSuspended) continue;
+
+        const q = (filter.searchQuery || '').trim().toLowerCase();
+        if (q) {
+          const match =
+            (data.displayName && data.displayName.toLowerCase().includes(q)) ||
+            (data.email && data.email.toLowerCase().includes(q)) ||
+            d.id.toLowerCase().includes(q) ||
+            (data.stageName && data.stageName.toLowerCase().includes(q)) ||
+            (data.genre && data.genre.toLowerCase().includes(q)) ||
+            (data.city && data.city.toLowerCase().includes(q));
+          if (!match) continue;
+        }
+
+        fallbackItems.push({
+          uid: d.id,
+          displayName: data.displayName || null,
+          email: data.email || null,
+          photoUrl: data.photoUrl || null,
+          personaType: data.personaType || (data.stripeAccountId ? 'solo_musician' : 'fan'),
+          verificationStatus: isVerified ? 'verified' : 'unverified',
+          accountStatus: isSuspended ? 'suspended' : 'active',
+          city: data.city || null,
+          genre: data.genre || null,
+          stageName: data.stageName || null,
+          totalMonetaryCents: data.totalTipsReceivedCents || data.totalEarnedCents || data.totalTipsSentCents || 0,
+          relationshipsCount: data.followerCount || 0,
+          openCasesCount: data.openTicketsCount || 0,
+          stripeConnected: !!data.stripeAccountId,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAt || null),
+        });
+      }
+
+      setItems(fallbackItems);
+      setTotalCount(fallbackItems.length);
+    } catch (fallbackErr: any) {
+      setError(fallbackErr?.message || 'Failed to load CRM directory.');
+    } finally {
+      setLoading(false);
+    }
+  }, [JSON.stringify(filter)]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { items, totalCount, loading, error, refresh };
+}
+
+/**
+ * useAdminCrmCaseHistory
+ * Queries aggregated case history (support tickets, abuse reports, payout holds) for a target user.
+ */
+export function useAdminCrmCaseHistory(targetUid: string | null) {
+  const [cases, setCases] = useState<CrmCaseHistoryItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!targetUid) {
+      setCases([]);
+      setTotalCount(0);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const getHistoryFn = httpsCallable<GetCrmCaseHistoryRequest, GetCrmCaseHistoryResponse>(
+        fns(),
+        'getCrmCaseHistoryCallable'
+      );
+      const res = await getHistoryFn({ targetUid });
+      if (res.data?.ok && Array.isArray(res.data.cases)) {
+        setCases(res.data.cases);
+        setTotalCount(res.data.totalCount ?? res.data.cases.length);
+        setLoading(false);
+        return;
+      }
+    } catch (callErr: any) {
+      console.warn('getCrmCaseHistoryCallable unavailable, using fallback:', callErr?.message);
+    }
+
+    try {
+      const firestore = db();
+      const list: CrmCaseHistoryItem[] = [];
+
+      // Support tickets
+      const tSnap = await getDocs(
+        query(collection(firestore, 'supportRequests'), where('userId', '==', targetUid), limit(20))
+      ).catch(() => ({ docs: [] }));
+
+      tSnap.docs.forEach((doc) => {
+        const d = doc.data();
+        list.push({
+          caseId: doc.id,
+          type: 'SUPPORT_TICKET',
+          title: d.subject || 'Support Ticket',
+          status: (d.status || 'OPEN').toUpperCase(),
+          priority: (d.priority || 'MEDIUM').toUpperCase(),
+          createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt || new Date().toISOString()),
+          resolvedAt: d.resolvedAt?.toDate ? d.resolvedAt.toDate().toISOString() : (d.resolvedAt || null),
+          assignedStaff: d.assignedTo || null,
+        });
+      });
+
+      // Reports
+      const rSnap = await getDocs(
+        query(collection(firestore, 'reports'), where('targetId', '==', targetUid), limit(20))
+      ).catch(() => ({ docs: [] }));
+
+      rSnap.docs.forEach((doc) => {
+        const d = doc.data();
+        list.push({
+          caseId: doc.id,
+          type: 'TRUST_SAFETY_REPORT',
+          title: `Report: ${d.reason || d.category || 'Content Violation'}`,
+          status: (d.status || 'PENDING').toUpperCase(),
+          priority: (d.severity || 'HIGH').toUpperCase(),
+          createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt || new Date().toISOString()),
+          resolvedAt: d.resolvedAt?.toDate ? d.resolvedAt.toDate().toISOString() : (d.resolvedAt || null),
+        });
+      });
+
+      setCases(list);
+      setTotalCount(list.length);
+    } catch (fallbackErr: any) {
+      setError(fallbackErr?.message || 'Failed to load case history.');
+    } finally {
+      setLoading(false);
+    }
+  }, [targetUid]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { cases, totalCount, loading, error, refresh };
+}
+
+/**
+ * callUpdateCrmVerificationStatus
+ * Updates verification status for a user, artist, band, or sponsor with audited reason.
+ */
+export async function callUpdateCrmVerificationStatus(
+  params: UpdateCrmVerificationStatusRequest
+): Promise<UpdateCrmVerificationStatusResponse> {
+  const updateFn = httpsCallable<UpdateCrmVerificationStatusRequest, UpdateCrmVerificationStatusResponse>(
+    fns(),
+    'updateCrmVerificationStatusCallable'
+  );
+  const res = await updateFn(params);
+  return res.data;
+}
+
+/**
+ * callAddCrmInternalNote
+ * Appends an audited staff internal note to a user's record.
+ */
+export async function callAddCrmInternalNote(
+  params: AddCrmInternalNoteRequest
+): Promise<AddCrmInternalNoteResponse> {
+  const noteFn = httpsCallable<AddCrmInternalNoteRequest, AddCrmInternalNoteResponse>(
+    fns(),
+    'addCrmInternalNoteCallable'
+  );
+  const res = await noteFn(params);
+  return res.data;
+}
+

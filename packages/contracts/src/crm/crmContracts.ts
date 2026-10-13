@@ -245,3 +245,85 @@ export interface AddCrmInternalNoteResponse {
   readonly ok: boolean;
   readonly note: CrmInternalNote;
 }
+
+// ─── Phase 8 Unified Directory & Search Contracts ───────────────────────────
+
+export interface CrmDirectoryFilter {
+  readonly entityType?: 'all' | 'fan' | 'solo_musician' | 'band' | 'sponsor';
+  readonly verificationStatus?: 'all' | 'verified' | 'unverified';
+  readonly accountStatus?: 'all' | 'active' | 'suspended';
+  readonly searchQuery?: string;
+  readonly limit?: number;
+  readonly offset?: number;
+}
+
+export interface CrmDirectoryItem {
+  readonly id?: string;
+  readonly uid: string;
+  readonly displayName: string | null;
+  readonly email: string | null;
+  readonly photoUrl: string | null;
+  readonly personaType: string | null;
+  readonly verificationStatus: 'verified' | 'unverified' | 'pending';
+  readonly accountStatus: 'active' | 'suspended';
+  readonly city: string | null;
+  readonly genre?: string | null;
+  readonly stageName?: string | null;
+  readonly totalMonetaryCents: number;
+  readonly relationshipsCount: number;
+  readonly openCasesCount: number;
+  readonly stripeConnected: boolean;
+  readonly createdAt: IsoTimestamp | null;
+}
+
+export interface SearchCrmDirectoryRequest {
+  readonly filter?: CrmDirectoryFilter;
+}
+
+export interface SearchCrmDirectoryResponse {
+  readonly ok: boolean;
+  readonly items: CrmDirectoryItem[];
+  readonly totalCount: number;
+}
+
+// ─── Phase 8 Case History Contracts ─────────────────────────────────────────
+
+export interface CrmCaseHistoryItem {
+  readonly caseId: string;
+  readonly type: 'SUPPORT_TICKET' | 'TRUST_SAFETY_REPORT' | 'DISPUTE' | 'PAYOUT_HOLD';
+  readonly title: string;
+  readonly status: string;
+  readonly priority: string;
+  readonly createdAt: IsoTimestamp;
+  readonly resolvedAt?: IsoTimestamp | null;
+  readonly assignedStaff?: string | null;
+  readonly details?: Record<string, unknown>;
+}
+
+export interface GetCrmCaseHistoryRequest {
+  readonly targetUid: string;
+}
+
+export interface GetCrmCaseHistoryResponse {
+  readonly ok: boolean;
+  readonly targetUid: string;
+  readonly cases: CrmCaseHistoryItem[];
+  readonly totalCount: number;
+}
+
+// ─── Phase 8 Verification Status Contracts ──────────────────────────────────
+
+export interface UpdateCrmVerificationStatusRequest {
+  readonly targetUid: string;
+  readonly targetType: 'user' | 'artist' | 'band' | 'sponsor';
+  readonly verified: boolean;
+  readonly reason: string;
+}
+
+export interface UpdateCrmVerificationStatusResponse {
+  readonly ok: boolean;
+  readonly message: string;
+  readonly targetUid: string;
+  readonly verified: boolean;
+}
+

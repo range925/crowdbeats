@@ -18,6 +18,13 @@ import type {
   CrmCustomerProfile,
   CrmRelationshipItem,
   CrmFinancialReference,
+  CrmDirectoryFilter,
+  CrmDirectoryItem,
+  SearchCrmDirectoryResponse,
+  CrmCaseHistoryItem,
+  GetCrmCaseHistoryResponse,
+  UpdateCrmVerificationStatusRequest,
+  UpdateCrmVerificationStatusResponse,
 } from '@crowdbeats/contracts';
 import {
   CRM_RETENTION_DAYS,
@@ -27,11 +34,13 @@ import {
 
 const STAFF_ROLES = [
   'SUPER_ADMIN',
+  'EXECUTIVE',
   'CUSTOMER_SUPPORT',
   'TRUST_SAFETY',
   'ARTIST_RELATIONS',
   'FINANCE_ADMIN',
   'COMPLIANCE_OFFICER',
+  'DEVELOPER',
 ] as const;
 
 export function isStaffCaller(caller: { platformRole?: string | null; isAdmin?: boolean }): boolean {
@@ -606,3 +615,412 @@ export async function addCrmInternalNote(
     note: internalNote,
   };
 }
+
+// ─── 6. Phase 8 Unified Directory & Search ───────────────────────────────────
+
+export async function searchCrmDirectory(
+  db: admin.firestore.Firestore,
+  filter: CrmDirectoryFilter = {},
+  caller: { uid: string; platformRole?: string | null; isAdmin?: boolean }
+): Promise<SearchCrmDirectoryResponse> {
+  if (!isStaffCaller(caller)) {
+    throw new HttpsError('permission-denied', 'Unauthorized. Only staff roles may access CRM directories.');
+  }
+
+  const {
+    entityType = 'all',
+    verificationStatus = 'all',
+    accountStatus = 'all',
+    searchQuery = '',
+    limit = 100,
+    offset = 0,
+  } = filter;
+
+  // Query users collection as base entity directory
+  const snap = await db.collection('users').orderBy('createdAt', 'desc').limit(250).get();
+
+  const items: CrmDirectoryItem[] = [];
+
+  for (const doc of snap.docs) {
+    const data = doc.data();
+    const uid = doc.id;
+    const personaRaw = (data.personaType || '').toLowerCase();
+
+    // Check entityType filter
+    if (entityType === 'fan') {
+      const isFan = personaRaw === 'fan' || (!personaRaw && !data.stripeAccountId && !data.stageName);
+      if (!isFan) continue;
+    } else if (entityType === 'solo_musician') {
+      const isSolo = personaRaw.includes('solo') || personaRaw === 'artist' || personaRaw === 'creator';
+      if (!isSolo) continue;
+    } else if (entityType === 'band') {
+      const isBand = personaRaw.includes('band');
+      if (!isBand) continue;
+    } else if (entityType === 'sponsor') {
+      const isSponsor = personaRaw.includes('sponsor');
+      if (!isSponsor) continue;
+    }
+
+    // Check verificationStatus filter
+    const isVerified = data.verified === true || data.isVerified === true;
+    if (verificationStatus === 'verified' && !isVerified) continue;
+    if (verificationStatus === 'unverified' && isVerified) continue;
+
+    // Check accountStatus filter
+    const isSuspended = data.isSuspended === true || !!data.suspendedAt;
+    if (accountStatus === 'active' && isSuspended) continue;
+    if (accountStatus === 'suspended' && !isSuspended) continue;
+
+    // Search query matching
+    const q = (searchQuery || '').trim().toLowerCase();
+    if (q) {
+      const matches =
+        (data.displayName && data.displayName.toLowerCase().includes(q)) ||
+        (data.email && data.email.toLowerCase().includes(q)) ||
+        uid.toLowerCase().includes(q) ||
+        (data.stageName && data.stageName.toLowerCase().includes(q)) ||
+        (data.genre && data.genre.toLowerCase().includes(q)) ||
+        (data.city && data.city.toLowerCase().includes(q));
+      if (!matches) continue;
+    }
+
+    // Total monetary calculation
+    const totalSent = data.totalTipsSentCents || data.totalTippedCents || 0;
+    const totalEarned = data.totalTipsReceivedCents || data.totalEarnedCents || 0;
+    const totalMonetaryCents =
+      entityType === 'fan' || personaRaw === 'fan'
+        ? totalSent
+        : totalEarned > 0
+        ? totalEarned
+        : totalSent;
+
+    items.push({
+      uid,
+      displayName: data.displayName || null,
+      email: data.email || null,
+      photoUrl: data.photoUrl || null,
+      personaType: data.personaType || (data.stripeAccountId ? 'solo_musician' : 'fan'),
+      verificationStatus: isVerified ? 'verified' : 'unverified',
+      accountStatus: isSuspended ? 'suspended' : 'active',
+      city: data.city || null,
+      genre: data.genre || null,
+      stageName: data.stageName || null,
+      totalMonetaryCents,
+      relationshipsCount: data.followerCount || 0,
+      openCasesCount: data.openTicketsCount || 0,
+      stripeConnected: !!data.stripeAccountId,
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAt || null),
+    });
+  }
+
+  // Also query bands collection if entityType is 'all' or 'band'
+  if (entityType === 'all' || entityType === 'band') {
+    try {
+      const bandSnap = await db.collection('bands').limit(100).get();
+      for (const bDoc of bandSnap.docs) {
+        if (items.some((i) => i.uid === bDoc.id)) continue;
+        const b = bDoc.data();
+        const isVerified = b.verified === true || b.isVerified === true || b.verificationStatus === 'verified';
+        if (verificationStatus === 'verified' && !isVerified) continue;
+        if (verificationStatus === 'unverified' && isVerified) continue;
+
+        const isSuspended = b.status === 'suspended' || b.isSuspended === true;
+        if (accountStatus === 'active' && isSuspended) continue;
+        if (accountStatus === 'suspended' && !isSuspended) continue;
+
+        const q = (searchQuery || '').trim().toLowerCase();
+        if (q) {
+          const matches =
+            (b.name && b.name.toLowerCase().includes(q)) ||
+            (b.handle && b.handle.toLowerCase().includes(q)) ||
+            (b.genre && b.genre.toLowerCase().includes(q)) ||
+            (b.city && b.city.toLowerCase().includes(q)) ||
+            bDoc.id.toLowerCase().includes(q);
+          if (!matches) continue;
+        }
+
+        items.push({
+          uid: bDoc.id,
+          displayName: b.name || b.handle || 'Band',
+          email: b.contactEmail || null,
+          photoUrl: b.avatarUrl || b.photoUrl || null,
+          personaType: 'band',
+          verificationStatus: isVerified ? 'verified' : 'unverified',
+          accountStatus: isSuspended ? 'suspended' : 'active',
+          city: b.city || null,
+          genre: b.genre || null,
+          stageName: b.name || null,
+          totalMonetaryCents: b.totalEarnedCents || 0,
+          relationshipsCount: b.followerCount || (b.members ? b.members.length : 0),
+          openCasesCount: 0,
+          stripeConnected: !!b.stripeAccountId,
+          createdAt: b.createdAt?.toDate ? b.createdAt.toDate().toISOString() : (b.createdAt || null),
+        });
+      }
+    } catch (err) {
+      // collection may not exist yet in tests
+    }
+  }
+
+  const totalCount = items.length;
+  const paginated = items.slice(offset, offset + limit);
+
+  return {
+    ok: true,
+    items: paginated,
+    totalCount,
+  };
+}
+
+// ─── 7. Phase 8 Case History Aggregation ─────────────────────────────────────
+
+export async function getCrmCaseHistory(
+  db: admin.firestore.Firestore,
+  targetUid: string,
+  caller: { uid: string; platformRole?: string | null; isAdmin?: boolean }
+): Promise<GetCrmCaseHistoryResponse> {
+  if (!isStaffCaller(caller) && caller.uid !== targetUid) {
+    throw new HttpsError('permission-denied', 'Access denied to target case history.');
+  }
+
+  const cases: CrmCaseHistoryItem[] = [];
+
+  // 1. Support Requests
+  try {
+    const supportSnap = await db
+      .collection('supportRequests')
+      .where('userId', '==', targetUid)
+      .limit(50)
+      .get();
+
+    for (const doc of supportSnap.docs) {
+      const d = doc.data();
+      cases.push({
+        caseId: doc.id,
+        type: 'SUPPORT_TICKET',
+        title: d.subject || 'Customer Support Request',
+        status: (d.status || 'OPEN').toUpperCase(),
+        priority: (d.priority || 'MEDIUM').toUpperCase(),
+        createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt || nowIso()),
+        resolvedAt: d.resolvedAt?.toDate ? d.resolvedAt.toDate().toISOString() : (d.resolvedAt || null),
+        assignedStaff: d.assignedTo || null,
+        details: {
+          category: d.category || 'GENERAL',
+          description: d.description || '',
+        },
+      });
+    }
+  } catch (err) {
+    // collection may be empty or unindexed in dev
+  }
+
+  // 2. Trust & Safety Abuse Reports
+  try {
+    const seenReportIds = new Set<string>();
+
+    const checkReportDocs = (docs: FirebaseFirestore.QueryDocumentSnapshot[]) => {
+      for (const doc of docs) {
+        if (!seenReportIds.has(doc.id)) {
+          seenReportIds.add(doc.id);
+          const d = doc.data();
+          cases.push({
+            caseId: doc.id,
+            type: 'TRUST_SAFETY_REPORT',
+            title: `Abuse Report: ${d.reason || d.category || d.violationCategory || 'Content Violation'}`,
+            status: (d.status || 'PENDING_REVIEW').toUpperCase(),
+            priority: (d.severity || d.slaTier || 'HIGH').toUpperCase(),
+            createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt || nowIso()),
+            resolvedAt: d.resolvedAt?.toDate ? d.resolvedAt.toDate().toISOString() : (d.resolvedAt || null),
+            assignedStaff: d.assignedOfficer || d.assignedStaff || null,
+            details: {
+              reporterUid: isStaffCaller(caller) ? (d.reporterUid || d.reporterUserId) : undefined,
+              notes: d.notes || d.description || '',
+            },
+          });
+        }
+      }
+    };
+
+    const [snap1, snap2, snap3] = await Promise.all([
+      db.collection('reports').where('targetId', '==', targetUid).limit(50).get().catch(() => ({ docs: [] })),
+      db.collection('reports').where('targetUid', '==', targetUid).limit(50).get().catch(() => ({ docs: [] })),
+      db.collection('reports').where('targetUserId', '==', targetUid).limit(50).get().catch(() => ({ docs: [] })),
+    ]);
+
+    checkReportDocs(snap1.docs as any);
+    checkReportDocs(snap2.docs as any);
+    checkReportDocs(snap3.docs as any);
+  } catch (err) {
+    // collection may be empty or unindexed in dev
+  }
+
+  // 3. Payout Holds
+  try {
+    const seenHoldIds = new Set<string>();
+
+    const checkHoldDocs = (docs: FirebaseFirestore.QueryDocumentSnapshot[]) => {
+      for (const doc of docs) {
+        if (!seenHoldIds.has(doc.id)) {
+          seenHoldIds.add(doc.id);
+          const d = doc.data();
+          cases.push({
+            caseId: doc.id,
+            type: 'PAYOUT_HOLD',
+            title: `Compliance Payout Hold: ${d.reason || d.reasonCode || 'Verification Required'}`,
+            status: (d.status || 'ACTIVE').toUpperCase(),
+            priority: 'CRITICAL',
+            createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt || d.appliedAt || nowIso()),
+            resolvedAt: d.releasedAt?.toDate ? d.releasedAt.toDate().toISOString() : (d.releasedAt || null),
+            assignedStaff: d.assignedTo || d.appliedByUid || null,
+            details: {
+              holdAmountCents: d.amountCents || 0,
+            },
+          });
+        }
+      }
+    };
+
+    const [hSnap1, hSnap2, hSnap3] = await Promise.all([
+      db.collection('payoutHolds').where('creatorId', '==', targetUid).limit(20).get().catch(() => ({ docs: [] })),
+      db.collection('payoutHolds').where('artistUid', '==', targetUid).limit(20).get().catch(() => ({ docs: [] })),
+      db.collection('payoutHolds').where('creatorUid', '==', targetUid).limit(20).get().catch(() => ({ docs: [] })),
+    ]);
+
+    checkHoldDocs(hSnap1.docs as any);
+    checkHoldDocs(hSnap2.docs as any);
+    checkHoldDocs(hSnap3.docs as any);
+  } catch (err) {
+    // collection may be empty or unindexed in dev
+  }
+
+  // Sort descending by createdAt
+  cases.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return {
+    ok: true,
+    targetUid,
+    cases,
+    totalCount: cases.length,
+  };
+}
+
+// ─── 8. Phase 8 Verification Status Update ───────────────────────────────────
+
+export async function updateCrmVerificationStatus(
+  db: admin.firestore.Firestore,
+  request: UpdateCrmVerificationStatusRequest,
+  caller: { uid: string; platformRole?: string | null; isAdmin?: boolean }
+): Promise<UpdateCrmVerificationStatusResponse> {
+  if (!isStaffCaller(caller)) {
+    throw new HttpsError('permission-denied', 'Unauthorized. Only staff roles may update verification status.');
+  }
+
+  const { targetUid, targetType, verified, reason } = request;
+  if (!targetUid || !targetType || typeof verified !== 'boolean') {
+    throw new HttpsError('invalid-argument', 'Missing targetUid, targetType, or verified flag.');
+  }
+
+  if (!reason || !reason.trim()) {
+    throw new HttpsError('invalid-argument', 'An operational justification reason is required.');
+  }
+
+  const batch = db.batch();
+  const timestamp = admin.firestore.FieldValue.serverTimestamp();
+  const statusString = verified ? 'verified' : 'unverified';
+
+  if (targetType === 'band') {
+    const bandRef = db.collection('bands').doc(targetUid);
+    batch.set(bandRef, {
+      verified,
+      isVerified: verified,
+      verificationStatus: statusString,
+      verificationReason: reason.trim(),
+      verifiedBy: caller.uid,
+      verifiedAt: timestamp,
+      updatedAt: timestamp,
+    }, { merge: true });
+  } else {
+    // 1. Update user document
+    const userRef = db.collection('users').doc(targetUid);
+    batch.set(userRef, {
+      verified,
+      isVerified: verified,
+      verificationStatus: statusString,
+      verificationReason: reason.trim(),
+      verificationUpdatedAt: timestamp,
+      verificationUpdatedBy: caller.uid,
+      updatedAt: timestamp,
+    }, { merge: true });
+
+    // 2. If artist or solo, update artist profile
+    if (targetType === 'artist' || targetType === 'user') {
+      const artistRef = db.collection('artistProfiles').doc(targetUid);
+      batch.set(artistRef, {
+        verified,
+        isVerified: verified,
+        verificationStatus: statusString,
+        updatedAt: timestamp,
+      }, { merge: true });
+    }
+
+    // 3. If sponsor, update sponsor document
+    if (targetType === 'sponsor') {
+      const sponsorRef = db.collection('sponsors').doc(targetUid);
+      batch.set(sponsorRef, {
+        verified,
+        isVerified: verified,
+        verificationStatus: statusString,
+        updatedAt: timestamp,
+      }, { merge: true });
+    }
+  }
+
+  // 4. Record immutable CRM event
+  const now = nowIso();
+  const eventId = buildCrmEventId('crm_admin', targetType, targetUid, Date.now());
+  const eventRef = db.collection('crmEvents').doc(eventId);
+  batch.set(eventRef, {
+    eventId,
+    source: 'admin_crm',
+    action: 'CRM_VERIFICATION_STATUS_CHANGED',
+    actorUid: caller.uid,
+    actorRole: caller.platformRole || 'staff',
+    targetId: targetUid,
+    targetType,
+    processingStatus: 'COMPLETED',
+    timestamp: now,
+    retentionDays: CRM_RETENTION_DAYS.DEFAULT,
+    idempotencyKey: `crm_verify:${targetUid}:${verified}:${Date.now()}`,
+    payload: {
+      verified,
+      newStatus: statusString,
+      reason: reason.trim(),
+    },
+    createdAt: timestamp,
+  });
+
+  // 5. Record Audit Event
+  const auditRef = db.collection('auditEvents').doc(eventId);
+  batch.set(auditRef, {
+    eventId,
+    action: 'CRM_VERIFICATION_STATUS_CHANGED',
+    actorUid: caller.uid,
+    actorRole: caller.platformRole || 'staff',
+    targetUid,
+    targetType,
+    fieldDiff: ['verified', 'verificationStatus'],
+    reason: reason.trim(),
+    timestamp,
+    requestId: `crm_verify_${targetUid}_${Date.now()}`,
+  });
+
+  await batch.commit();
+
+  return {
+    ok: true,
+    message: `Account verification status set to ${verified ? 'VERIFIED' : 'UNVERIFIED'}.`,
+    targetUid,
+    verified,
+  };
+}
+
