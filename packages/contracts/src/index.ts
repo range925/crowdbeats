@@ -123,6 +123,9 @@ export * from './admin/adminCommandCenterContracts';
 // ─── Support & Case Management (Phase 9) ──────────────────────────────────
 export * from './support/supportContracts';
 
-export const CONTRACTS_VERSION = '0.22.0-support-case-management' as const;
+// ─── Real-Time Operations Monitoring (Phase 10) ───────────────────────────
+export * from './operations/operationsMonitoringContracts';
+
+export const CONTRACTS_VERSION = '0.23.0-operations-monitoring' as const;
 
 

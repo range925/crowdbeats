@@ -782,6 +782,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /systemAlerts/{alertId} {
+      allow read: if isUserSupportStaff() || isSuperAdmin();
+      allow write: if false; // Admin SDK / server-authoritative callables only
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
     // FOLLOWS — /follows/{followId}
     // Supports multi-entity (sourceId_targetId) and legacy (fanUid_artistId)

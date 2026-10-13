@@ -324,3 +324,11 @@ export {
   addSupportInternalNoteCallable,
   getSupportTicketDetailsCallable,
 } from './support/supportCallables.js';
+
+// ─── Real-Time Operations Monitoring Callables (Phase 10) ────────────────────
+export {
+  getOperationsMonitoringSnapshotCallable,
+  simulateIncidentAlertCallable,
+  resolveIncidentAlertCallable,
+  acknowledgeIncidentAlertCallable,
+} from './operations/operationsMonitoringCallables.js';
