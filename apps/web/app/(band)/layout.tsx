@@ -7,9 +7,13 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 
+import { getSessionCookie } from '@/lib/session';
+
 interface BandLayoutProps {
   children: React.ReactNode;
 }
+
+const ALLOWED_PERSONAS = new Set(['band_member', 'artist', 'admin', 'staff']);
 
 const NAV_ITEMS = [
   { href: '/band/dashboard', label: 'Dashboard', icon: '📊' },
@@ -34,11 +38,65 @@ const NAV_ITEMS = [
 ];
 
 export default function BandStudioLayout({ children }: BandLayoutProps) {
-  const { displayName: authName, email: authEmail, logout } = useAuth();
+  const { status, displayName: authName, email: authEmail, personaType, logout } = useAuth();
   const { theme } = useTheme();
   const pathname = usePathname();
   const displayName = authName || 'Band Member';
   const email = authEmail || '';
+  const [accessDecision, setAccessDecision] = React.useState<boolean | null>(null);
+  const isDev = process.env.NODE_ENV === 'development';
+
+  React.useEffect(() => {
+    if (isDev) { setAccessDecision(true); return; }
+    if (typeof window !== 'undefined' && window.location.search.includes('preview=1')) {
+      setAccessDecision(true);
+      return;
+    }
+    if (status === 'loading') return;
+
+    const cookie = getSessionCookie();
+    const cookiePersona = (cookie?.personaType as string | null) ?? null;
+    const effectivePersona = personaType ?? cookiePersona;
+
+    if (effectivePersona && ALLOWED_PERSONAS.has(effectivePersona)) {
+      setAccessDecision(true);
+      return;
+    }
+
+    if (status === 'unauthenticated') {
+      if (cookie?.uid) return;
+      window.location.replace('/auth?return=' + encodeURIComponent(pathname || '/band/dashboard'));
+      return;
+    }
+
+    const allowed = Boolean(effectivePersona && ALLOWED_PERSONAS.has(effectivePersona));
+    setAccessDecision(allowed);
+  }, [status, personaType, pathname, isDev]);
+
+  if (!isDev && accessDecision === null) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--surface-base, #FBFBFD)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid var(--border-subtle, rgba(0,0,0,0.1))', borderTopColor: 'var(--accent-primary, #7C3AED)', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (!isDev && accessDecision === false) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--surface-base, #FBFBFD)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <div style={{ maxWidth: 420, width: '100%', textAlign: 'center', background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 24, padding: 36, boxShadow: '0 16px 40px rgba(0,0,0,0.06)' }}>
+          <div style={{ fontSize: 44, marginBottom: 16 }}>🚫</div>
+          <h1 style={{ color: 'var(--status-error, #EF4444)', fontSize: 20, fontWeight: 700, margin: '0 0 10px' }}>Band Studio Access Denied</h1>
+          <p style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: 13, lineHeight: 1.5, margin: '0 0 24px' }}>This area is reserved for verified band members, musicians, and managers.</p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <Link href="/fan" style={{ padding: '9px 18px', borderRadius: 9999, border: '1px solid var(--border-subtle, rgba(0,0,0,0.12))', background: 'transparent', textDecoration: 'none', color: 'var(--text-primary, #1D1D1F)', fontSize: 13, fontWeight: 600 }}>Fan Portal</Link>
+            <Link href="/onboarding/band" style={{ padding: '9px 18px', borderRadius: 9999, border: 'none', background: '#000000', color: '#FFFFFF', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Create Band Profile</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isActive = (href: string) =>
     href === '/band/dashboard' ? pathname === href : pathname.startsWith(href);

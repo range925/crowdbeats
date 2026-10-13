@@ -47,6 +47,17 @@ class FirestoreService {
     });
   }
 
+  Future<void> updateActivePersona({
+    required String uid,
+    required String personaType,
+  }) async {
+    await _db.collection('users').doc(uid).set({
+      'personaType': personaType,
+      'activePersona': personaType,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   Future<void> recordConsent({
     required String uid,
     required String consentVersion,

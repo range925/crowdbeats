@@ -300,15 +300,15 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
           });
           setChecking(false);
         } else {
-          clearSessionCookie();
-          const returnPath = pathname || '/admin/command-center';
-          router.replace(`/auth?return=${encodeURIComponent(returnPath)}`);
+          // Authenticated non-staff user: do not clear session or redirect to /auth in a loop.
+          // Set session to null to present explicit role-denial view.
+          setSession(null);
+          setChecking(false);
         }
       } catch (err) {
         console.error('Failed to verify staff claims on token:', err);
-        clearSessionCookie();
-        const returnPath = pathname || '/admin/command-center';
-        router.replace(`/auth?return=${encodeURIComponent(returnPath)}`);
+        setSession(null);
+        setChecking(false);
       }
     });
 
@@ -398,6 +398,63 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
           <LivePulseDot size={8} color="var(--accent-primary, #7C3AED)" />
           <span>Verifying credentials & authorization…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--surface-base)', padding: 24 }}>
+        <div style={{ maxWidth: 440, width: '100%', textAlign: 'center', background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle)', borderRadius: 24, padding: '36px 28px', boxShadow: '0 16px 40px rgba(0, 0, 0, 0.08)' }}>
+          <div style={{ fontSize: 44, marginBottom: 16 }}>🔒</div>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px', color: 'var(--text-primary)' }}>Admin Authorization Required</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 24px', lineHeight: 1.5 }}>
+            Your account is authenticated, but does not have platform administrative privileges to access the Crowdbeats Control Plane.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link
+              href="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 20px',
+                borderRadius: 9999,
+                border: '1px solid var(--border-subtle)',
+                background: 'transparent',
+                textDecoration: 'none',
+                color: 'var(--text-primary)',
+                fontWeight: 600,
+                fontSize: 13,
+              }}
+            >
+              Return Home
+            </Link>
+            <button
+              type="button"
+              onClick={async () => {
+                clearSessionCookie();
+                await signOut(getAuth(firebaseApp));
+                router.replace('/auth?return=%2Fadmin%2Fcommand-center');
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 20px',
+                borderRadius: 9999,
+                border: 'none',
+                background: '#EF4444',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: 13,
+              }}
+            >
+              Switch Account
+            </button>
+          </div>
         </div>
       </div>
     );

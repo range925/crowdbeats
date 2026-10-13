@@ -57,6 +57,22 @@ export function getSafeReturnUrl(
     if (candidate === '/auth' || candidate.startsWith('/auth/')) {
       return getPersonaDashboard(personaType);
     }
+
+    // Role-denial return URL protection: prevent redirect loops into unauthorized dashboards
+    if (candidate.startsWith('/admin') && personaType !== 'staff') {
+      return getPersonaDashboard(personaType);
+    }
+    if ((candidate.startsWith('/creator') || candidate.startsWith('/band')) &&
+        !['artist', 'band_member', 'staff'].includes(personaType)) {
+      return getPersonaDashboard(personaType);
+    }
+    if (candidate.startsWith('/sponsor') && !['sponsor_rep', 'staff'].includes(personaType)) {
+      return getPersonaDashboard(personaType);
+    }
+    if (candidate.startsWith('/venue') && !['venue_manager', 'staff'].includes(personaType)) {
+      return getPersonaDashboard(personaType);
+    }
+
     const tipCents = searchParams?.get('tipCents');
     if (tipCents && !candidate.includes('tipCents=') && !candidate.includes('action=tip')) {
       const separator = candidate.includes('?') ? '&' : '?';

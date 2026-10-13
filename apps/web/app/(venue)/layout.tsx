@@ -6,9 +6,14 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 
+import { usePathname } from 'next/navigation';
+import { getSessionCookie } from '@/lib/session';
+
 interface VenueLayoutProps {
   children: React.ReactNode;
 }
+
+const ALLOWED_PERSONAS = new Set(['venue_manager', 'admin', 'staff']);
 
 const NAV_ITEMS = [
   { href: '/venue/dashboard', label: 'Dashboard', icon: '📊' },
@@ -27,10 +32,65 @@ const NAV_ITEMS = [
 ];
 
 export default function VenueStudioLayout({ children }: VenueLayoutProps) {
+  const pathname = usePathname();
   const { theme } = useTheme();
-  const { displayName: authName, email: authEmail, logout } = useAuth();
+  const { status, displayName: authName, email: authEmail, personaType, logout } = useAuth();
   const displayName = authName || 'Venue Manager';
   const email = authEmail || '';
+  const [accessDecision, setAccessDecision] = React.useState<boolean | null>(null);
+  const isDev = process.env.NODE_ENV === 'development';
+
+  React.useEffect(() => {
+    if (isDev) { setAccessDecision(true); return; }
+    if (typeof window !== 'undefined' && window.location.search.includes('preview=1')) {
+      setAccessDecision(true);
+      return;
+    }
+    if (status === 'loading') return;
+
+    const cookie = getSessionCookie();
+    const cookiePersona = (cookie?.personaType as string | null) ?? null;
+    const effectivePersona = personaType ?? cookiePersona;
+
+    if (effectivePersona && ALLOWED_PERSONAS.has(effectivePersona)) {
+      setAccessDecision(true);
+      return;
+    }
+
+    if (status === 'unauthenticated') {
+      if (cookie?.uid) return;
+      window.location.replace('/auth?return=' + encodeURIComponent(pathname || '/venue/dashboard'));
+      return;
+    }
+
+    const allowed = Boolean(effectivePersona && ALLOWED_PERSONAS.has(effectivePersona));
+    setAccessDecision(allowed);
+  }, [status, personaType, pathname, isDev]);
+
+  if (!isDev && accessDecision === null) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--surface-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid var(--border-subtle, rgba(0,0,0,0.1))', borderTopColor: 'var(--accent-primary, #7C3AED)', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (!isDev && accessDecision === false) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--surface-base)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <div style={{ maxWidth: 420, width: '100%', textAlign: 'center', background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 24, padding: 36, boxShadow: '0 16px 40px rgba(0,0,0,0.06)' }}>
+          <div style={{ fontSize: 44, marginBottom: 16 }}>🚫</div>
+          <h1 style={{ color: 'var(--status-error, #EF4444)', fontSize: 20, fontWeight: 700, margin: '0 0 10px' }}>Venue Studio Access Denied</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.5, margin: '0 0 24px' }}>This area is reserved for live music venue managers, booking agents, and stage operators.</p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <Link href="/fan" style={{ padding: '9px 18px', borderRadius: 9999, border: '1px solid var(--border-subtle)', background: 'transparent', textDecoration: 'none', color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>Fan Portal</Link>
+            <Link href="/onboarding/venue" style={{ padding: '9px 18px', borderRadius: 9999, border: 'none', background: 'var(--accent-primary, #7C3AED)', color: '#FFFFFF', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Register Venue</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--surface-base)' }}>

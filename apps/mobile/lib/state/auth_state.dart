@@ -200,6 +200,21 @@ class CbAuthNotifier extends AsyncNotifier<CbAuthState> {
     }
   }
 
+  /// Switch the active persona in memory and persist to Firestore profile.
+  Future<void> switchPersona(String newPersona) async {
+    final current = state.valueOrNull;
+    if (current == null || current.user == null) return;
+    state = AsyncData(current.copyWith(personaType: newPersona));
+    try {
+      await FirestoreService.instance.updateActivePersona(
+        uid: current.user!.uid,
+        personaType: newPersona,
+      );
+    } catch (_) {
+      // Non-fatal: offline fallback preserves in-memory persona switch
+    }
+  }
+
   // ── Auth operations ────────────────────────────────────────────────────────
 
   Future<void> signIn(String email, String password) async {

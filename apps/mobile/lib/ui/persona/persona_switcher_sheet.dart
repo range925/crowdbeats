@@ -103,6 +103,7 @@ class PersonaSwitcherSheet extends ConsumerWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     if (!isActive) {
+                      ref.read(authNotifierProvider.notifier).switchPersona(key);
                       context.go(info.route);
                     }
                   },

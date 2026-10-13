@@ -24,7 +24,7 @@ import React, {
   useState,
 } from 'react';
 import { onAuthStateChanged, type User, type UserCredential } from 'firebase/auth';
-import { getFirebaseAuth, signIn, register, signOut, requestPasswordReset, mapAuthError, probeTokenHealth, requestAccountDeletion } from '../firebase/auth';
+import { getFirebaseAuth, signIn, register, signOut, requestPasswordReset, mapAuthError, probeTokenHealth, requestAccountDeletion, signInWithGoogle } from '../firebase/auth';
 import { getUserRecord } from '../firebase/firestore';
 import { setSessionCookie, clearSessionCookie, getSessionCookie } from '../session';
 import type { PersonaType } from '@crowdbeats/contracts';
@@ -56,6 +56,7 @@ export interface AuthState {
 
 interface AuthActions {
   login(email: string, password: string): Promise<UserCredential>;
+  loginWithGoogle(): Promise<UserCredential>;
   registerUser(email: string, password: string): Promise<UserCredential>;
   logout(): Promise<void>;
   resetPassword(email: string): Promise<void>;
@@ -336,6 +337,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const loginWithGoogle = useCallback(async (): Promise<UserCredential> => {
+    setState(s => ({ ...s, error: null, status: 'loading' }));
+    try {
+      const cred = await signInWithGoogle();
+      let pType: PersonaType | null = null;
+      let platformRole: string | null = null;
+      let resolvedDisplayName = cred.user.displayName;
+      try {
+        const record = await getUserRecord(cred.user.uid);
+        pType = (record?.personaType as PersonaType | null) ?? null;
+        platformRole = (record?.platformRole as string | null) ?? null;
+        resolvedDisplayName = cred.user.displayName ?? (record?.displayName as string | null) ?? null;
+      } catch {}
+      setSessionCookie({
+        uid: cred.user.uid,
+        personaType: pType,
+        emailVerified: cred.user.emailVerified,
+        onboarded: !!pType,
+        platformRole,
+        displayName: resolvedDisplayName,
+        email: cred.user.email,
+      });
+      return cred;
+    } catch (err) {
+      setState(s => ({ ...s, error: mapAuthError(err), status: 'unauthenticated' }));
+      throw err;
+    }
+  }, []);
+
   const registerUser = useCallback(async (email: string, password: string): Promise<UserCredential> => {
     setState(s => ({ ...s, error: null, status: 'loading' }));
     try {
@@ -388,8 +418,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, login, registerUser, logout, resetPassword, clearError, refreshAuth, deleteAccount }),
-    [state, login, registerUser, logout, resetPassword, clearError, refreshAuth, deleteAccount],
+    () => ({ ...state, login, loginWithGoogle, registerUser, logout, resetPassword, clearError, refreshAuth, deleteAccount }),
+    [state, login, loginWithGoogle, registerUser, logout, resetPassword, clearError, refreshAuth, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
