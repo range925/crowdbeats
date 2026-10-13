@@ -1208,6 +1208,48 @@ service cloud.firestore {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
+    // SUPPORT REQUESTS — /supportRequests/{ticketId}
+    // Users create and read own tickets; staff triage and resolve.
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /supportRequests/{ticketId} {
+      allow read: if isUserSupportStaff() || isSuperAdmin() || (isSignedIn() && resource.data.get('userId', '') == uid());
+      allow create: if isSignedIn() && request.resource.data.get('userId', '') == uid() && request.resource.data.get('status', 'open') == 'open' && !request.resource.data.keys().hasAny(['assignedTo', 'resolutionNotes', 'internalNotes']);
+      allow update: if isUserSupportStaff() || isSuperAdmin();
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // LEGAL DOCUMENTS — /legalDocuments/{docId}
+    // Public disclosures; server-only writes via legalDocumentCallables.
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /legalDocuments/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // LEGAL DOCUMENT DRAFTS — /legalDocumentDrafts/{draftId}
+    // Compliance & legal review; server-only writes via legalDocumentCallables.
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /legalDocumentDrafts/{draftId} {
+      allow read: if isSuperAdmin() || hasPlatformRole('COMPLIANCE_ADMIN') || hasPlatformRole('EXECUTIVE') || hasPlatformRole('LEGAL_COUNSEL');
+      allow write: if false;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // ANNOUNCEMENTS — /announcements/{announcementId}
+    // Publicly readable platform announcements; marketing & admin writable.
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if hasPlatformRole('MARKETING_STAFF') || hasPlatformRole('ADMIN') || isSuperAdmin();
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
     // DEFAULT DENY — ALL OTHER PATHS
     // ══════════════════════════════════════════════════════════════════════════
 
