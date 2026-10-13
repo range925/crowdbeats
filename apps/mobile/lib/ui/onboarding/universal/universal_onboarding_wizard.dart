@@ -1,17 +1,25 @@
-// Crowdbeats V2 — Universal Adaptive Onboarding Wizard
+// Crowdbeats V2 — Universal Adaptive Onboarding Wizard (Phase 5)
 //
-// Authoritative Design Reference: Google Stitch 5326179813018056505
 // Single Firebase Identity with Multi-Persona Support (Fan, Solo Musician, Band, Sponsor)
 // Non-negotiable No-Fake-Autofill contract: zero pre-selected cards, genres, or consents.
+// Truthful creator setup progress: distinguishes act creation from verified/payout-ready status.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import '../../theme/cb_colors.dart';
-import '../../components/cb_logo.dart';
-import '../../../state/auth_state.dart';
+
 import '../../../firebase/auth_service.dart';
+import '../../../state/auth_state.dart';
+import '../../components/cb_button.dart';
+import '../../components/cb_form_field.dart';
+import '../../components/cb_logo.dart';
+import '../../components/cb_scaffold.dart';
+import '../../theme/cb_colors.dart';
+import '../../theme/cb_spacing.dart';
+import '../../theme/cb_theme.dart';
+import '../../theme/cb_typography.dart';
 
 class UniversalOnboardingWizard extends ConsumerStatefulWidget {
   const UniversalOnboardingWizard({super.key});
@@ -26,68 +34,69 @@ class _UniversalOnboardingWizardState
   int _currentStep = 0;
   String? _selectedPersona;
 
-  // Step 1: Sign-in / Identity
+  // Identity (prefilled from authenticated user)
   String _email = '';
   String _displayName = '';
   String _handle = '';
   String? _photoUrl;
 
-  // Step 2: Legal & Consents
+  // Legal & Consents (all default to false per compliance)
   bool _termsAccepted = false;
   bool _privacyAccepted = false;
   bool _isAdultConfirmed = false;
   bool _marketingConsent = false;
 
-  // Persona details: Fan
+  // Fan specifics
   final Set<String> _fanGenres = {};
   String _fanCity = '';
 
-  // Persona details: Solo Musician
+  // Solo Musician specifics
   String _musicianStageName = '';
   String _musicianPrimaryGenre = '';
-  final Set<String> _musicianSecondaryGenres = {};
   String _musicianCity = '';
-  String _musicianBio = '';
-  String _musicianGoal = '';
 
-  // Persona details: Band
+  // Band specifics
   String _bandName = '';
   String _bandPrimaryGenre = '';
   String _bandCity = '';
   String _bandRole = '';
 
-  // Persona details: Sponsor
+  // Sponsor specifics
   String _sponsorOrgName = '';
   String _sponsorType = '';
   String _sponsorJobTitle = '';
-  String _sponsorObjective = '';
 
   bool _isSaving = false;
   String? _errorMessage;
 
-  final List<String> _availableGenres = [
+  static const List<String> _availableGenres = [
     'Rock', 'Pop', 'Indie', 'Hip-Hop', 'Electronic', 'Jazz',
     'Folk / Acoustic', 'R&B / Soul', 'Country', 'Reggae', 'Metal', 'Classical'
   ];
 
-  int _calculateTotalSteps() {
-    if (_selectedPersona == null) return 5;
-    switch (_selectedPersona) {
-      case 'fan':
-        return 7;
-      case 'artist':
-      case 'band':
-      case 'sponsor':
-        return 8;
-      default:
-        return 6;
-    }
+  static const int _totalSteps = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = ref.read(authStateProvider).user ?? AuthService.instance.currentUser;
+      if (user != null && mounted) {
+        setState(() {
+          if (_email.isEmpty) _email = user.email ?? '';
+          if (_displayName.isEmpty) _displayName = user.displayName ?? '';
+          _photoUrl ??= user.photoURL;
+        });
+      }
+    });
   }
 
   void _nextStep() {
     setState(() {
       _errorMessage = null;
-      _currentStep++;
+      if (_currentStep < _totalSteps - 1) {
+        _currentStep++;
+      }
     });
   }
 
@@ -98,6 +107,20 @@ class _UniversalOnboardingWizardState
         _currentStep--;
       });
     }
+  }
+
+  String? _getReturnDestination() {
+    try {
+      final from = GoRouterState.of(context).uri.queryParameters['from'];
+      if (from != null &&
+          from.isNotEmpty &&
+          from.startsWith('/') &&
+          !from.startsWith('/auth') &&
+          !from.startsWith('/onboarding')) {
+        return from;
+      }
+    } catch (_) {}
+    return null;
   }
 
   Future<void> _completeOnboarding() async {
@@ -127,20 +150,16 @@ class _UniversalOnboardingWizardState
       } else if (_selectedPersona == 'artist') {
         profileData['stageName'] = _musicianStageName.isNotEmpty ? _musicianStageName : _displayName;
         profileData['primaryGenre'] = _musicianPrimaryGenre;
-        profileData['secondaryGenres'] = _musicianSecondaryGenres.toList();
         profileData['serviceCity'] = _musicianCity;
-        profileData['bio'] = _musicianBio;
-        profileData['firstGoal'] = _musicianGoal;
       } else if (_selectedPersona == 'band') {
         profileData['bandName'] = _bandName.isNotEmpty ? _bandName : _displayName;
         profileData['primaryGenre'] = _bandPrimaryGenre;
         profileData['baseCity'] = _bandCity;
-        profileData['userRoleInBand'] = _bandRole;
+        profileData['userRoleInBand'] = _bandRole.isNotEmpty ? _bandRole : 'FOUNDER';
       } else if (_selectedPersona == 'sponsor') {
         profileData['organizationName'] = _sponsorOrgName.isNotEmpty ? _sponsorOrgName : _displayName;
-        profileData['sponsorType'] = _sponsorType;
+        profileData['sponsorType'] = _sponsorType.isNotEmpty ? _sponsorType : 'LOCAL_BUSINESS';
         profileData['userJobTitle'] = _sponsorJobTitle;
-        profileData['firstObjective'] = _sponsorObjective;
       }
 
       await callable.call<Map<String, dynamic>>({
@@ -159,14 +178,11 @@ class _UniversalOnboardingWizardState
       await ref.read(authNotifierProvider.notifier).refreshProfile();
 
       if (mounted) {
-        String? from;
-        try {
-          from = GoRouterState.of(context).uri.queryParameters['from'];
-        } catch (_) {}
-        if (from != null && from.isNotEmpty && from.startsWith('/') && !from.startsWith('/auth') && !from.startsWith('/onboarding')) {
-          context.go(from);
+        final returnTarget = _getReturnDestination();
+        if (returnTarget != null) {
+          context.go(returnTarget);
         } else {
-          context.go('/' + _selectedPersona!);
+          context.go('/$_selectedPersona');
         }
       }
     } catch (e) {
@@ -183,381 +199,252 @@ class _UniversalOnboardingWizardState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CbColors.bgApp,
+    final ext = Theme.of(context).extension<CbThemeExtension>() ?? CbThemeExtension.defaults;
+
+    return CbSafeScaffold(
       appBar: AppBar(
-        backgroundColor: CbColors.surface1,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: _currentStep > 0
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: _prevStep,
                 tooltip: 'Back',
               )
             : null,
         title: Text(
-          'Step ' + (_currentStep + 1).toString() + ' of ' + _calculateTotalSteps().toString(),
-          style: const TextStyle(fontSize: 14, color: CbColors.textSecondary, fontWeight: FontWeight.w600),
+          'Step ${_currentStep + 1} of $_totalSteps',
+          style: GoogleFonts.dmSans(
+            fontSize: 14,
+            color: ext.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
-          if (_currentStep > 0)
-            TextButton(
-              onPressed: () => context.go('/'),
-              child: const Text('Save & Exit', style: TextStyle(color: CbColors.purpleLight)),
+          TextButton(
+            onPressed: () {
+              final returnTarget = _getReturnDestination();
+              context.go(returnTarget ?? '/fan');
+            },
+            child: Text(
+              'Exit',
+              style: GoogleFonts.dmSans(
+                color: ext.borderFocus,
+                fontWeight: FontWeight.w600,
+              ),
             ),
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
           child: LinearProgressIndicator(
-            value: (_currentStep + 1) / _calculateTotalSteps(),
-            backgroundColor: CbColors.surface2,
-            valueColor: const AlwaysStoppedAnimation<Color>(CbColors.purpleMain),
+            value: (_currentStep + 1) / _totalSteps,
+            backgroundColor: ext.surfaceCard,
+            valueColor: AlwaysStoppedAnimation<Color>(ext.borderFocus),
             minHeight: 3,
           ),
         ),
       ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 680),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              child: _buildCurrentStepContent(),
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: CbSpacing.s6, vertical: CbSpacing.s5),
+            child: _buildCurrentStepContent(ext),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCurrentStepContent() {
+  Widget _buildCurrentStepContent(CbThemeExtension ext) {
     switch (_currentStep) {
       case 0:
-        return _buildStep0Welcome();
+        return _buildStep0Legal(ext);
       case 1:
-        return _buildStep1AuthMethod();
+        return _buildStep1Persona(ext);
       case 2:
-        return _buildStep2LegalAndEligibility();
+        return _buildStep2ProfileDetails(ext);
       case 3:
-        return _buildStep3PersonaSelector();
-      case 4:
-        return _buildStep4BasicIdentity();
-      case 5:
-        return _buildPersonaStep1();
-      case 6:
-        return _buildPersonaStep2();
-      case 7:
-        return _buildStepReview();
       default:
-        return _buildStepReview();
+        return _buildStep3Review(ext);
     }
   }
 
-  Widget _buildStep0Welcome() {
+  // ── Step 0: Legal & Eligibility ──────────────────────────────────────────────
+
+  Widget _buildStep0Legal(CbThemeExtension ext) {
+    final canProceed = _isAdultConfirmed && _termsAccepted && _privacyAccepted;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 16),
+        const SizedBox(height: CbSpacing.s2),
         const Center(
           child: CbLogo(
             variant: CbLogoVariant.horizontal,
-            surface: CbLogoSurface.dark,
-            height: 44,
+            surface: CbLogoSurface.auto,
+            height: 38,
           ),
         ),
-        const SizedBox(height: 28),
-        Text(
-          'Live Music Powered by Community',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-                letterSpacing: -0.5,
-              ),
-        ),
-        const SizedBox(height: 12),
-        const Text(
-          'Discover nearby stage sessions, support independent performers directly with 1-tap tips, and build vibrant live music communities.',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 15, height: 1.5),
-        ),
-        const SizedBox(height: 48),
-
-        FilledButton(
-          onPressed: _nextStep,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          child: const Text('Create Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        ),
-        const SizedBox(height: 14),
-        OutlinedButton(
-          onPressed: () => context.go('/auth'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white,
-            side: const BorderSide(color: CbColors.borderSubtle),
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          child: const Text('Sign in for existing users', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-        ),
-        const SizedBox(height: 14),
-        TextButton(
-          onPressed: () => context.go('/fan'),
-          child: const Text('Explore Crowdbeats as Guest', style: TextStyle(color: CbColors.textSecondary, fontSize: 14)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStep1AuthMethod() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Choose your sign-in method',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'One secure Crowdbeats account unlocks all performer, band, fan, and sponsor capabilities.',
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
-        ),
-        const SizedBox(height: 32),
-
-        _buildProviderButton(
-          label: 'Continue with Google',
-          icon: Icons.g_mobiledata_rounded,
-          onTap: () {
-            setState(() {
-              _email = 'user@gmail.com';
-              _displayName = 'Google Account';
-            });
-            _nextStep();
-          },
-        ),
-        const SizedBox(height: 14),
-
-        _buildProviderButton(
-          label: 'Continue with Apple',
-          icon: Icons.apple_rounded,
-          onTap: () {
-            setState(() {
-              _email = 'user@privaterelay.appleid.com';
-              _displayName = 'Apple User';
-            });
-            _nextStep();
-          },
-        ),
-        const SizedBox(height: 24),
-
-        const Row(
-          children: [
-            Expanded(child: Divider(color: CbColors.borderSubtle)),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('or continue with email', style: TextStyle(color: CbColors.textSecondary, fontSize: 12)),
-            ),
-            Expanded(child: Divider(color: CbColors.borderSubtle)),
-          ],
-        ),
-        const SizedBox(height: 20),
-
-        TextField(
-          onChanged: (val) => _email = val,
-          keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Email address',
-            labelStyle: const TextStyle(color: CbColors.textSecondary),
-            filled: true,
-            fillColor: CbColors.surface2,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: CbColors.borderSubtle),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        FilledButton(
-          onPressed: _nextStep,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProviderButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        decoration: BoxDecoration(
-          color: CbColors.surface1,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: CbColors.borderSubtle),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(width: 12),
-            Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStep2LegalAndEligibility() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
+        const SizedBox(height: CbSpacing.s5),
         Text(
           'Eligibility & Agreements',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'Review terms and confirm account eligibility. All consents start unchecked in accordance with our compliance policies.',
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Please confirm your eligibility and review our platform agreements before getting started.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: CbSpacing.s6),
 
         _buildConsentCard(
+          ext: ext,
           title: 'Age & Eligibility Confirmation',
-          description: 'I confirm that I am at least 18 years of age (or the age of legal majority in my jurisdiction) and legally authorized to create a Crowdbeats account.',
+          description: 'I confirm that I am at least 18 years of age (or legal majority) and authorized to create a Crowdbeats account.',
           isChecked: _isAdultConfirmed,
           onChanged: (val) => setState(() => _isAdultConfirmed = val ?? false),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: CbSpacing.s3),
 
         _buildConsentCard(
+          ext: ext,
           title: 'Terms of Service (v2026-08-25)',
-          description: 'I have read, understood, and agree to the Crowdbeats Terms of Service, including finality of tips after 24h, acceptable content policies, and dispute terms.',
+          description: 'I agree to the Crowdbeats Terms of Service, including finality of tips after 24h, code of conduct, and platform rules.',
           isChecked: _termsAccepted,
           onChanged: (val) => setState(() => _termsAccepted = val ?? false),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: CbSpacing.s3),
 
         _buildConsentCard(
+          ext: ext,
           title: 'Privacy Policy (v2026-08-25)',
-          description: 'I acknowledge the Crowdbeats Privacy Policy describing how location, payments, and account data are processed and protected.',
+          description: 'I acknowledge the Crowdbeats Privacy Policy describing how location, payments, and account data are processed.',
           isChecked: _privacyAccepted,
           onChanged: (val) => setState(() => _privacyAccepted = val ?? false),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: CbSpacing.s3),
 
         _buildConsentCard(
+          ext: ext,
           title: 'Live Event Updates (Optional)',
-          description: 'Receive occasional curated emails regarding local festival lineups, stage sessions, and performer campaigns.',
+          description: 'Receive occasional emails regarding nearby stage sessions, festival lineups, and performer spotlights.',
           isChecked: _marketingConsent,
           isOptional: true,
           onChanged: (val) => setState(() => _marketingConsent = val ?? false),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: CbSpacing.s6),
 
-        if (_errorMessage != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Text(_errorMessage!, style: const TextStyle(color: CbColors.errorRed, fontSize: 13)),
+        if (_errorMessage != null) ...[
+          Text(
+            _errorMessage!,
+            style: GoogleFonts.dmSans(color: ext.statusError, fontSize: 13),
+            textAlign: TextAlign.center,
           ),
+          const SizedBox(height: CbSpacing.s3),
+        ],
 
-        FilledButton(
-          onPressed: (_isAdultConfirmed && _termsAccepted && _privacyAccepted) ? _nextStep : null,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            disabledBackgroundColor: CbColors.surface2,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Agree & Continue', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        CbButton(
+          label: 'Agree & Continue',
+          fullWidth: true,
+          onPressed: canProceed ? _nextStep : null,
         ),
       ],
     );
   }
 
   Widget _buildConsentCard({
+    required CbThemeExtension ext,
     required String title,
     required String description,
     required bool isChecked,
     required ValueChanged<bool?> onChanged,
     bool isOptional = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CbColors.surface1,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isChecked ? CbColors.purpleLight.withAlpha(80) : CbColors.borderSubtle),
-      ),
+    return InkWell(
+      onTap: () => onChanged(!isChecked),
+      borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+      child: Container(
+        padding: const EdgeInsets.all(CbSpacing.s4),
+        decoration: BoxDecoration(
+          color: ext.surfaceCard,
+          borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+          border: Border.all(
+            color: isChecked ? ext.borderFocus.withAlpha(120) : ext.borderSubtle,
+          ),
+        ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Checkbox(
             value: isChecked,
-            activeColor: CbColors.purpleMain,
+            activeColor: ext.borderFocus,
             checkColor: Colors.white,
             onChanged: onChanged,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: CbSpacing.s2),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.dmSans(
+                          color: ext.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                     if (isOptional)
-                      const Text(' • Optional', style: TextStyle(color: CbColors.textSecondary, fontSize: 12)),
+                      Text(
+                        'Optional',
+                        style: GoogleFonts.dmSans(
+                          color: ext.textTertiary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(description, style: const TextStyle(color: CbColors.textSecondary, fontSize: 12, height: 1.4)),
+                Text(
+                  description,
+                  style: GoogleFonts.dmSans(
+                    color: ext.textSecondary,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildStep3PersonaSelector() {
+  // ── Step 1: Persona Selection ────────────────────────────────────────────────
+
+  Widget _buildStep1Persona(CbThemeExtension ext) {
     final personas = [
       {
         'id': 'fan',
         'title': 'Fan / Music Enthusiast',
-        'desc': 'Discover live stage sessions, support artists with tips, and follow favorite performers.',
+        'desc': 'Discover live stage sessions, support artists with tips, and follow favorite acts.',
         'icon': Icons.headphones_rounded,
       },
       {
         'id': 'artist',
         'title': 'Solo Musician / Performer',
-        'desc': 'Host live stages, receive tips directly, and build a verified performer presence.',
+        'desc': 'Host live stages, receive direct fan patronage, and manage your performer presence.',
         'icon': Icons.mic_external_on_rounded,
       },
       {
@@ -578,65 +465,78 @@ class _UniversalOnboardingWizardState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'How will you use Crowdbeats?',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
+          'Choose Your Focus',
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'Choose your initial primary focus. You can freely add and switch personas later without creating another account.',
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Select how you primarily intend to use Crowdbeats. You can participate across roles with one unified account.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: CbSpacing.s6),
 
         ...personas.map((p) {
           final isSelected = _selectedPersona == p['id'];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: CbSpacing.s3),
             child: InkWell(
               onTap: () => setState(() => _selectedPersona = p['id'] as String),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
               child: Container(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(CbSpacing.s4),
                 decoration: BoxDecoration(
-                  color: isSelected ? CbColors.purpleMain.withAlpha(25) : CbColors.surface1,
-                  borderRadius: BorderRadius.circular(14),
+                  color: isSelected ? ext.borderFocus.withAlpha(20) : ext.surfaceCard,
+                  borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
                   border: Border.all(
-                    color: isSelected ? CbColors.purpleLight : CbColors.borderSubtle,
-                    width: isSelected ? 2 : 1,
+                    color: isSelected ? ext.borderFocus : ext.borderSubtle,
+                    width: isSelected ? 1.5 : 1.0,
                   ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: isSelected ? CbColors.purpleMain : CbColors.surface2,
-                        borderRadius: BorderRadius.circular(12),
+                        color: isSelected ? ext.borderFocus : ext.surfaceRaised,
+                        borderRadius: BorderRadius.circular(CbSpacing.radiusSm),
                       ),
-                      child: Icon(p['icon'] as IconData, color: Colors.white, size: 26),
+                      child: Icon(
+                        p['icon'] as IconData,
+                        color: isSelected ? Colors.white : ext.textSecondary,
+                        size: 24,
+                      ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: CbSpacing.s4),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Text(p['title'] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                            ],
+                          Text(
+                            p['title'] as String,
+                            style: GoogleFonts.dmSans(
+                              color: ext.textPrimary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(p['desc'] as String, style: const TextStyle(color: CbColors.textSecondary, fontSize: 12, height: 1.3)),
+                          const SizedBox(height: 3),
+                          Text(
+                            p['desc'] as String,
+                            style: GoogleFonts.dmSans(
+                              color: ext.textSecondary,
+                              fontSize: 12,
+                              height: 1.3,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     Icon(
                       isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-                      color: isSelected ? CbColors.purpleLight : CbColors.textSecondary,
+                      color: isSelected ? ext.borderFocus : ext.textTertiary,
                     ),
                   ],
                 ),
@@ -644,395 +544,337 @@ class _UniversalOnboardingWizardState
             ),
           );
         }),
-        const SizedBox(height: 20),
+        const SizedBox(height: CbSpacing.s5),
 
-        FilledButton(
+        CbButton(
+          label: 'Continue',
+          fullWidth: true,
           onPressed: _selectedPersona != null ? _nextStep : null,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            disabledBackgroundColor: CbColors.surface2,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Continue with Selected Persona', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
       ],
     );
   }
 
-  Widget _buildStep4BasicIdentity() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Set up your public identity',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Your display name and optional handle will be visible to creators, bands, and audiences on Crowdbeats.',
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
-        ),
-        const SizedBox(height: 28),
+  // ── Step 2: Profile & Act Details ────────────────────────────────────────────
 
-        Center(
-          child: Stack(
-            children: [
-              const CircleAvatar(
-                radius: 44,
-                backgroundColor: CbColors.surface2,
-                child: Icon(Icons.person_rounded, size: 48, color: CbColors.textSecondary),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: CbColors.purpleMain,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.camera_alt_rounded, size: 16, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        TextFormField(
-          initialValue: _displayName,
-          onChanged: (val) => _displayName = val,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Display Name',
-            labelStyle: const TextStyle(color: CbColors.textSecondary),
-            hintText: 'e.g. Alex Morgan',
-            filled: true,
-            fillColor: CbColors.surface2,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: CbColors.borderSubtle),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        TextFormField(
-          initialValue: _handle,
-          onChanged: (val) => _handle = val,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Unique Handle (Optional)',
-            prefixText: '@',
-            labelStyle: const TextStyle(color: CbColors.textSecondary),
-            hintText: 'alexmorgan',
-            filled: true,
-            fillColor: CbColors.surface2,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: CbColors.borderSubtle),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
-            ),
-          ),
-        ),
-        const SizedBox(height: 28),
-
-        FilledButton(
-          onPressed: _nextStep,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Next Step', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPersonaStep1() {
+  Widget _buildStep2ProfileDetails(CbThemeExtension ext) {
     if (_selectedPersona == 'fan') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Favorite Genres',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: CbColors.textPrimary,
-                ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Select music genres you enjoy to personalize nearby stage discovery. You can skip this step anytime.',
-            style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
-          ),
-          const SizedBox(height: 24),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 10,
-            children: _availableGenres.map((genre) {
-              final isSelected = _fanGenres.contains(genre);
-              return FilterChip(
-                label: Text(genre),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      _fanGenres.add(genre);
-                    } else {
-                      _fanGenres.remove(genre);
-                    }
-                  });
-                },
-                selectedColor: CbColors.purpleMain,
-                backgroundColor: CbColors.surface2,
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : CbColors.textSecondary,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: BorderSide(color: isSelected ? CbColors.purpleLight : CbColors.borderSubtle),
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 32),
-
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _nextStep,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: CbColors.textSecondary,
-                    side: const BorderSide(color: CbColors.borderSubtle),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('Skip for now'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _nextStep,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: CbColors.purpleMain,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
+      return _buildFanDetails(ext);
+    } else if (_selectedPersona == 'artist') {
+      return _buildArtistDetails(ext);
+    } else if (_selectedPersona == 'band') {
+      return _buildBandDetails(ext);
+    } else {
+      return _buildSponsorDetails(ext);
     }
-
-    if (_selectedPersona == 'artist') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Performer Identity',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: CbColors.textPrimary,
-                ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Set your public stage name and primary genre. Financial and payout details are deferred until you set up earnings.',
-            style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
-          ),
-          const SizedBox(height: 24),
-
-          TextFormField(
-            initialValue: _musicianStageName,
-            onChanged: (val) => _musicianStageName = val,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: 'Stage / Artist Name',
-              hintText: 'e.g. Luna & The Waves',
-              filled: true,
-              fillColor: CbColors.surface2,
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: CbColors.borderSubtle)),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          DropdownButtonFormField<String>(
-            value: _musicianPrimaryGenre.isNotEmpty ? _musicianPrimaryGenre : null,
-            hint: const Text('Select Primary Genre', style: TextStyle(color: CbColors.textSecondary)),
-            dropdownColor: CbColors.surface1,
-            style: const TextStyle(color: Colors.white),
-            items: _availableGenres.map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
-            onChanged: (val) => setState(() => _musicianPrimaryGenre = val ?? ''),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: CbColors.surface2,
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: CbColors.borderSubtle)),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          TextFormField(
-            initialValue: _musicianCity,
-            onChanged: (val) => _musicianCity = val,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: 'Home City / Region',
-              hintText: 'e.g. Austin, TX',
-              filled: true,
-              fillColor: CbColors.surface2,
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: CbColors.borderSubtle)),
-            ),
-          ),
-          const SizedBox(height: 28),
-
-          FilledButton(
-            onPressed: _nextStep,
-            style: FilledButton.styleFrom(
-              backgroundColor: CbColors.purpleMain,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ),
-        ],
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          _selectedPersona == 'band' ? 'Band Profile' : 'Organization Profile',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          _selectedPersona == 'band'
-              ? 'Enter your band name and your relationship to the ensemble.'
-              : 'Enter your organization name and sponsorship objective.',
-          style: const TextStyle(color: CbColors.textSecondary, fontSize: 14),
-        ),
-        const SizedBox(height: 24),
-
-        TextFormField(
-          initialValue: _selectedPersona == 'band' ? _bandName : _sponsorOrgName,
-          onChanged: (val) => _selectedPersona == 'band' ? _bandName = val : _sponsorOrgName = val,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: _selectedPersona == 'band' ? 'Band Name' : 'Company / Sponsor Name',
-            filled: true,
-            fillColor: CbColors.surface2,
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: CbColors.borderSubtle)),
-          ),
-        ),
-        const SizedBox(height: 28),
-
-        FilledButton(
-          onPressed: _nextStep,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ),
-      ],
-    );
   }
 
-  Widget _buildPersonaStep2() {
+  Widget _buildFanDetails(CbThemeExtension ext) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Location & Experience',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
+          'Your Fan Profile',
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'Set your city or region to explore and attend stage sessions happening near you.',
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Your display name appears when tipping or interacting with live acts.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: CbSpacing.s6),
 
-        TextFormField(
+        CbFormField(
+          label: 'Display Name',
+          initialValue: _displayName,
+          hintText: 'e.g. Alex Morgan',
+          leadingIcon: Icon(Icons.person_outline_rounded, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _displayName = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Home City / Metro Area (Optional)',
           initialValue: _fanCity,
+          hintText: 'e.g. Austin, TX',
+          leadingIcon: Icon(Icons.location_on_outlined, color: ext.textTertiary, size: 20),
           onChanged: (val) => _fanCity = val,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Search City or Metro Area',
-            prefixIcon: const Icon(Icons.location_on_rounded, color: CbColors.purpleLight),
-            hintText: 'e.g. San Diego, CA',
-            filled: true,
-            fillColor: CbColors.surface2,
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: CbColors.borderSubtle)),
+        ),
+        const SizedBox(height: CbSpacing.s5),
+
+        Text(
+          'Favorite Music Genres (Optional)',
+          style: GoogleFonts.dmSans(
+            color: ext.textSecondary,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: CbSpacing.s3),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _availableGenres.map((genre) {
+            final isSelected = _fanGenres.contains(genre);
+            return FilterChip(
+              label: Text(genre),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) {
+                    _fanGenres.add(genre);
+                  } else {
+                    _fanGenres.remove(genre);
+                  }
+                });
+              },
+              selectedColor: ext.borderFocus,
+              backgroundColor: ext.surfaceCard,
+              labelStyle: GoogleFonts.dmSans(
+                color: isSelected ? Colors.white : ext.textSecondary,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(CbSpacing.radiusSm),
+                side: BorderSide(color: isSelected ? ext.borderFocus : ext.borderSubtle),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: CbSpacing.s6),
 
-        FilledButton(
+        CbButton(
+          label: 'Continue to Review',
+          fullWidth: true,
           onPressed: _nextStep,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Review & Complete', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
       ],
     );
   }
 
-  Widget _buildStepReview() {
+  Widget _buildArtistDetails(CbThemeExtension ext) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Review Your Account',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: CbColors.textPrimary,
-              ),
+          'Solo Performer Identity',
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'Verify your onboarding details. You can tap Edit on any section to make adjustments.',
-          style: TextStyle(color: CbColors.textSecondary, fontSize: 14),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Set your public stage name and primary genre. Detailed bio and payout verification are deferred to Creator Studio.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: CbSpacing.s6),
+
+        CbFormField(
+          label: 'Stage / Artist Name',
+          initialValue: _musicianStageName.isNotEmpty ? _musicianStageName : _displayName,
+          hintText: 'e.g. Luna Hollis',
+          leadingIcon: Icon(Icons.mic_none_rounded, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _musicianStageName = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Primary Genre',
+          initialValue: _musicianPrimaryGenre,
+          hintText: 'e.g. Indie / Folk',
+          leadingIcon: Icon(Icons.music_note_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _musicianPrimaryGenre = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Home City / Primary Region',
+          initialValue: _musicianCity,
+          hintText: 'e.g. Nashville, TN',
+          leadingIcon: Icon(Icons.location_on_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _musicianCity = val,
+        ),
+        const SizedBox(height: CbSpacing.s5),
 
         Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(CbSpacing.s4),
           decoration: BoxDecoration(
-            color: CbColors.surface1,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: CbColors.borderSubtle),
+            color: ext.surfaceCard,
+            borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+            border: Border.all(color: ext.borderSubtle),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline_rounded, color: ext.borderFocus, size: 20),
+              const SizedBox(width: CbSpacing.s3),
+              Expanded(
+                child: Text(
+                  'Bio, social media links, and Stripe payout setup can be configured in Creator Studio after completing basic onboarding.',
+                  style: GoogleFonts.dmSans(
+                    color: ext.textSecondary,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: CbSpacing.s6),
+
+        CbButton(
+          label: 'Continue to Review',
+          fullWidth: true,
+          onPressed: _nextStep,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBandDetails(CbThemeExtension ext) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Band & Ensemble Setup',
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Name your ensemble and specify your role. Member invitations and revenue splits can be managed from Studio.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
+        ),
+        const SizedBox(height: CbSpacing.s6),
+
+        CbFormField(
+          label: 'Band / Ensemble Name',
+          initialValue: _bandName,
+          hintText: 'e.g. The Midnight Echoes',
+          leadingIcon: Icon(Icons.groups_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _bandName = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Primary Genre',
+          initialValue: _bandPrimaryGenre,
+          hintText: 'e.g. Alternative Rock',
+          leadingIcon: Icon(Icons.music_note_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _bandPrimaryGenre = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Base City',
+          initialValue: _bandCity,
+          hintText: 'e.g. Chicago, IL',
+          leadingIcon: Icon(Icons.location_on_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _bandCity = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Your Role in Band',
+          initialValue: _bandRole,
+          hintText: 'e.g. Founder, Lead Vocalist, Drummer',
+          leadingIcon: Icon(Icons.badge_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _bandRole = val,
+        ),
+        const SizedBox(height: CbSpacing.s6),
+
+        CbButton(
+          label: 'Continue to Review',
+          fullWidth: true,
+          onPressed: _nextStep,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSponsorDetails(CbThemeExtension ext) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Sponsor & Partner Profile',
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Enter your organization details for local stage sponsorship and match funding.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
+        ),
+        const SizedBox(height: CbSpacing.s6),
+
+        CbFormField(
+          label: 'Organization / Business Name',
+          initialValue: _sponsorOrgName,
+          hintText: 'e.g. Austin Craft Brews',
+          leadingIcon: Icon(Icons.business_outlined, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _sponsorOrgName = val,
+        ),
+        const SizedBox(height: CbSpacing.s4),
+
+        CbFormField(
+          label: 'Your Job Title / Function',
+          initialValue: _sponsorJobTitle,
+          hintText: 'e.g. Community Marketing Lead',
+          leadingIcon: Icon(Icons.work_outline_rounded, color: ext.textTertiary, size: 20),
+          onChanged: (val) => _sponsorJobTitle = val,
+        ),
+        const SizedBox(height: CbSpacing.s6),
+
+        CbButton(
+          label: 'Continue to Review',
+          fullWidth: true,
+          onPressed: _nextStep,
+        ),
+      ],
+    );
+  }
+
+  // ── Step 3: Review & Complete ────────────────────────────────────────────────
+
+  Widget _buildStep3Review(CbThemeExtension ext) {
+    final actName = _selectedPersona == 'fan'
+        ? (_displayName.isNotEmpty ? _displayName : 'Crowdbeats Fan')
+        : (_selectedPersona == 'artist'
+            ? (_musicianStageName.isNotEmpty ? _musicianStageName : _displayName)
+            : (_selectedPersona == 'band'
+                ? (_bandName.isNotEmpty ? _bandName : 'New Band')
+                : (_sponsorOrgName.isNotEmpty ? _sponsorOrgName : _displayName)));
+
+    final isCreator = _selectedPersona == 'artist' || _selectedPersona == 'band';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Review & Confirmation',
+          style: CbTypography.sectionTitle(color: ext.textPrimary),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: CbSpacing.s2),
+        Text(
+          'Verify your account details before entering Crowdbeats.',
+          textAlign: TextAlign.center,
+          style: CbTypography.bodyMd(color: ext.textSecondary),
+        ),
+        const SizedBox(height: CbSpacing.s6),
+
+        Container(
+          padding: const EdgeInsets.all(CbSpacing.s5),
+          decoration: BoxDecoration(
+            color: ext.surfaceCard,
+            borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+            border: Border.all(color: ext.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1040,52 +882,125 @@ class _UniversalOnboardingWizardState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Account & Persona', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(
+                    'Account Summary',
+                    style: GoogleFonts.dmSans(
+                      color: ext.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
                   TextButton(
-                    onPressed: () => setState(() => _currentStep = 3),
-                    child: const Text('Edit', style: TextStyle(color: CbColors.purpleLight)),
+                    onPressed: () => setState(() => _currentStep = 1),
+                    child: Text(
+                      'Change',
+                      style: GoogleFonts.dmSans(
+                        color: ext.borderFocus,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const Divider(color: Colors.white12),
-              _buildReviewRow('Display Name', _displayName.isNotEmpty ? _displayName : 'Crowdbeats Member'),
-              _buildReviewRow('Primary Persona', _selectedPersona != null ? _selectedPersona!.toUpperCase() : 'FAN'),
-              if (_handle.isNotEmpty) _buildReviewRow('Handle', '@' + _handle),
-              _buildReviewRow('Legal Terms', 'v2026-08-25 Accepted'),
+              Divider(color: ext.borderSubtle),
+              _buildReviewRow(ext, 'Primary Focus', (_selectedPersona ?? 'fan').toUpperCase()),
+              _buildReviewRow(ext, 'Display / Act Name', actName),
+              if (_email.isNotEmpty)
+                _buildReviewRow(ext, 'Account Email', _email),
+              _buildReviewRow(ext, 'Terms of Service', 'v2026-08-25 Agreed'),
+              _buildReviewRow(ext, 'Privacy Policy', 'v2026-08-25 Acknowledged'),
             ],
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: CbSpacing.s4),
 
-        if (_errorMessage != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Text(_errorMessage!, style: const TextStyle(color: CbColors.errorRed, fontSize: 13), textAlign: TextAlign.center),
+        if (isCreator) ...[
+          Container(
+            padding: const EdgeInsets.all(CbSpacing.s4),
+            decoration: BoxDecoration(
+              color: ext.surfaceRaised,
+              borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+              border: Border.all(color: ext.borderSubtle),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.shield_outlined, color: ext.borderFocus, size: 20),
+                    const SizedBox(width: CbSpacing.s2),
+                    Text(
+                      'Next Steps in Creator Studio',
+                      style: GoogleFonts.dmSans(
+                        color: ext.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: CbSpacing.s2),
+                Text(
+                  '• Basic act profile will be created upon confirmation.\n'
+                  '• Identity verification and Stripe Connect payout setup must be completed in Studio before hosting live stages or withdrawing tips.\n'
+                  '• No payouts are promised or issued until formal bank verification passes.',
+                  style: GoogleFonts.dmSans(
+                    color: ext.textSecondary,
+                    fontSize: 12,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(height: CbSpacing.s4),
+        ],
 
-        FilledButton(
+        if (_errorMessage != null) ...[
+          Container(
+            padding: const EdgeInsets.all(CbSpacing.s3),
+            decoration: BoxDecoration(
+              color: ext.statusError.withAlpha(20),
+              borderRadius: BorderRadius.circular(CbSpacing.radiusSm),
+              border: Border.all(color: ext.statusError.withAlpha(80)),
+            ),
+            child: Text(
+              _errorMessage!,
+              style: GoogleFonts.dmSans(color: ext.statusError, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: CbSpacing.s4),
+        ],
+
+        CbButton(
+          label: 'Complete Setup',
+          fullWidth: true,
+          isLoading: _isSaving,
           onPressed: _isSaving ? null : _completeOnboarding,
-          style: FilledButton.styleFrom(
-            backgroundColor: CbColors.purpleMain,
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          child: _isSaving
-              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('Complete Onboarding & Enter Crowdbeats', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
       ],
     );
   }
 
-  Widget _buildReviewRow(String label, String value) {
+  Widget _buildReviewRow(CbThemeExtension ext, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: CbColors.textSecondary, fontSize: 13)),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+          Text(
+            label,
+            style: GoogleFonts.dmSans(color: ext.textSecondary, fontSize: 13),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.dmSans(
+              color: ext.textPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
         ],
       ),
     );

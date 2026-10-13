@@ -68,7 +68,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       appBar: AppBar(
         title: Text(
           'Reset Password',
-          style: GoogleFonts.plusJakartaSans(
+          style: GoogleFonts.dmSans(
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -120,7 +120,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         const SizedBox(width: CbSpacing.s2),
                         Text(
                           'Instructions Sent',
-                          style: GoogleFonts.plusJakartaSans(
+                          style: GoogleFonts.dmSans(
                             color: ext.statusSuccess,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -131,7 +131,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     const SizedBox(height: CbSpacing.s3),
                     Text(
                       "If an account exists for ${_email.text.trim()}, you will receive a password reset link shortly. Please check your spam folder.",
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: ext.textPrimary,
                         fontSize: 14,
                         height: 1.4,
@@ -140,7 +140,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     const SizedBox(height: CbSpacing.s2),
                     Text(
                       "Reset links expire in 15 minutes for your security.",
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: ext.textTertiary,
                         fontSize: 12,
                       ),
@@ -165,6 +165,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 hintText: 'you@example.com',
                 leadingIcon: Icon(Icons.email_outlined, size: 20, color: ext.textTertiary),
                 keyboardType: TextInputType.emailAddress,
+                autofillHints: const [AutofillHints.email],
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => _submit(),
               ),
               const SizedBox(height: CbSpacing.s6),
               CbButton(

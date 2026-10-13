@@ -91,11 +91,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 dividerColor: Colors.transparent,
                 labelColor: ext.textPrimary,
                 unselectedLabelColor: ext.textTertiary,
-                labelStyle: GoogleFonts.plusJakartaSans(
+                labelStyle: GoogleFonts.dmSans(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
-                unselectedLabelStyle: GoogleFonts.plusJakartaSans(
+                unselectedLabelStyle: GoogleFonts.dmSans(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),
@@ -198,7 +198,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
                   Expanded(
                     child: Text(
                       errorMsg,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: ext.statusError,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -216,6 +216,8 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
             hintText: 'you@example.com',
             leadingIcon: Icon(Icons.email_outlined, size: 20, color: ext.textTertiary),
             keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+            textInputAction: TextInputAction.next,
             onChanged: (_) {
               if (errorMsg != null) {
                 ref.read(authNotifierProvider.notifier).clearError();
@@ -229,6 +231,9 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
             hintText: '••••••••',
             leadingIcon: Icon(Icons.lock_outline, size: 20, color: ext.textTertiary),
             obscureText: _obscure,
+            autofillHints: const [AutofillHints.password],
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => _submit(),
             trailing: IconButton(
               icon: Icon(
                 _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
@@ -248,7 +253,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
               },
               child: Text(
                 'Forgot password?',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   color: ext.borderFocus,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -268,10 +273,23 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
           const SizedBox(height: CbSpacing.s4),
           // Guest Escape Hatch
           CbButton(
-            label: 'Explore as Guest',
+            label: 'Continue as Guest',
             variant: CbButtonVariant.ghost,
             fullWidth: true,
-            onPressed: isBusy ? null : () => context.go('/explore'),
+            onPressed: isBusy
+                ? null
+                : () {
+                    final from = widget.returnPath;
+                    if (from != null &&
+                        from.isNotEmpty &&
+                        from.startsWith('/') &&
+                        !from.startsWith('/auth') &&
+                        !from.startsWith('/account')) {
+                      context.go(from);
+                    } else {
+                      context.go('/fan');
+                    }
+                  },
           ),
         ],
       ),
@@ -380,7 +398,7 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
                   Expanded(
                     child: Text(
                       displayErr,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: ext.statusError,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -398,6 +416,8 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
             hintText: 'you@example.com',
             leadingIcon: Icon(Icons.email_outlined, size: 20, color: ext.textTertiary),
             keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+            textInputAction: TextInputAction.next,
             onChanged: (_) {
               if (_localError != null) setState(() => _localError = null);
               if (authError != null) ref.read(authNotifierProvider.notifier).clearError();
@@ -410,6 +430,8 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
             hintText: 'At least 8 characters',
             leadingIcon: Icon(Icons.lock_outline, size: 20, color: ext.textTertiary),
             obscureText: _obscure,
+            autofillHints: const [AutofillHints.newPassword],
+            textInputAction: TextInputAction.next,
             trailing: IconButton(
               icon: Icon(
                 _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
@@ -429,6 +451,9 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
             hintText: 'Repeat your password',
             leadingIcon: Icon(Icons.lock_outline, size: 20, color: ext.textTertiary),
             obscureText: _obscure,
+            autofillHints: const [AutofillHints.newPassword],
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => _submit(),
             onChanged: (_) {
               if (_localError != null) setState(() => _localError = null);
             },
@@ -440,7 +465,7 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
             children: [
               Text(
                 'By creating an account, you agree to our ',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 12,
                   color: ext.textTertiary,
                 ),
@@ -449,7 +474,7 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
                 onTap: () => context.push('/terms'),
                 child: Text(
                   'Terms of Service',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     fontSize: 12,
                     color: ext.borderFocus,
                     decoration: TextDecoration.underline,
@@ -459,7 +484,7 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
               ),
               Text(
                 ' & ',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 12,
                   color: ext.textTertiary,
                 ),
@@ -468,7 +493,7 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
                 onTap: () => context.push('/privacy'),
                 child: Text(
                   'Privacy Policy',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     fontSize: 12,
                     color: ext.borderFocus,
                     decoration: TextDecoration.underline,
@@ -478,7 +503,7 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
               ),
               Text(
                 '.',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 12,
                   color: ext.textTertiary,
                 ),
@@ -497,10 +522,23 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
           const SizedBox(height: CbSpacing.s4),
           // Guest Escape Hatch
           CbButton(
-            label: 'Explore as Guest',
+            label: 'Continue as Guest',
             variant: CbButtonVariant.ghost,
             fullWidth: true,
-            onPressed: isBusy ? null : () => context.go('/explore'),
+            onPressed: isBusy
+                ? null
+                : () {
+                    final from = widget.returnPath;
+                    if (from != null &&
+                        from.isNotEmpty &&
+                        from.startsWith('/') &&
+                        !from.startsWith('/auth') &&
+                        !from.startsWith('/account')) {
+                      context.go(from);
+                    } else {
+                      context.go('/fan');
+                    }
+                  },
           ),
         ],
       ),
@@ -529,7 +567,7 @@ class _OAuthButtons extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: CbSpacing.s3),
               child: Text(
                 'or',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   color: ext.textTertiary,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -544,7 +582,7 @@ class _OAuthButtons extends ConsumerWidget {
           icon: const Icon(Icons.g_mobiledata, size: 26, color: Color(0xFF4285F4)),
           label: Text(
             'Continue with Google',
-            style: GoogleFonts.plusJakartaSans(
+            style: GoogleFonts.dmSans(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: ext.textPrimary,
@@ -567,7 +605,7 @@ class _OAuthButtons extends ConsumerWidget {
         const SizedBox(height: CbSpacing.s3),
         Text(
           'Protected by Firebase Auth & App Check',
-          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: ext.textTertiary),
+          style: GoogleFonts.dmSans(fontSize: 11, color: ext.textTertiary),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: CbSpacing.s2),
@@ -580,7 +618,7 @@ class _OAuthButtons extends ConsumerWidget {
               onTap: () => context.push('/terms'),
               child: Text(
                 'Terms of Service',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 11,
                   color: ext.textSecondary,
                   decoration: TextDecoration.underline,
@@ -592,7 +630,7 @@ class _OAuthButtons extends ConsumerWidget {
               onTap: () => context.push('/privacy'),
               child: Text(
                 'Privacy Policy',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 11,
                   color: ext.textSecondary,
                   decoration: TextDecoration.underline,
@@ -604,7 +642,7 @@ class _OAuthButtons extends ConsumerWidget {
               onTap: () => context.push('/legal'),
               child: Text(
                 'Legal Disclosures',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 11,
                   color: ext.textSecondary,
                   decoration: TextDecoration.underline,

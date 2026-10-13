@@ -323,7 +323,7 @@ void main() {
       expect(find.text('Forgot password?'), findsOneWidget);
       expect(find.widgetWithText(CbButton, 'Sign In'), findsOneWidget);
       expect(find.text('Continue with Google'), findsOneWidget);
-      expect(find.text('Explore as Guest'), findsOneWidget);
+      expect(find.text('Continue as Guest'), findsOneWidget);
     });
 
     testWidgets('Tapping Create Account switches to registration tab with password confirmation', (tester) async {

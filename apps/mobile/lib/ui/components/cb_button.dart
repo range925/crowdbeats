@@ -118,13 +118,18 @@ class _CbButtonState extends State<CbButton>
           Icon(widget.leadingIcon, size: _fontSize + 4, color: fg),
         if (widget.isLoading || widget.leadingIcon != null)
           const SizedBox(width: CbSpacing.s2),
-        Text(
-          widget.isLoading ? 'Loading…' : widget.label,
-          style: GoogleFonts.dmSans(
-            fontSize: _fontSize,
-            fontWeight: FontWeight.w600,
-            color: fg,
-            letterSpacing: 0.01,
+        Flexible(
+          child: Text(
+            widget.isLoading ? 'Loading…' : widget.label,
+            style: GoogleFonts.dmSans(
+              fontSize: _fontSize,
+              fontWeight: FontWeight.w600,
+              color: fg,
+              letterSpacing: 0.01,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
           ),
         ),
         if (!widget.isLoading && widget.trailingIcon != null) ...[

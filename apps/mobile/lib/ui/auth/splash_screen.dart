@@ -97,7 +97,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CbButton(
-                            label: 'Explore as Guest',
+                            label: 'Continue as Guest',
                             variant: CbButtonVariant.secondary,
                             size: CbButtonSize.sm,
                             onPressed: () => context.go('/fan'),

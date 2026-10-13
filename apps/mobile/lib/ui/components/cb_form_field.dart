@@ -22,6 +22,9 @@ class CbFormField extends StatefulWidget {
     this.keyboardType,
     this.maxLines = 1,
     this.maxLength,
+    this.autofillHints,
+    this.textInputAction,
+    this.onFieldSubmitted,
     this.onChanged,
     this.validator,
   });
@@ -38,6 +41,9 @@ class CbFormField extends StatefulWidget {
   final TextInputType? keyboardType;
   final int maxLines;
   final int? maxLength;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
   final ValueChanged<String>? onChanged;
   final FormFieldValidator<String>? validator;
 
@@ -88,7 +94,7 @@ class _CbFormFieldState extends State<CbFormField> {
             Expanded(
               child: Text(
                 widget.label,
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   color: ext.textSecondary,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -99,7 +105,7 @@ class _CbFormFieldState extends State<CbFormField> {
               const SizedBox(width: 8),
               Text(
                 widget.validationText!,
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   color: widget.isValid == true ? ext.statusSuccess : ext.statusError,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -124,16 +130,19 @@ class _CbFormFieldState extends State<CbFormField> {
             keyboardType: widget.keyboardType,
             maxLines: widget.maxLines,
             maxLength: widget.maxLength,
+            autofillHints: widget.autofillHints,
+            textInputAction: widget.textInputAction,
+            onFieldSubmitted: widget.onFieldSubmitted,
             onChanged: widget.onChanged,
             validator: widget.validator,
-            style: GoogleFonts.plusJakartaSans(
+            style: GoogleFonts.dmSans(
               color: ext.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: GoogleFonts.plusJakartaSans(
+              hintStyle: GoogleFonts.dmSans(
                 color: ext.textTertiary,
                 fontSize: 14,
               ),

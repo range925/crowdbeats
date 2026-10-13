@@ -169,7 +169,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               Text(
                 auth.email ?? 'your email address',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: ext.textPrimary,
@@ -200,7 +200,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       const SizedBox(width: CbSpacing.s2),
                       Text(
                         'Checking automatically every 3 seconds',
-                        style: GoogleFonts.plusJakartaSans(
+                        style: GoogleFonts.dmSans(
                           fontSize: 12,
                           color: ext.textSecondary,
                         ),
@@ -227,7 +227,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   ),
                   child: Text(
                     _notice!,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       fontSize: 13,
                       color: _isSuccessNotice ? ext.statusSuccess : ext.statusError,
                       fontWeight: FontWeight.w500,

@@ -539,4 +539,68 @@ Tests: each feature owner adds tests in **new** files named after their area. Ch
 * **Checkpoint Tag:** `redesign-mobile-cp4`.
 * **Ready for Phase 5:** Screen-by-screen feature refactoring per `coverage.csv`.
 
+---
+
+## 17. Phase 5 Gate Report & Launch / Auth / Onboarding Verification
+
+**Phase:** Phase 5 (Launch, Auth, and Onboarding: `AUTH-01..06`, `ONB-01..11`, `SYS-01..07`)  
+**Owners:** Auth/Firebase Specialist, Flutter Navigation Engineer, UX Specialist, QA  
+**Status:** **PASSED**  
+**Checkpoint Tag:** `redesign-mobile-cp5`  
+**Date Completed:** October 12, 2026  
+
+---
+
+### 17.1 Deliverables & Implementations
+
+1. **Ergonomic Form Controls (`apps/mobile/lib/ui/components/cb_form_field.dart` & `cb_button.dart`):**
+   - **Autofill & Keyboard Action Support:** Extended `CbFormField` with `autofillHints: Iterable<String>?`, `textInputAction: TextInputAction?`, and `onFieldSubmitted: ValueChanged<String>?`.
+   - **DM Sans Typography:** Standardized input labels, hints, and error text on `GoogleFonts.dmSans`.
+   - **Button Flex Overflow Defense:** Wrapped `CbButton` label text in `Flexible` with `overflow: TextOverflow.ellipsis` and `maxLines: 1` to prevent horizontal `RenderFlex` overflows under narrow viewports (320dp) or large text scaling configurations (2.0x).
+
+2. **Focused & Calm Authentication Surfaces (`apps/mobile/lib/ui/auth/auth_screen.dart`):**
+   - **Continue as Guest:** Replaced broken `/explore` routing with "Continue as Guest", which inspects `returnPath` / `?from=` to resume intended performer profiles or tip flows, falling back to `/fan`.
+   - **Autofill Configuration:** Configured `AutofillHints.email` and `TextInputAction.next` on email input; `AutofillHints.password` and `TextInputAction.done` with automatic `_submit()` on login; `AutofillHints.newPassword` on registration and confirmation fields.
+   - **Typography & Token Alignment:** Converted all tabs, headers, helper texts, and link labels to DM Sans and obsidian theme tokens (`CbColors.surface`, `CbColors.outline`).
+
+3. **Account Recovery & Verification Ergonomics (`apps/mobile/lib/ui/auth/forgot_password_screen.dart` & `verify_email_screen.dart`):**
+   - **Forgot Password:** Added `AutofillHints.email`, `TextInputAction.done`, and `onFieldSubmitted: (_) => _submit()`; verified enumeration-resistant confirmation banner upon submission.
+   - **Email Verification:** Styled on DM Sans typography, maintaining live 3-second polling, manual reload, and 60-second resend cooldown timer.
+   - **Splash Screen:** Unified landing action button label to "Continue as Guest".
+
+4. **Universal 4-Step Onboarding Wizard (`apps/mobile/lib/ui/onboarding/universal/universal_onboarding_wizard.dart`):**
+   - Streamlined legacy 8-step mock wizard into an accessible 4-step progressive flow:
+     - **Step 1 of 4: Eligibility & Legal Agreements:** Verified statutory age eligibility (18+) and mandatory agreements (Terms v2026-08-25, Privacy Policy v2026-08-25) start unchecked. Separate optional marketing consent checkbox. Interactive cards wrapped in `InkWell` for full-surface tap ergonomics.
+     - **Step 2 of 4: Role / Focus Selection:** Clean cards for Fan, Solo Musician, Band, and Sponsor.
+     - **Step 3 of 4: Core Act / User Identity:** Prefilled from authenticated Firebase user; deferred non-essential bios, social handles, and revenue split percentages to Studio.
+     - **Step 4 of 4: Review & Truthful Setup Confirmation:** Displays truthful next steps for Creator Studio (explicitly documents required identity verification and Stripe Connect payout onboarding before hosting live stages or withdrawing tips; zero fake instant payout promises).
+   - Onboarding completion calls `completeUniversalOnboarding`, forces token claim refresh, updates `authNotifierProvider`, and resumes `from=` query destination. Exit button preserves browse state.
+
+5. **Router Guard Matrix & Return Resumption (`apps/mobile/lib/main.dart`):**
+   - Public exploration and legal routes (`/fan`, `/tip/:id`, `/qr-scan`, `/terms`, `/privacy`) remain accessible unauthenticated.
+   - Unauthenticated access to protected routes redirects to `/auth?from=...`.
+   - Unverified accounts redirect to `/auth/verify-email`.
+   - Unonboarded accounts redirect to `/onboarding?from=...`.
+   - Authenticated users with pending `from` return destination route directly to target screen; authenticated users without `from` route to authorized persona dashboard (`/creator` or `/fan`).
+
+---
+
+### 17.2 Automated Test Execution & Verification Evidence
+
+| Test Suite / Tool | Command | Result | Notes |
+| :--- | :--- | :--- | :--- |
+| **Static Analysis** | `flutter analyze --no-pub` | **PASS (0 issues)** | "No issues found! (ran in 15.3s)" across all 219 Dart files in `apps/mobile`. |
+| **Phase 5 Auth & Onboarding Suite** | `flutter test --no-pub test/phase5_auth_onboarding_test.dart` | **PASS (8 / 8)** | Verified `AuthScreen` autofill, "Continue as Guest", `ForgotPasswordScreen`, `UniversalOnboardingWizard` 4-step compliance, and `cbAuthRedirect` matrix. |
+| **Auth Resilience Suite** | `flutter test --no-pub test/auth_flow_resilience_test.dart` | **PASS (15 / 15)** | Verified redirect resiliency, session persistence, and cold start routing. |
+| **Full Mobile Test Suite** | `flutter test --no-pub` | **PASS (490 / 490)** | All 490 tests passed (+8 tests beyond Phase 4) with zero regressions across auth, location, tipping, settings, and creator pipelines. |
+
+---
+
+### 17.3 Phase 5 Gate Sign-Off
+
+* **Phase 5 Gate:** **PASSED** (Launch, auth, and onboarding screens implemented, tested, and recorded in `coverage.csv`).
+* **Isolation Maintained:** Zero changes to `apps/web` or root `.stitch/`.
+* **Checkpoint Tag:** `redesign-mobile-cp5`.
+* **Ready for Phase 6:** Discovery & Public Profiles (`GST-01..07`, `DSC-01..12`, `PRF-01..03`).
+
 
