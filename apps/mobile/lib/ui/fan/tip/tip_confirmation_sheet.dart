@@ -1,15 +1,10 @@
-// Crowdbeats V2 — Tip Confirmation Sheet (Phase 6b)
+// Crowdbeats V2 — Tip Confirmation Sheet (Stitch Screen ca5f8e01565d4fde9080d6f9774d84db)
+// Bottom sheet shown after amount selection.
+// Displays: performer name, amount, transparent fee schedule, saved payment method.
 //
-// Bottom sheet shown after "Next" on TipFlowScreen.
-// Displays: performer name, amount, fee breakdown, saved payment method.
-//
-// Saved PM fast-path (≤3 taps):
-//   If a default payment method exists → show ••••1234 chip.
-//   "Confirm & Pay" charges immediately via the saved method — no PaymentSheet.
-//
-// First-time flow (no saved PM):
-//   PaymentSheet opens for card entry.
-//   On success → ShowSaveCardPrompt (once-only prompt to save).
+// Saved PM fast-path:
+//   If a default payment method exists → show ••••4242 chip.
+//   "Confirm & Pay" charges immediately via the saved method.
 //
 // Duplicate tap prevention: button disabled immediately on first tap.
 // Idempotent: same idempotencyKey re-used on retry (safe).
@@ -18,12 +13,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/cb_colors.dart';
+import '../../theme/cb_spacing.dart';
 import '../../../state/tip_state.dart';
 import '../../../state/auth_state.dart';
 import '../../../firebase/payment_service.dart';
 import '../../components/cb_card_input_sheet.dart';
+import 'tip_result_screen.dart';
 
 // ── Riverpod provider: saved payment methods stream ───────────────────────────
 
@@ -73,7 +71,6 @@ class TipConfirmationSheet extends ConsumerStatefulWidget {
 
 class _TipConfirmationSheetState extends ConsumerState<TipConfirmationSheet> {
   bool _tapped = false; // duplicate-tap guard
-  // Selected PM override (fan taps "Change" chip or adds card)
   SavedPaymentMethod? _selectedPm;
 
   String _formatCents(int cents) {
@@ -134,7 +131,6 @@ class _TipConfirmationSheetState extends ConsumerState<TipConfirmationSheet> {
     // ── Web or Saved Card Path: Complete Payment ───────────────────────────
     try {
       if (!kIsWeb) {
-        // Native mobile Stripe confirmation if available
         try {
           await Stripe.instance.confirmPayment(
             paymentIntentClientSecret: clientSecret,
@@ -153,23 +149,10 @@ class _TipConfirmationSheetState extends ConsumerState<TipConfirmationSheet> {
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Tip sent successfully to ${ref.read(tipFlowProvider).recipientName}!',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: CbColors.liveGreen,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      // Show authoritative Tip Result Screen
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const TipResultScreen(),
         ),
       );
     } catch (e) {
@@ -212,194 +195,232 @@ class _TipConfirmationSheetState extends ConsumerState<TipConfirmationSheet> {
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.60,
-        minChildSize: 0.45,
-        maxChildSize: 0.88,
-        expand: false,
-        builder: (ctx, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: CbColors.surfaceCard,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: ListView(
-            controller: scrollController,
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(2),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.65,
+          minChildSize: 0.45,
+          maxChildSize: 0.90,
+          expand: false,
+          builder: (ctx, scrollController) => Container(
+            decoration: const BoxDecoration(
+              color: CbColors.surfaceContainer,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border(top: BorderSide(color: CbColors.outline)),
+            ),
+            child: ListView(
+              controller: scrollController,
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+              children: [
+                // Handle
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
-              // Header
-              Text(
-                'Confirm Tip',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'to ${tipState.recipientName}',
-                style: const TextStyle(color: CbColors.textSecondary),
-              ),
-              const SizedBox(height: 24),
-
-              // Amount row
-              _SummaryRow(
-                label: 'Gross tip amount',
-                value: _formatCents(amountCents),
-                isLarge: true,
-              ),
-              const SizedBox(height: 8),
-              _SummaryRow(
-                label: 'Crowdbeats fee (6%)',
-                value: '− ${_formatCents(platformFeeCents)}',
-              ),
-              const SizedBox(height: 4),
-              _SummaryRow(
-                label: 'Stripe fee (2.9% + 30¢)',
-                value: '− ${_formatCents(stripeFeeCents)}',
-              ),
-              const SizedBox(height: 4),
-              _SummaryRow(
-                label: 'Total deductions',
-                value: '− ${_formatCents(totalDeductionsCents)}',
-              ),
-              const SizedBox(height: 6),
-              _SummaryRow(
-                label: 'Musician receives (net proceeds)',
-                value: _formatCents(netAmountCents),
-                highlight: true,
-              ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0x2210B981),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0x4410B981)),
+                // Header
+                Text(
+                  'Confirm Tip',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.verified, size: 14, color: CbColors.statusLive),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'Daily Stripe Rate Verified ($rateDate) • 6% Platform Fee Deducted',
-                        style: const TextStyle(
-                          color: CbColors.statusLive,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                const SizedBox(height: 2),
+                Text(
+                  'to ${tipState.recipientName ?? "the artist"}',
+                  style: GoogleFonts.dmSans(
+                    color: CbColors.textMuted,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Fee schedule container
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: CbColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: CbColors.outline),
+                  ),
+                  child: Column(
+                    children: [
+                      _SummaryRow(
+                        label: 'Gross tip amount',
+                        value: _formatCents(amountCents),
+                        isLarge: true,
+                      ),
+                      const SizedBox(height: 8),
+                      _SummaryRow(
+                        label: 'Crowdbeats fee (6%)',
+                        value: '− ${_formatCents(platformFeeCents)}',
+                      ),
+                      const SizedBox(height: 4),
+                      _SummaryRow(
+                        label: 'Stripe fee (2.9% + 30¢)',
+                        value: '− ${_formatCents(stripeFeeCents)}',
+                      ),
+                      const SizedBox(height: 4),
+                      _SummaryRow(
+                        label: 'Total deductions',
+                        value: '− ${_formatCents(totalDeductionsCents)}',
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 6),
+                        child: Divider(color: CbColors.outline, height: 1),
+                      ),
+                      _SummaryRow(
+                        label: 'Musician receives (net proceeds)',
+                        value: _formatCents(netAmountCents),
+                        highlight: true,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // Verified rate badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0x2210B981),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0x4410B981)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.verified, size: 14, color: CbColors.statusLive),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Daily Stripe Rate Verified ($rateDate) • 6% Platform Fee Deducted',
+                          style: GoogleFonts.dmSans(
+                            color: CbColors.statusLive,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '“Crowdbeats charges a 6% platform fee. Stripe payment-processing and applicable Stripe Connect fees are additional.”',
-                style: TextStyle(
-                  color: CbColors.textSecondary,
-                  fontSize: 11,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Divider(color: Colors.white12),
-              ),
-
-              // Payment method section
-              Text(
-                'Payment',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: CbColors.textSecondary,
-                      letterSpacing: 0.5,
-                    ),
-              ),
-              const SizedBox(height: 10),
-
-              if (defaultPm != null)
-                _PayingWithChip(
-                  pm: defaultPm,
-                  onChangeTap: () => _showMethodPicker(
-                    context,
-                    methodsAsync.valueOrNull ?? [],
-                  ),
-                )
-              else
-                _NewCardRow(onTap: _openCardInput),
-
-              const SizedBox(height: 28),
-
-              // Error
-              if (tipState.errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    tipState.errorMessage!,
-                    style: const TextStyle(
-                        color: CbColors.statusError, fontSize: 13),
-                    textAlign: TextAlign.center,
+                    ],
                   ),
                 ),
 
-              // Confirm button
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: (_tapped || tipState.isProcessing)
-                      ? null
-                      : _onConfirmAndPay,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: CbColors.accentPrimary,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 8),
+
+                Text(
+                  '“Crowdbeats charges a 6% platform fee. Stripe payment-processing and applicable Stripe Connect fees are additional.”',
+                  style: GoogleFonts.dmSans(
+                    color: CbColors.textMuted,
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(color: CbColors.outline, height: 1),
+                ),
+
+                // Payment method section
+                Text(
+                  'Payment',
+                  style: GoogleFonts.dmSans(
+                    color: CbColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                if (defaultPm != null)
+                  _PayingWithChip(
+                    pm: defaultPm,
+                    onChangeTap: () => _showMethodPicker(
+                      context,
+                      methodsAsync.valueOrNull ?? [],
+                    ),
+                  )
+                else
+                  _NewCardRow(onTap: _openCardInput),
+
+                const SizedBox(height: 20),
+
+                // Error message
+                if (tipState.errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      tipState.errorMessage!,
+                      style: GoogleFonts.dmSans(
+                        color: CbColors.statusError,
+                        fontSize: 13,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  child: (_tapped || tipState.isProcessing)
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.black),
-                        )
-                      : Text(
-                          defaultPm != null
-                              ? 'Confirm & Pay ${_formatCents(amountCents)}'
-                              : 'Add card & Pay ${_formatCents(amountCents)}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                ),
-              ),
 
-              const SizedBox(height: 12),
-              const Text(
-                'By tapping above you agree to Crowdbeats\' Terms.',
-                style: TextStyle(
-                    fontSize: 11, color: CbColors.textTertiary),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                // Confirm button (52dp height)
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: (_tapped || tipState.isProcessing)
+                        ? null
+                        : _onConfirmAndPay,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: CbColors.purpleMain,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: CbColors.purpleMain.withAlpha(120),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: (_tapped || tipState.isProcessing)
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            defaultPm != null
+                                ? 'Confirm & Pay ${_formatCents(amountCents)}'
+                                : 'Add card & Pay ${_formatCents(amountCents)}',
+                            style: GoogleFonts.dmSans(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+                Text(
+                  'By tapping above you agree to Crowdbeats\' Terms.',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    color: CbColors.textMuted,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 
   Future<void> _showMethodPicker(
@@ -430,34 +451,47 @@ class _PayingWithChip extends StatelessWidget {
     return GestureDetector(
       onTap: onChangeTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: CbColors.surfaceRaised,
+          color: CbColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: CbColors.accentPrimary.withAlpha(80)),
+          border: Border.all(color: CbColors.purpleMain.withAlpha(80)),
         ),
         child: Row(
           children: [
             const Icon(Icons.credit_card_rounded,
-                color: CbColors.accentPrimary, size: 22),
-            const SizedBox(width: 12),
+                color: CbColors.purpleLight, size: 20),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(pm.displayName,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
-                  Text('Expires ${pm.expiry}',
-                      style: const TextStyle(
-                          fontSize: 12, color: CbColors.textSecondary)),
+                  Text(
+                    pm.displayName,
+                    style: GoogleFonts.dmSans(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    'Expires ${pm.expiry}',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 11,
+                      color: CbColors.textMuted,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Text('Change',
-                style: TextStyle(
-                    color: CbColors.accentSecondary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500)),
+            Text(
+              'Change',
+              style: GoogleFonts.dmSans(
+                color: CbColors.purpleLight,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -475,27 +509,28 @@ class _NewCardRow extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: CbColors.surfaceRaised,
+          color: CbColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: CbColors.accentPrimary.withAlpha(60)),
+          border: Border.all(color: CbColors.outline),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.add_card_rounded,
-                color: CbColors.accentPrimary, size: 22),
-            SizedBox(width: 12),
+            const Icon(Icons.add_card_rounded,
+                color: CbColors.purpleLight, size: 20),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 'Add credit or debit card',
-                style: TextStyle(
+                style: GoogleFonts.dmSans(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
+                  fontSize: 13,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white54, size: 20),
+            const Icon(Icons.chevron_right_rounded, color: Colors.white54, size: 18),
           ],
         ),
       ),
@@ -514,8 +549,9 @@ class _MethodPickerSheet extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       decoration: BoxDecoration(
-        color: CbColors.surfaceCard,
-        borderRadius: BorderRadius.circular(24),
+        color: CbColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: CbColors.outline),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -529,27 +565,36 @@ class _MethodPickerSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 16),
-          Text('Choose payment method',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          Text(
+            'Choose payment method',
+            style: GoogleFonts.dmSans(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 10),
           ...methods.map(
             (m) => ListTile(
               leading: const Icon(Icons.credit_card_rounded,
-                  color: CbColors.accentPrimary),
-              title: Text(m.displayName),
-              subtitle: Text('Expires ${m.expiry}'),
+                  color: CbColors.purpleLight),
+              title: Text(
+                m.displayName,
+                style: GoogleFonts.dmSans(color: Colors.white, fontSize: 14),
+              ),
+              subtitle: Text(
+                'Expires ${m.expiry}',
+                style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 12),
+              ),
               trailing: m.isDefault
                   ? const Icon(Icons.check_circle,
-                      color: CbColors.statusSuccess)
+                      color: CbColors.statusSuccess, size: 18)
                   : null,
               onTap: () => Navigator.of(context).pop(m),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -576,20 +621,25 @@ class _SummaryRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Text(label,
-              style: TextStyle(
-                color: highlight ? CbColors.textPrimary : CbColors.textSecondary,
-                fontSize: isLarge ? 16 : 14,
-              )),
+          child: Text(
+            label,
+            style: GoogleFonts.dmSans(
+              color: highlight ? Colors.white : CbColors.textMuted,
+              fontSize: isLarge ? 15 : 13,
+              fontWeight: isLarge || highlight ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ),
         const SizedBox(width: 8),
-        Text(value,
-            style: TextStyle(
-              fontWeight:
-                  isLarge || highlight ? FontWeight.bold : FontWeight.normal,
-              fontSize: isLarge ? 18 : 14,
-              color: highlight ? CbColors.statusSuccess : CbColors.textPrimary,
-            )),
+        Text(
+          value,
+          style: GoogleFonts.dmSans(
+            fontWeight:
+                isLarge || highlight ? FontWeight.bold : FontWeight.normal,
+            fontSize: isLarge ? 16 : 13,
+            color: highlight ? const Color(0xFF00D8C4) : Colors.white,
+          ),
+        ),
       ],
     );
   }

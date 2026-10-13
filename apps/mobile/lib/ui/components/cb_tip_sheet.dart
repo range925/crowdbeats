@@ -197,7 +197,7 @@ class _CbTipSheetState extends State<CbTipSheet> {
                                             const SizedBox(width: 4),
                                             Text(
                                               'LIVE NOW',
-                                              style: GoogleFonts.plusJakartaSans(
+                                              style: GoogleFonts.dmSans(
                                                 color: ext.statusLive,
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w800,
@@ -239,7 +239,7 @@ class _CbTipSheetState extends State<CbTipSheet> {
                       // Preset Chips
                       Text(
                         'SELECT AMOUNT',
-                        style: GoogleFonts.plusJakartaSans(
+                        style: GoogleFonts.dmSans(
                           color: ext.textTertiary,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,

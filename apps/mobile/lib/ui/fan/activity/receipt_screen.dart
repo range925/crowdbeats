@@ -1,11 +1,11 @@
-// Crowdbeats V2 — Receipt Screen (Phase 6)
-//
-// Full tip receipt. Shows fee breakdown, Stripe payment ID, refund button.
+// Crowdbeats V2 — Receipt Screen (Stitch Screen 2310da91984f41ecb30a59d7ee64e62a)
+// Full tip receipt. Shows fee breakdown, Stripe payment ID, and refund request action.
 // Refund button visible only within 24-hour window.
 // Two-step refund confirmation with reason capture.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
@@ -74,24 +74,28 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
   // ── Refund flow ────────────────────────────────────────────────────────────
 
   Future<void> _onRefund() async {
-    // Step 1: confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Request Refund'),
+        backgroundColor: CbColors.surfaceContainer,
+        title: Text(
+          'Request Refund',
+          style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         content: Text(
-            'Refund ${_formatCents(_amountCents)} to your original payment method?'
-            '\n\nRefunds are processed within 5–10 business days.'),
+          'Refund ${_formatCents(_amountCents)} to your original payment method?'
+          '\n\nRefunds are processed within 5–10 business days.',
+          style: GoogleFonts.dmSans(color: CbColors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.dmSans(color: CbColors.textMuted)),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(
-                backgroundColor: CbColors.statusError),
-            child: const Text('Request Refund'),
+            style: FilledButton.styleFrom(backgroundColor: CbColors.statusError),
+            child: Text('Request Refund', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -112,8 +116,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content:
-                Text('Refund requested. Allow 5–10 business days.'),
+            content: Text('Refund requested. Allow 5–10 business days.'),
             backgroundColor: Colors.green,
           ),
         );
@@ -136,16 +139,25 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
     );
   }
 
-  // ── Build ──────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CbColors.surface,
       appBar: AppBar(
-        title: const Text('Receipt'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: Text(
+          'Receipt',
+          style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.share_outlined),
+            icon: const Icon(Icons.share_outlined, color: Colors.white),
             onPressed: _shareReceipt,
             tooltip: 'Share receipt',
           ),
@@ -153,13 +165,13 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Status badge at top
               _StatusHeader(status: _status),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Receipt details card
               _ReceiptCard(
@@ -177,47 +189,44 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                 formatDate: _formatDate,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Refund section
               if (_status == 'refunded') ...[
                 _InfoBanner(
-                  message:
-                      'Refund processed on ${_formatDate(widget.tip['refundedAt'])}.',
+                  message: 'Refund processed on ${_formatDate(widget.tip['refundedAt'])}.',
                   color: Colors.blueAccent,
                 ),
               ] else if (_canRefund) ...[
                 if (_refundError != null)
-                  _InfoBanner(
-                      message: _refundError!, color: CbColors.statusError),
+                  _InfoBanner(message: _refundError!, color: CbColors.statusError),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: _refunding ? null : _onRefund,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: CbColors.statusError,
                     side: const BorderSide(color: CbColors.statusError),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: _refunding
                       ? const SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: CbColors.statusError),
                         )
-                      : const Text('Request Refund'),
+                      : Text('Request Refund', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Refunds available within 24 hours of tip.',
-                  style: TextStyle(
-                      fontSize: 11, color: Colors.white38),
+                  style: GoogleFonts.dmSans(fontSize: 11, color: CbColors.textMuted),
                   textAlign: TextAlign.center,
                 ),
               ] else if (_status == 'succeeded') ...[
-                const Text(
+                Text(
                   'Refund window expired (24h).',
-                  style:
-                      TextStyle(fontSize: 12, color: Colors.white38),
+                  style: GoogleFonts.dmSans(fontSize: 12, color: CbColors.textMuted),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -243,22 +252,22 @@ class _StatusHeader extends StatelessWidget {
 
     switch (status) {
       case 'succeeded':
-        icon = const Icon(Icons.check_circle, size: 56, color: Colors.greenAccent);
+        icon = const Icon(Icons.check_circle, size: 52, color: CbColors.liveGreen);
         label = 'Tip Confirmed';
-        color = Colors.greenAccent;
+        color = CbColors.liveGreen;
         break;
       case 'refunded':
-        icon = const Icon(Icons.undo, size: 56, color: Colors.blueAccent);
+        icon = const Icon(Icons.undo, size: 52, color: Colors.blueAccent);
         label = 'Refunded';
         color = Colors.blueAccent;
         break;
       case 'failed':
-        icon = const Icon(Icons.error_outline, size: 56, color: CbColors.statusError);
+        icon = const Icon(Icons.error_outline, size: 52, color: CbColors.statusError);
         label = 'Payment Failed';
         color = CbColors.statusError;
         break;
       default:
-        icon = const Icon(Icons.schedule, size: 56, color: Colors.orange);
+        icon = const Icon(Icons.schedule, size: 52, color: Colors.orange);
         label = 'Processing';
         color = Colors.orange;
     }
@@ -267,9 +276,14 @@ class _StatusHeader extends StatelessWidget {
       children: [
         icon,
         const SizedBox(height: 8),
-        Text(label,
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+        Text(
+          label,
+          style: GoogleFonts.dmSans(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
       ],
     );
   }
@@ -311,26 +325,28 @@ class _ReceiptCard extends StatelessWidget {
         : tipId;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(20),
+        color: CbColors.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: CbColors.outline),
       ),
       child: Column(
         children: [
           _Row('Artist', recipientName),
           _Row('Gross Amount', formatCents(amountCents)),
-          _Row('Crowdbeats fee (6%)', '−${formatCents(platformFeeCents)}',
-              muted: true),
-          _Row('Stripe processing fee', '−${formatCents(stripeFeeCents)}',
-              muted: true),
-          _Row('Total deductions', '−${formatCents(totalDeductionsCents)}',
-              muted: true),
-          const Divider(height: 16),
-          _Row('Musician net proceeds', formatCents(netAmountCents),
-              bold: true, accent: true),
-          const Divider(height: 16),
+          _Row('Crowdbeats fee (6%)', '−${formatCents(platformFeeCents)}', muted: true),
+          _Row('Stripe processing fee', '−${formatCents(stripeFeeCents)}', muted: true),
+          _Row('Total deductions', '−${formatCents(totalDeductionsCents)}', muted: true),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(color: CbColors.outline, height: 1),
+          ),
+          _Row('Musician net proceeds', formatCents(netAmountCents), bold: true, accent: true),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(color: CbColors.outline, height: 1),
+          ),
           _Row('Date', formatDate(createdAt)),
           _Row('Receipt ID', shortId, mono: true),
           if (stripeIntentId.isNotEmpty)
@@ -361,17 +377,16 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = accent
-        ? CbColors.accentPrimary
+        ? const Color(0xFF00D8C4)
         : muted
-            ? Colors.white38
-            : null;
+            ? CbColors.textMuted
+            : Colors.white;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: const TextStyle(fontSize: 13, color: Colors.white54)),
+          Text(label, style: GoogleFonts.dmSans(fontSize: 13, color: CbColors.textMuted)),
           Flexible(
             child: Text(
               value,
@@ -404,7 +419,7 @@ class _InfoBanner extends StatelessWidget {
         border: Border.all(color: color.withAlpha(80)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(message, style: TextStyle(color: color, fontSize: 12)),
+      child: Text(message, style: GoogleFonts.dmSans(color: color, fontSize: 12)),
     );
   }
 }

@@ -1,14 +1,16 @@
-// Crowdbeats V2 — Direct Musician Tipping Flow (Stitch Screen 1)
-// Spotlight performer hero, preset amount tiles, impact banner, payment methods, and Tip CTA.
+// Crowdbeats V2 — Direct Musician Tipping Flow (Stitch Screen ca5f8e01565d4fde9080d6f9774d84db)
+// Focused transactional flow: Spotlight performer hero, large numeral amount display,
+// preset amount pills ($2, $5, $10, $20, Custom), cheer note, transparent fee schedule,
+// payment method selector, and 52px Electric Purple Tip CTA.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/cb_colors.dart';
 import '../../theme/cb_spacing.dart';
-import '../../components/cb_pill_button.dart';
-import '../../components/cb_tip_preset_card.dart';
+import '../../components/cb_button.dart';
 import '../../components/cb_form_field.dart';
 import '../../../data/models/discovery.dart';
 import '../../../state/auth_state.dart';
@@ -26,7 +28,7 @@ class TipFlowScreen extends ConsumerStatefulWidget {
     this.sessionId,
     this.avatarUrl,
     this.genre = 'Indie Pop / Rock',
-    this.venue = 'The Casbah • Main Stage',
+    this.venue = 'The Continental Club • Austin, TX',
     this.initialAmountCents = 1000,
   });
 
@@ -48,7 +50,7 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
   bool _isCustom = false;
   final TextEditingController _customCtrl = TextEditingController();
   final TextEditingController _msgCtrl = TextEditingController();
-  String _paymentMethod = 'card'; // 'google_pay' | 'card'
+  String _paymentMethod = 'card'; // 'google_pay' | 'card' | 'apple_pay'
   bool _submitting = false;
 
   late String _resolvedName;
@@ -57,6 +59,14 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
   late String _resolvedGenre;
   late String _resolvedVenue;
   bool _isVerified = true;
+
+  final List<Map<String, dynamic>> _presets = [
+    {'cents': 200, 'label': r'$2'},
+    {'cents': 500, 'label': r'$5'},
+    {'cents': 1000, 'label': r'$10'},
+    {'cents': 2000, 'label': r'$20'},
+    {'cents': 0, 'label': 'Custom'},
+  ];
 
   @override
   void initState() {
@@ -70,6 +80,12 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
     _resolvedGenre = widget.genre;
     _resolvedVenue = widget.venue;
 
+    // Check if initial amount is one of the presets
+    _isCustom = !_presets.any((p) => p['cents'] == _selectedAmountCents && (p['cents'] as int) > 0);
+    if (_isCustom) {
+      _customCtrl.text = (_selectedAmountCents / 100).toStringAsFixed(2);
+    }
+
     // Restore pending tip context if one was saved for this recipient
     final pending = ref.read(tipFlowProvider).pendingTipContext;
     if (pending != null &&
@@ -78,7 +94,15 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
       if (pending.message != null && pending.message!.isNotEmpty) {
         _msgCtrl.text = pending.message!;
       }
+      _isCustom = !_presets.any((p) => p['cents'] == _selectedAmountCents && (p['cents'] as int) > 0);
+      if (_isCustom) {
+        _customCtrl.text = (_selectedAmountCents / 100).toStringAsFixed(2);
+      }
     }
+
+    _msgCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadPerformerDetails();
@@ -124,7 +148,6 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
     try {
       final db = FirebaseFirestore.instance;
 
-      // Check artistProfiles
       final artistDoc = await db.collection('artistProfiles').doc(widget.recipientId).get();
       if (artistDoc.exists && artistDoc.data() != null) {
         final d = artistDoc.data()!;
@@ -144,7 +167,6 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
         return;
       }
 
-      // Check bands
       final bandDoc = await db.collection('bands').doc(widget.recipientId).get();
       if (bandDoc.exists && bandDoc.data() != null) {
         final d = bandDoc.data()!;
@@ -164,7 +186,6 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
         return;
       }
 
-      // Check users
       final userDoc = await db.collection('users').doc(widget.recipientId).get();
       if (userDoc.exists && userDoc.data() != null) {
         final d = userDoc.data()!;
@@ -190,13 +211,6 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
     }
   }
 
-  final List<Map<String, dynamic>> _presets = [
-    {'cents': 500, 'label': '\$5', 'badge': null, 'icon': Icons.favorite_border},
-    {'cents': 1000, 'label': '\$10', 'badge': 'POPULAR', 'icon': Icons.favorite},
-    {'cents': 2000, 'label': '\$20', 'badge': 'SUPERFAN', 'icon': Icons.star},
-    {'cents': 0, 'label': 'Custom', 'badge': null, 'icon': Icons.edit},
-  ];
-
   @override
   void dispose() {
     _customCtrl.dispose();
@@ -207,6 +221,15 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
   String get _amountDisplay {
     final d = _selectedAmountCents ~/ 100;
     final c = _selectedAmountCents % 100;
+    return '\$$d.${c.toString().padLeft(2, '0')}';
+  }
+
+  int get _platformFeeCents => (_selectedAmountCents * 600) ~/ 10000;
+  int get _netAmountCents => _selectedAmountCents - _platformFeeCents;
+
+  String _formatCents(int cents) {
+    final d = cents ~/ 100;
+    final c = cents % 100;
     return '\$$d.${c.toString().padLeft(2, '0')}';
   }
 
@@ -289,319 +312,602 @@ class _TipFlowScreenState extends ConsumerState<TipFlowScreen> {
       }
     });
 
+    final defaultAvatar = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80';
+
     return Scaffold(
-      backgroundColor: CbColors.bgApp,
-      body: Stack(
-        children: [
-          // Background Concert Photo with Gradient
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 280,
-            child: Stack(
-              children: [
-                Image.network(
-                  _resolvedAvatar ?? 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80',
-                  height: 280,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0x80000000),
-                        Color(0xCC0B0C10),
-                        CbColors.bgApp,
-                      ],
-                    ),
+      backgroundColor: CbColors.surface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Focused Transactional Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 22),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    tooltip: 'Close',
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          SafeArea(
-            child: Column(
-              children: [
-                // Top App Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white, size: 22),
-                        onPressed: () => Navigator.of(context).maybePop(),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xCC151722),
-                          borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
-                          border: Border.all(color: CbColors.borderSubtle),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.shield_outlined, color: CbColors.liveGreen, size: 14),
-                            SizedBox(width: 4),
-                            Text('Secure Tip', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 48), // Spacer
-                    ],
-                  ),
-                ),
-
-                // Scrollable Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  const SizedBox(width: 4),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 10),
-
-                        // Performer Spotlight Card
-                        Center(
-                          child: Column(
-                            children: [
-                              if (_isVerified) ...[
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: CbColors.purpleDim,
-                                    borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
-                                    border: Border.all(color: CbColors.purpleLight),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.verified, color: CbColors.purpleLight, size: 13),
-                                      SizedBox(width: 4),
-                                      Text('Verified Performer', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                              ],
-                              Text(
-                                _resolvedName,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _resolvedVenue,
-                                style: const TextStyle(color: CbColors.purpleLight, fontSize: 12, fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                _resolvedGenre,
-                                style: const TextStyle(color: CbColors.textMuted, fontSize: 11),
-                              ),
-                            ],
+                        Text(
+                          'Send Tip to $_resolvedName',
+                          style: GoogleFonts.dmSans(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-
-                        const SizedBox(height: 28),
-
-                        // Amount Selector Tiles (Stitch Screen 1)
-                        const Text(
-                          'Select Tip Amount',
-                          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 10),
-
-                        Row(
-                          children: _presets.map((p) {
-                            final int cents = p['cents'] as int;
-                            final String label = p['label'] as String;
-                            final String? badge = p['badge'] as String?;
-                            final IconData icon = p['icon'] as IconData;
-                            final bool isSelected = !_isCustom && _selectedAmountCents == cents;
-
-                            return Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                child: CbTipPresetCard(
-                                  amountLabel: label,
-                                  badgeText: badge,
-                                  icon: Icon(icon, size: 14, color: isSelected ? CbColors.purpleLight : CbColors.textMuted),
-                                  isSelected: label == 'Custom' ? _isCustom : isSelected,
-                                  onTap: () {
-                                    if (label == 'Custom') {
-                                      setState(() {
-                                        _isCustom = true;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        _isCustom = false;
-                                        _selectedAmountCents = cents;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-
-                        // Custom Amount Field (if selected)
-                        if (_isCustom) ...[
-                          const SizedBox(height: 12),
-                          CbFormField(
-                            label: 'Custom Amount (\$)',
-                            controller: _customCtrl,
-                            keyboardType: TextInputType.number,
-                            hintText: 'Enter amount (e.g. 25.00)',
-                            onChanged: (val) {
-                              final parsed = double.tryParse(val);
-                              if (parsed != null) {
-                                setState(() {
-                                  _selectedAmountCents = (parsed * 100).round();
-                                });
-                              }
-                            },
-                          ),
-                        ],
-
-                        const SizedBox(height: 18),
-
-                        // Message Input
-                        CbFormField(
-                          label: 'Add a Note of Appreciation (Optional)',
-                          controller: _msgCtrl,
-                          hintText: 'Say something encouraging...',
-                          leadingIcon: const Icon(Icons.chat_bubble_outline, size: 16, color: CbColors.textMuted),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // Payment Methods Selector
-                        const Text(
-                          'Payment Method',
-                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-
                         Row(
                           children: [
-                            Expanded(
-                              child: _buildPaymentRadio(
-                                id: 'google_pay',
-                                label: 'Google Pay',
-                                icon: Icons.account_balance_wallet,
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: CbColors.statusLive,
+                                shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 5),
                             Expanded(
-                              child: _buildPaymentRadio(
-                                id: 'card',
-                                label: 'Card •••• 4242',
-                                icon: Icons.credit_card,
+                              child: Text(
+                                _resolvedVenue,
+                                style: GoogleFonts.dmSans(
+                                  color: CbColors.textMuted,
+                                  fontSize: 11,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
-
-                        const SizedBox(height: 18),
-
-                        // Impact Notice Banner (Stitch Screen 1)
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: CbColors.surface2,
-                            borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
-                            border: Border.all(color: CbColors.borderSubtle),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: CbColors.surfaceContainer,
+                      borderRadius: BorderRadius.circular(CbSpacing.radiusFull),
+                      border: Border.all(color: CbColors.outline),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.shield_outlined, color: CbColors.liveGreen, size: 12),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Secure Tip',
+                          style: GoogleFonts.dmSans(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: const Row(
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(color: CbColors.outline, height: 1),
+
+            // Scrollable Content Body
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Performer Live Card
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: CbColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: CbColors.outline),
+                      ),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              _resolvedAvatar ?? defaultAvatar,
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 56,
+                                height: 56,
+                                color: CbColors.surfaceBright,
+                                child: const Icon(Icons.music_note, color: CbColors.purpleLight),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        _resolvedName,
+                                        style: GoogleFonts.dmSans(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (_isVerified) ...[
+                                      const SizedBox(width: 4),
+                                      const Icon(Icons.verified, color: CbColors.purpleLight, size: 14),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _resolvedGenre,
+                                  style: GoogleFonts.dmSans(
+                                    color: CbColors.textMuted,
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.music_note, color: CbColors.purpleLight, size: 13),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        'Live Set • Active Stage',
+                                        style: GoogleFonts.dmSans(
+                                          color: CbColors.purpleLight,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Tip Amount Selection Section
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: CbColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: CbColors.outline),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Select Tip Amount',
+                            style: GoogleFonts.dmSans(
+                              color: CbColors.textMuted,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // Big Numeral Value
+                          Text(
+                            _amountDisplay,
+                            style: GoogleFonts.dmSans(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -1,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          // Preset Buttons Row (>=48dp touch targets)
+                          Row(
+                            children: _presets.map((p) {
+                              final int cents = p['cents'] as int;
+                              final String label = p['label'] as String;
+                              final bool isSelected = (label == 'Custom')
+                                  ? _isCustom
+                                  : (!_isCustom && _selectedAmountCents == cents);
+
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  child: Semantics(
+                                    button: true,
+                                    selected: isSelected,
+                                    label: '$label tip preset',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          if (label == 'Custom') {
+                                            setState(() {
+                                              _isCustom = true;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              _isCustom = false;
+                                              _selectedAmountCents = cents;
+                                            });
+                                          }
+                                        },
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 150),
+                                          height: 48,
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? CbColors.purpleMain : CbColors.surfaceBright,
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: isSelected ? CbColors.purpleLight : CbColors.outline,
+                                              width: isSelected ? 1.5 : 1,
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            label,
+                                            style: GoogleFonts.dmSans(
+                                              color: isSelected ? Colors.white : CbColors.textSecondary,
+                                              fontSize: label == 'Custom' ? 12 : 14,
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+
+                          // Custom Amount Input
+                          if (_isCustom) ...[
+                            const SizedBox(height: 14),
+                            CbFormField(
+                              label: 'Custom Amount (\$)',
+                              controller: _customCtrl,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              hintText: 'Enter amount (e.g. 25.00)',
+                              onChanged: (val) {
+                                final parsed = double.tryParse(val);
+                                if (parsed != null && parsed > 0) {
+                                  setState(() {
+                                    _selectedAmountCents = (parsed * 100).round();
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Cheer Note Input
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: CbColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: CbColors.outline),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(Icons.volunteer_activism, color: CbColors.liveGreen, size: 18),
-                              SizedBox(width: 10),
                               Expanded(
-                                child: Text(
-                                  '100% of your tip goes directly to the performer via verified Stripe Connect payout.',
-                                  style: TextStyle(color: CbColors.textSecondary, fontSize: 11, height: 1.3),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.chat_bubble_outline, color: CbColors.purpleLight, size: 16),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        'Send a Cheer Note',
+                                        style: GoogleFonts.dmSans(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Optional',
+                                style: GoogleFonts.dmSans(
+                                  color: CbColors.textMuted,
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Tip CTA Button
-                        CbPillButton(
-                          label: 'Tip $_amountDisplay',
-                          leadingIcon: const Icon(Icons.favorite, size: 18, color: Colors.white),
-                          isLoading: _submitting,
-                          onPressed: _onProceed,
-                        ),
-
-                        const SizedBox(height: 16),
-                      ],
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _msgCtrl,
+                            maxLength: 140,
+                            maxLines: 2,
+                            style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13),
+                            decoration: InputDecoration(
+                              hintText: 'Add an encouraging note to $_resolvedName (optional)',
+                              hintStyle: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 13),
+                              filled: true,
+                              fillColor: CbColors.surface,
+                              counterText: '${_msgCtrl.text.length} / 140',
+                              counterStyle: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 11),
+                              contentPadding: const EdgeInsets.all(12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: CbColors.outline),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: CbColors.outline),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: CbColors.purpleMain, width: 1.5),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildPaymentRadio({
-    required String id,
-    required String label,
-    required IconData icon,
-  }) {
-    final bool isSelected = _paymentMethod == id;
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      label: '$label payment method',
-      child: GestureDetector(
-        onTap: () => setState(() => _paymentMethod = id),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: CbColors.surface2,
-            borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
-            border: Border.all(
-              color: isSelected ? CbColors.purpleMain : CbColors.borderSubtle,
-              width: isSelected ? 1.5 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 16, color: isSelected ? Colors.white : CbColors.textMuted),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : CbColors.textSecondary,
-                    fontSize: 12,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 14),
+
+                    // Payout Transparency Card (Stitch Screen 1)
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: CbColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: CbColors.outline),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.receipt_long, color: CbColors.liveGreen, size: 16),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Payout Transparency',
+                                style: GoogleFonts.dmSans(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text('Gross Tip', style: GoogleFonts.dmSans(color: CbColors.textSecondary, fontSize: 13)),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(_amountDisplay, style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text('Crowdbeats Platform Fee (6%)', style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 12)),
+                              ),
+                              const SizedBox(width: 8),
+                              Text('− ${_formatCents(_platformFeeCents)}', style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 12)),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text('Payment Processing', style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 12)),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0x2210B981),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'Covered by platform',
+                                  style: GoogleFonts.dmSans(color: CbColors.liveGreen, fontSize: 11, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            child: Divider(color: CbColors.outline, height: 1),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Net Received by Artist',
+                                      style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      'Transfers via direct deposit in 2-3 business days',
+                                      style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _formatCents(_netAmountCents),
+                                style: GoogleFonts.dmSans(
+                                  color: const Color(0xFF00D8C4),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Payment Method Selector
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: CbColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: CbColors.outline),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: CbColors.surfaceBright,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: CbColors.outline),
+                            ),
+                            child: const Icon(Icons.credit_card, color: Colors.white, size: 20),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      _paymentMethod == 'google_pay' ? 'Google Pay' : 'Card',
+                                      style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: CbColors.surfaceBright,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        '•••• 4242',
+                                        style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 10),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  'Default payment method',
+                                  style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = _paymentMethod == 'card' ? 'google_pay' : 'card';
+                              });
+                            },
+                            child: Text(
+                              'Change',
+                              style: GoogleFonts.dmSans(color: CbColors.purpleLight, fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
-              if (isSelected)
-                const Icon(Icons.check_circle, size: 14, color: CbColors.purpleLight),
-            ],
-          ),
+            ),
+
+            // Fixed Bottom Payment Bar (52dp CTA)
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              decoration: const BoxDecoration(
+                color: CbColors.surface,
+                border: Border(top: BorderSide(color: CbColors.outline)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CbButton(
+                    label: 'Tip $_amountDisplay',
+                    leadingIcon: Icons.bolt,
+                    isLoading: _submitting,
+                    fullWidth: true,
+                    size: CbButtonSize.lg,
+                    onPressed: _onProceed,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.lock, color: CbColors.textMuted, size: 12),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          '256-bit encrypted via Stripe • Zero tip skimming',
+                          style: GoogleFonts.dmSans(
+                            color: CbColors.textMuted,
+                            fontSize: 11,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

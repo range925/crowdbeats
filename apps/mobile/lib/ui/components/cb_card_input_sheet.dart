@@ -6,6 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../theme/cb_colors.dart';
 import '../../state/auth_state.dart';
 import '../../firebase/payment_service.dart';
@@ -136,7 +138,7 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to save card: $e'),
-            backgroundColor: CbColors.errorRed,
+            backgroundColor: CbColors.statusError,
           ),
         );
       }
@@ -151,11 +153,11 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
       ),
       child: Container(
         decoration: const BoxDecoration(
-          color: CbColors.surface1,
+          color: CbColors.surfaceContainer,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border(top: BorderSide(color: CbColors.borderSubtle)),
+          border: Border(top: BorderSide(color: CbColors.outline)),
         ),
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
         child: Form(
           key: _formKey,
           child: Column(
@@ -173,7 +175,7 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
               // Title
               Row(
@@ -181,10 +183,11 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                 children: [
                   Text(
                     'Add Payment Card',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: CbColors.textPrimary,
-                        ),
+                    style: GoogleFonts.dmSans(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   if (_cardBrand != 'unknown')
                     Container(
@@ -196,7 +199,7 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                       ),
                       child: Text(
                         _cardBrand,
-                        style: TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: _getBrandColor(),
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -205,18 +208,18 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                     ),
                 ],
               ),
-              const SizedBox(height: 6),
-              const Text(
+              const SizedBox(height: 4),
+              Text(
                 'Card details are securely encrypted and tokenized with Stripe.',
-                style: TextStyle(color: CbColors.textSecondary, fontSize: 13),
+                style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 12),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
               // Card number input
               TextFormField(
                 controller: _cardNumberController,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 1.2),
+                style: GoogleFonts.dmSans(color: Colors.white, fontSize: 15, letterSpacing: 1.2),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(16),
@@ -224,19 +227,19 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                 ],
                 decoration: InputDecoration(
                   labelText: 'Card Number',
-                  labelStyle: const TextStyle(color: CbColors.textSecondary),
+                  labelStyle: GoogleFonts.dmSans(color: CbColors.textMuted),
                   hintText: '•••• •••• •••• ••••',
-                  hintStyle: const TextStyle(color: CbColors.textMuted),
+                  hintStyle: GoogleFonts.dmSans(color: CbColors.textMuted.withAlpha(100)),
                   prefixIcon: Icon(_getBrandIcon(), color: CbColors.purpleLight),
                   filled: true,
-                  fillColor: CbColors.surface2,
+                  fillColor: CbColors.surface,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: CbColors.borderSubtle),
+                    borderSide: const BorderSide(color: CbColors.outline),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: CbColors.borderFocus, width: 2),
+                    borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
                   ),
                 ),
                 validator: (val) {
@@ -246,7 +249,7 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                   return null;
                 },
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
               // Expiry & CVC row
               Row(
@@ -255,7 +258,7 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                     child: TextFormField(
                       controller: _expiryController,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: GoogleFonts.dmSans(color: Colors.white, fontSize: 15),
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(4),
@@ -263,18 +266,18 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                       ],
                       decoration: InputDecoration(
                         labelText: 'Expires (MM/YY)',
-                        labelStyle: const TextStyle(color: CbColors.textSecondary),
+                        labelStyle: GoogleFonts.dmSans(color: CbColors.textMuted),
                         hintText: '12/28',
-                        hintStyle: const TextStyle(color: CbColors.textMuted),
+                        hintStyle: GoogleFonts.dmSans(color: CbColors.textMuted.withAlpha(100)),
                         filled: true,
-                        fillColor: CbColors.surface2,
+                        fillColor: CbColors.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: CbColors.borderSubtle),
+                          borderSide: const BorderSide(color: CbColors.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: CbColors.borderFocus, width: 2),
+                          borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
                         ),
                       ),
                       validator: (val) {
@@ -291,25 +294,25 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                       controller: _cvcController,
                       keyboardType: TextInputType.number,
                       obscureText: true,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: GoogleFonts.dmSans(color: Colors.white, fontSize: 15),
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(4),
                       ],
                       decoration: InputDecoration(
                         labelText: 'CVC / CVV',
-                        labelStyle: const TextStyle(color: CbColors.textSecondary),
+                        labelStyle: GoogleFonts.dmSans(color: CbColors.textMuted),
                         hintText: '123',
-                        hintStyle: const TextStyle(color: CbColors.textMuted),
+                        hintStyle: GoogleFonts.dmSans(color: CbColors.textMuted.withAlpha(100)),
                         filled: true,
-                        fillColor: CbColors.surface2,
+                        fillColor: CbColors.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: CbColors.borderSubtle),
+                          borderSide: const BorderSide(color: CbColors.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: CbColors.borderFocus, width: 2),
+                          borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
                         ),
                       ),
                       validator: (val) {
@@ -322,27 +325,27 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
               // Cardholder Name input
               TextFormField(
                 controller: _nameController,
                 textCapitalization: TextCapitalization.words,
-                style: const TextStyle(color: Colors.white, fontSize: 15),
+                style: GoogleFonts.dmSans(color: Colors.white, fontSize: 15),
                 decoration: InputDecoration(
                   labelText: 'Name on Card',
-                  labelStyle: const TextStyle(color: CbColors.textSecondary),
+                  labelStyle: GoogleFonts.dmSans(color: CbColors.textMuted),
                   hintText: 'Jane Doe',
-                  hintStyle: const TextStyle(color: CbColors.textMuted),
+                  hintStyle: GoogleFonts.dmSans(color: CbColors.textMuted.withAlpha(100)),
                   filled: true,
-                  fillColor: CbColors.surface2,
+                  fillColor: CbColors.surface,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: CbColors.borderSubtle),
+                    borderSide: const BorderSide(color: CbColors.outline),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: CbColors.borderFocus, width: 2),
+                    borderSide: const BorderSide(color: CbColors.purpleMain, width: 2),
                   ),
                 ),
                 validator: (val) {
@@ -352,7 +355,7 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // Save default toggle
               Row(
@@ -363,37 +366,39 @@ class _CbCardInputSheetState extends ConsumerState<CbCardInputSheet> {
                     checkColor: Colors.white,
                     onChanged: (val) => setState(() => _isDefault = val ?? true),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Save as primary card for 1-tap future tips',
-                      style: TextStyle(color: CbColors.textSecondary, fontSize: 13),
+                      style: GoogleFonts.dmSans(color: CbColors.textMuted, fontSize: 13),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-              // Submit Button
-              FilledButton(
-                onPressed: _saving ? null : _handleSave,
-                style: FilledButton.styleFrom(
-                  backgroundColor: CbColors.purpleMain,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+              // Submit Button (52dp height)
+              SizedBox(
+                height: 52,
+                child: FilledButton(
+                  onPressed: _saving ? null : _handleSave,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: CbColors.purpleMain,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
+                  child: _saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          'Save Payment Card',
+                          style: GoogleFonts.dmSans(fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
                 ),
-                child: _saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Text(
-                        'Save Payment Card',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
               ),
             ],
           ),
