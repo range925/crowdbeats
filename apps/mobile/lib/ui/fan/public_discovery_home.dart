@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/models/discovery.dart';
 import '../../state/auth_state.dart';
@@ -92,11 +93,11 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
         : performers.take(3).toList();
 
     return Scaffold(
-      backgroundColor: CbColors.bgApp,
+      backgroundColor: CbColors.surface,
       body: SafeArea(
         child: RefreshIndicator(
-          color: CbColors.purpleMain,
-          backgroundColor: const Color(0xFF151722),
+          color: CbColors.primary,
+          backgroundColor: CbColors.surfaceContainer,
           onRefresh: () async {
             await Future<void>.delayed(const Duration(milliseconds: 400));
           },
@@ -116,12 +117,11 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                             children: [
                               Text(
                                 'CROWDBEATS',
-                                style: TextStyle(
+                                style: GoogleFonts.dmSans(
                                   color: Colors.white,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: -0.5,
-                                  fontFamily: Theme.of(context).textTheme.titleLarge?.fontFamily,
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -159,15 +159,15 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: () => context.push('/auth'),
+                                  onPressed: () => context.push('/auth?from=/fan'),
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                     minimumSize: const Size(48, 44),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     'Sign in',
-                                    style: TextStyle(
-                                      color: Color(0xFFA855F7),
+                                    style: GoogleFonts.dmSans(
+                                      color: CbColors.primary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -175,9 +175,9 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                                 ),
                                 const SizedBox(width: 6),
                                 ElevatedButton(
-                                  onPressed: () => context.push('/auth'),
+                                  onPressed: () => context.push('/auth?mode=signup&from=/fan'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: CbColors.purpleMain,
+                                    backgroundColor: CbColors.primary,
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                     minimumSize: const Size(48, 44),
@@ -186,9 +186,9 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                                     ),
                                     elevation: 0,
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     'Join',
-                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                                    style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700),
                                   ),
                                 ),
                               ],
@@ -196,10 +196,10 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Discover music around you',
-                        style: TextStyle(
-                          color: Color(0xFF94A3B8),
+                        style: GoogleFonts.dmSans(
+                          color: CbColors.onSurfaceVariant,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -217,9 +217,9 @@ class _PublicDiscoveryHomeState extends ConsumerState<PublicDiscoveryHome> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1B1E28),
+                        color: CbColors.surfaceContainer,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFF2B2D44)),
+                        border: Border.all(color: CbColors.outline),
                       ),
                       child: Column(
                         children: [

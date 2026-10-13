@@ -5,8 +5,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../theme/cb_colors.dart';
 import '../../theme/cb_spacing.dart';
+import '../../components/cb_button.dart';
 import '../../components/cb_live_badge.dart';
 import '../activity/receipt_screen.dart';
 import '../../../state/auth_state.dart';
@@ -492,13 +496,17 @@ class _ActivityTabState extends ConsumerState<ActivityTab> {
 
     if (!isAuthenticated) {
       return Scaffold(
-        backgroundColor: CbColors.bgApp,
+        backgroundColor: CbColors.surface,
         appBar: AppBar(
-          backgroundColor: CbColors.bgApp,
+          backgroundColor: CbColors.surface,
           elevation: 0,
-          title: const Text(
+          title: Text(
             'Activity & Alerts',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: GoogleFonts.dmSans(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         body: Center(
@@ -511,33 +519,35 @@ class _ActivityTabState extends ConsumerState<ActivityTab> {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: CbColors.surfaceCard,
+                    color: CbColors.surfaceContainerHigh,
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0x338B5CF6)),
+                    border: Border.all(color: CbColors.outline, width: 1.5),
                   ),
-                  child: const Icon(Icons.notifications_none, size: 36, color: CbColors.purpleLight),
+                  child: const Icon(Icons.notifications_none_rounded, size: 36, color: CbColors.primary),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Sign in to view your activity',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                  style: GoogleFonts.dmSans(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Keep track of your tip receipts, creator stage alerts, live notifications, and favorite artists.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13, height: 1.4),
+                  style: GoogleFonts.dmSans(
+                    color: CbColors.onSurfaceVariant,
+                    fontSize: 13,
+                    height: 1.45,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: CbColors.purpleMain,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () => Navigator.of(context).pushNamed('/auth'),
-                  child: const Text('Sign In / Register', style: TextStyle(fontWeight: FontWeight.w700)),
+                CbButton(
+                  label: 'Sign In / Register',
+                  onPressed: () => context.push('/auth?from=/fan'),
                 ),
               ],
             ),

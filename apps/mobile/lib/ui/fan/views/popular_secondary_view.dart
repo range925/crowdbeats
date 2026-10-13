@@ -6,6 +6,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/cb_colors.dart';
 import '../../../data/models/discovery.dart';
 import '../../../state/discovery_state.dart';
 import '../public_profile_screen.dart';
@@ -42,9 +44,9 @@ class _PopularSecondaryViewState extends ConsumerState<PopularSecondaryView> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0C10),
+      backgroundColor: CbColors.surface,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF131315),
+        backgroundColor: CbColors.surfaceContainer,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
@@ -55,17 +57,17 @@ class _PopularSecondaryViewState extends ConsumerState<PopularSecondaryView> {
           children: [
             Text(
               'Popular in $cityName',
-              style: const TextStyle(
+              style: GoogleFonts.dmSans(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.2,
               ),
             ),
-            const Text(
+            Text(
               'Ranked by active fan engagement',
-              style: TextStyle(
-                color: Color(0xFFF59E0B),
+              style: GoogleFonts.dmSans(
+                color: CbColors.rankGold,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),

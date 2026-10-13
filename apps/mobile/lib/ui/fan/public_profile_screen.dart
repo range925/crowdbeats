@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/models/discovery.dart';
 import '../../state/auth_state.dart';
@@ -99,14 +100,14 @@ class PublicProfileScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: CbColors.bgApp,
+      backgroundColor: CbColors.surface,
       body: CustomScrollView(
         slivers: [
           // Sliver App Bar with Cover Photo
           SliverAppBar(
             expandedHeight: 260,
             pinned: true,
-            backgroundColor: CbColors.surfaceBase,
+            backgroundColor: CbColors.surfaceContainer,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => context.pop(),
@@ -136,8 +137,8 @@ class PublicProfileScreen extends ConsumerWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          CbColors.purpleDark.withValues(alpha: 0.8),
-                          CbColors.bgApp,
+                          CbColors.surfaceContainerHigh,
+                          CbColors.surface,
                         ],
                       ),
                     ),
@@ -156,7 +157,7 @@ class PublicProfileScreen extends ConsumerWidget {
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Colors.transparent, CbColors.bgApp],
+                          colors: [Colors.transparent, CbColors.surface],
                         ),
                       ),
                     ),
@@ -212,7 +213,7 @@ class PublicProfileScreen extends ConsumerWidget {
                   // Performer Name
                   Text(
                     performer.name,
-                    style: const TextStyle(
+                    style: GoogleFonts.dmSans(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -306,9 +307,9 @@ class PublicProfileScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF151C2C),
+                      color: CbColors.surfaceContainer,
                       borderRadius: BorderRadius.circular(CbSpacing.radiusLg),
-                      border: Border.all(color: const Color(0x3300E5FF)),
+                      border: Border.all(color: CbColors.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,9 +398,9 @@ class PublicProfileScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: CbColors.surfaceCard,
+                      color: CbColors.surfaceContainer,
                       borderRadius: BorderRadius.circular(CbSpacing.radiusLg),
-                      border: Border.all(color: const Color(0x2B8B5CF6)),
+                      border: Border.all(color: CbColors.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -468,9 +469,9 @@ class PublicProfileScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: CbColors.surfaceCard,
+                      color: CbColors.surfaceContainer,
                       borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
-                      border: Border.all(color: const Color(0x1AFFFFFF)),
+                      border: Border.all(color: CbColors.outline),
                     ),
                     child: Row(
                       children: [
@@ -522,22 +523,27 @@ class PublicProfileScreen extends ConsumerWidget {
     bool isAuthenticated,
   ) {
     return Expanded(
-      child: GestureDetector(
-        onTap: () => _handleTip(context, ref, performer, amountCents, isAuthenticated),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0x228B5CF6),
-            borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
-            border: Border.all(color: CbColors.purpleMain.withValues(alpha: 0.5)),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
+      child: Semantics(
+        button: true,
+        label: 'Select $label tip',
+        child: GestureDetector(
+          onTap: () => _handleTip(context, ref, performer, amountCents, isAuthenticated),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: CbColors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(CbSpacing.radiusMd),
+              border: Border.all(color: CbColors.outlineVariant),
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: GoogleFonts.dmSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),

@@ -603,4 +603,58 @@ Tests: each feature owner adds tests in **new** files named after their area. Ch
 * **Checkpoint Tag:** `redesign-mobile-cp5`.
 * **Ready for Phase 6:** Discovery & Public Profiles (`GST-01..07`, `DSC-01..12`, `PRF-01..03`).
 
+---
+
+## 18. Phase 6 Gate Report & Discovery / Public Profiles Verification
+
+**Phase:** Phase 6 (Discovery & Public Profiles: `GST-01..07`, `DSC-01..12`, `PRF-01..03`)  
+**Owners:** Coordinator, Discovery/Location Specialist, UX Specialist, QA  
+**Status:** **PASSED**  
+**Checkpoint Tag:** `redesign-mobile-cp6`  
+**Date Completed:** October 12, 2026  
+
+---
+
+### 18.1 Deliverables & Implementations
+
+1. **Guest Account Ergonomics & Grouped Legal Hierarchy (`apps/mobile/lib/ui/guest/guest_account_screen.dart`):**
+   - **Uber/Lyft Grouped Pattern:** Replaced standalone cards with `CbGroupedCard.divided` container (`#161B22`, 1px hairline divider) hosting 4 accessible `CbSettingsRow` items (Help & Support Center, Terms of Service, Privacy Policy, DMCA & Copyright Policy).
+   - **Return Resumption Routing:** Configured "Create Account" to push `/auth?mode=signup&from=/fan` and "Sign In" to push `/auth?from=/fan`.
+   - **Obsidian Tokens & DM Sans:** Aligned with `CbColors.surface` (`#0E1116`), `CbColors.outline`, and DM Sans typography.
+
+2. **Location-First Public Discovery (`apps/mobile/lib/ui/fan/public_discovery_home.dart`):**
+   - **Header & Guest Entry Points:** CROWDBEATS wordmark with live status pill; "Sign in" and "Join" actions pass `?from=/fan` return destinations.
+   - **Dismissible Primer Card:** Obsidian container (`CbColors.surfaceContainer`, `CbColors.outline`) with value propositions (Explore Live, Follow, Support).
+   - **Compact Google Map & Autocomplete Search:** Direct placement of interactive basemap below 3-character threshold autocomplete search, supporting manual pan "Search this area" floating pill and top-5 live-first distance ranking.
+
+3. **Public Profiles & Safety Moderation (`apps/mobile/lib/ui/fan/public_profile_screen.dart` & `cb_safety_action_sheet.dart`):**
+   - **Solo Artist (`PRF-01`) & Band (`PRF-02`):** Displays verified badge, live status indicator, genre chips, distance/venue indicator, and crowdfunding campaign progress cards.
+   - **Tip Presets & Touch Targets:** Preset pills ($5, $10, $20) and Custom Tip button adhere to >=48dp accessible touch floor with `GoogleFonts.dmSans`.
+   - **Guest Auth Gate:** Tapping a tip preset while unauthenticated prompts `TipAuthGateModal` with `PendingTipContext(sourceScreen: 'public_profile')`, resuming the tip confirmation immediately upon sign-in.
+   - **Safety Menu (`PRF-03`):** Header shield button launches `CbSafetyActionSheet` for blocking, restricting, or categorizing violation reports.
+
+4. **Activity & Secondary Discovery Feeds (`apps/mobile/lib/ui/fan/tabs/activity_tab.dart` & `views/popular_secondary_view.dart`):**
+   - **Activity Guest Explainer (`GST-07`):** Replaced legacy `pushNamed('/auth')` with accessible `CbButton` pushing `/auth?from=/fan`.
+   - **Popular Feed (`GST-03`):** Clean header, filter chips (Trending, Solo Artists, Bands, Top Venues), and obsidian surface tokens.
+
+---
+
+### 18.2 Automated Test Execution & Verification Evidence
+
+| Test Suite / Tool | Command | Result | Notes |
+| :--- | :--- | :--- | :--- |
+| **Static Analysis** | `flutter analyze --no-pub` | **PASS (0 issues)** | "No issues found! (ran in 11.4s)" across all 220 Dart files in `apps/mobile`. |
+| **Phase 6 Discovery & Profiles Suite** | `flutter test --no-pub test/phase6_discovery_profiles_test.dart` | **PASS (8 / 8)** | Verified `GuestAccountScreen` grouped card, `PublicDiscoveryHome` guest actions, `PublicProfileScreen` (artist & band), tip preset gates, `CbSafetyActionSheet`, and `ActivityTab` guest explainer. |
+| **Discovery Vertical Slice & Permissions** | `flutter test --no-pub test/discovery_vertical_slice_test.dart test/discovery_permissions_tipping_test.dart test/discovery_test.dart` | **PASS (26 / 26)** | Verified top-5 map-list sync, 3-char autocomplete, pan gesture pill, location permission fallbacks, and QR preservation. |
+| **Full Mobile Test Suite** | `flutter test --no-pub` | **PASS (498 / 498)** | All 498 tests passed (+8 tests beyond Phase 5) with zero regressions across auth, discovery, location, tipping, settings, and creator pipelines. |
+
+---
+
+### 18.3 Phase 6 Gate Sign-Off
+
+* **Phase 6 Gate:** **PASSED** (Discovery and public profile screens redesigned, verified against Stitch specs, and recorded in `coverage.csv`).
+* **Isolation Maintained:** Zero changes to `apps/web` or root `.stitch/`.
+* **Checkpoint Tag:** `redesign-mobile-cp6`.
+* **Ready for Phase 7:** Tipping & Payments Flow (`TIP-01..11`).
+
 
