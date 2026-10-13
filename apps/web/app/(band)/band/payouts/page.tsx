@@ -14,6 +14,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { calculateNetTipPayout, calculateBandNetSplits } from '@/lib/financial/stripeDailyFeeService';
 import { callCallableFunction } from '@/lib/firebase/functions';
+import { useAuth, useOptionalAuth } from '@/lib/hooks/useAuth';
+import { useBandTreasury } from '@/lib/band/bandCrm';
 
 export interface ConnectAccountStatus {
   accountId: string | null;
@@ -106,6 +108,12 @@ function BandCardForm() {
 }
 
 export default function BandPayoutsPage() {
+  const auth = useOptionalAuth();
+  const user = auth?.user ?? null;
+  const bandId = (user as any)?.bandId || (user as any)?.activeBandId || 'band_neon_pulse';
+  const currentUid = user?.uid || '';
+  const { treasury } = useBandTreasury(bandId);
+
   const [accountStatus, setAccountStatus] = useState<ConnectAccountStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [statusError, setStatusError] = useState<string | null>(null);
@@ -446,18 +454,69 @@ export default function BandPayoutsPage() {
         })()}
       </div>
 
-      {/* 3. Member split matrix */}
+      {/* 3. Member split matrix & Payout-Data Isolation */}
       <div style={{ background: 'var(--surface-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-subtle)', fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Member Payout Status</div>
+        <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-subtle)', fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <span>Member Payout &amp; KYC Status</span>
+          <span style={{ fontSize: 12, padding: '3px 8px', borderRadius: 6, background: 'rgba(16,185,129,0.1)', color: '#10B981', fontWeight: 600 }}>
+            🔒 Payout-Data Isolation Active
+          </span>
+        </div>
+
+        <div style={{ padding: '10px 24px', background: 'rgba(16,185,129,0.05)', borderBottom: '1px solid var(--border-subtle)', fontSize: 12, color: '#10B981', lineHeight: 1.4 }}>
+          <strong>Platform Isolation Rule:</strong> Individual member wallet balances and private bank details are isolated. Each member can only view their own personal payout balance, while band leadership can verify KYC onboarding readiness.
+        </div>
+
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-          <thead><tr style={{ background: 'var(--surface-raised)', color: 'var(--text-secondary)' }}>
-            <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600 }}>Member</th>
-            <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600 }}>KYC Status</th>
-            <th style={{ padding: '12px 20px', textAlign: 'right', fontWeight: 600 }}>Balance</th>
-          </tr></thead>
-          <tbody><tr>
-            <td colSpan={3} style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text-tertiary)' }}>No band members connected yet. Invite members to set up their Stripe accounts.</td>
-          </tr></tbody>
+          <thead>
+            <tr style={{ background: 'var(--surface-raised)', color: 'var(--text-secondary)' }}>
+              <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600 }}>Member</th>
+              <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600 }}>Role</th>
+              <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600 }}>Split Share</th>
+              <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600 }}>KYC Readiness</th>
+              <th style={{ padding: '12px 20px', textAlign: 'right', fontWeight: 600 }}>Personal Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {treasury && treasury.members && treasury.members.length > 0 ? (
+              treasury.members.map((m) => {
+                const isSelf = m.uid === currentUid;
+                return (
+                  <tr key={m.uid} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                    <td style={{ padding: '14px 20px', fontWeight: 600 }}>
+                      {m.displayName} {isSelf && <span style={{ color: '#8B5CF6', fontSize: 11 }}>(You)</span>}
+                    </td>
+                    <td style={{ padding: '14px 20px', color: 'var(--text-secondary)' }}>
+                      {m.role.replace('BAND_', '')}
+                    </td>
+                    <td style={{ padding: '14px 20px', fontWeight: 700 }}>
+                      {(m.splitBps / 100).toFixed(1)}%
+                    </td>
+                    <td style={{ padding: '14px 20px' }}>
+                      {m.stripePayoutsEnabled ? (
+                        <span style={{ color: '#10B981', fontWeight: 600, fontSize: 12 }}>✓ Ready for Payouts</span>
+                      ) : (
+                        <span style={{ color: '#F59E0B', fontWeight: 600, fontSize: 12 }}>⏳ Pending KYC</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '14px 20px', textAlign: 'right', fontWeight: 700 }}>
+                      {isSelf ? (
+                        <span style={{ color: '#10B981' }}>${(m.availableBalanceCents / 100).toFixed(2)}</span>
+                      ) : (
+                        <span style={{ color: 'var(--text-tertiary)', fontWeight: 500, fontSize: 12 }}>🔒 Isolated (Member only)</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={5} style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                  No band members connected yet. Invite members to set up their Stripe accounts.
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
     </div>

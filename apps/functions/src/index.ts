@@ -340,3 +340,11 @@ export {
   getCreatorSupporterDetailsCallable,
   sendCreatorThankYouNoteCallable,
 } from './creator/creatorCrmCallables.js';
+
+// ─── Band CRM & Member Management Callables (Phase 12) ────────────────────────
+export {
+  getBandSupportersCallable,
+  getBandSupporterDetailsCallable,
+  sendBandThankYouNoteCallable,
+  getBandActivityCallable,
+} from './band/bandCrmCallables.js';

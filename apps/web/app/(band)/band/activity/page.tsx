@@ -94,11 +94,38 @@ const INITIAL_BAND_ACTIVITIES: BandActivityItem[] = [
   },
 ];
 
-export default function BandActivityPage() {
-  const [filter, setFilter] = useState<'All' | 'Band Tips' | 'Splits' | 'Gigs' | 'Roster'>('All');
-  const [activities] = useState<BandActivityItem[]>(INITIAL_BAND_ACTIVITIES);
+import { useAuth } from '@/lib/hooks/useAuth';
+import { useBandActivity, useBandTreasury } from '@/lib/band/bandCrm';
 
-  const filtered = activities.filter((act) => {
+export default function BandActivityPage() {
+  const { user } = useAuth();
+  const bandId = (user as any)?.bandId || (user as any)?.activeBandId || 'band_neon_pulse';
+
+  const [filter, setFilter] = useState<'All' | 'Band Tips' | 'Splits' | 'Gigs' | 'Roster'>('All');
+  const { activities: liveActivities, loading } = useBandActivity(bandId, filter);
+  const { treasury } = useBandTreasury(bandId);
+
+  // Map live activities to BandActivityItem shape
+  const liveItems: BandActivityItem[] = liveActivities.map((a) => {
+    let type: BandActivityItem['type'] = 'member';
+    if (a.type === 'TIP_RECEIVED') type = 'tip';
+    else if (a.type === 'SPLIT_UPDATED') type = 'split';
+    else if (a.type === 'GIG_CHECKIN') type = 'gig';
+
+    return {
+      id: a.eventId,
+      type,
+      title: a.title,
+      subtitle: a.description,
+      amount: a.amountCents ? `+$${(a.amountCents / 100).toFixed(2)}` : undefined,
+      timeAgo: new Date(a.timestamp).toLocaleDateString(),
+      statusTag: a.type.replace('_', ' '),
+    };
+  });
+
+  const combinedActivities = liveItems.length > 0 ? liveItems : INITIAL_BAND_ACTIVITIES;
+
+  const filtered = combinedActivities.filter((act) => {
     if (filter === 'All') return true;
     if (filter === 'Band Tips') return act.type === 'tip';
     if (filter === 'Splits') return act.type === 'split';

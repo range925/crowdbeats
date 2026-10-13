@@ -432,3 +432,7 @@ export function useAuth(): AuthState & AuthActions {
   if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');
   return ctx;
 }
+
+export function useOptionalAuth(): (AuthState & AuthActions) | null {
+  return useContext(AuthContext);
+}

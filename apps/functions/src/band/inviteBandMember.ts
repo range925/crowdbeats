@@ -119,12 +119,25 @@ export const inviteBandMember = onCall(
       createdAt: now,
     });
 
-    // Audit log
-    await _db().collection('bands').doc(bandId).collection('auditLogs').doc(uuidv4()).set({
+    // Audit log & Shared Activity
+    const actId = uuidv4();
+    await _db().collection('bands').doc(bandId).collection('auditLogs').doc(actId).set({
       action: 'MEMBER_INVITED',
       performedByUid: uid,
       details: { email, role: roleRaw, invitationId },
       timestamp: now,
+    });
+
+    await _db().collection('bands').doc(bandId).collection('activity').doc(actId).set({
+      eventId: actId,
+      bandId,
+      type: 'INVITATION_SENT',
+      title: 'Member Invitation Dispatched',
+      description: `Invited ${email} as ${roleRaw}`,
+      actorUid: uid,
+      timestamp: new Date().toISOString(),
+      metadata: { email, role: roleRaw, invitationId },
+      createdAt: now,
     });
 
     return { invitationId, expiresAt };

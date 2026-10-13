@@ -369,6 +369,12 @@ service cloud.firestore {
         allow read: if isBandAdmin(bandId) || isSuperAdmin();
         allow create, update, delete: if false;
       }
+
+      // ── Band Activity (subcollection) ──────────────────────────────────────
+      match /activity/{activityId} {
+        allow read: if isBandMember(bandId) || isUserSupportStaff();
+        allow create, update, delete: if false;
+      }
     }
 
     // ── Top-level Invitations Index ─────────────────────────────────────────
@@ -529,6 +535,7 @@ service cloud.firestore {
       allow read: if isSignedIn() &&
         (resource.data.fanUid == uid() ||
          resource.data.get('creatorId', '') == uid() ||
+         (resource.data.get('creatorType', '') == 'band' && isBandMember(resource.data.get('creatorId', ''))) ||
          isUserSupportStaff());
       allow create, update, delete: if false;
     }
@@ -575,7 +582,10 @@ service cloud.firestore {
     match /campaigns/{campaignId} {
       allow read: if isSignedIn();
       allow create: if false; // Via createCampaign callable
-      allow update: if isSignedIn() && resource.data.creatorId == uid() &&
+      allow update: if isSignedIn() && (
+        resource.data.creatorId == uid() ||
+        (resource.data.get('creatorType', '') == 'band' && isBandAdmin(resource.data.get('creatorId', '')))
+      ) &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(
           ['title', 'description', 'coverUrl', 'updatedAt', 'v']
         ) &&

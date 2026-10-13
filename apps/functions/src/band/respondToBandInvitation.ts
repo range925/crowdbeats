@@ -127,12 +127,26 @@ export const respondToBandInvitation = onCall(
       updatedAt: now,
     });
 
-    // Audit log
-    batch.set(bandRef.collection('auditLogs').doc(uuidv4()), {
+    // Audit log & Shared Activity
+    const actId = uuidv4();
+    batch.set(bandRef.collection('auditLogs').doc(actId), {
       action: 'MEMBER_JOINED',
       performedByUid: uid,
       details: { role, invitationId, displayName },
       timestamp: now,
+    });
+
+    batch.set(bandRef.collection('activity').doc(actId), {
+      eventId: actId,
+      bandId,
+      type: 'MEMBER_JOINED',
+      title: 'New Band Member Joined',
+      description: `${displayName} joined as ${role}`,
+      actorUid: uid,
+      actorName: displayName,
+      timestamp: new Date().toISOString(),
+      metadata: { role, invitationId, displayName },
+      createdAt: now,
     });
 
     await batch.commit();

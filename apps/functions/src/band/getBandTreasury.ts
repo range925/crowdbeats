@@ -43,11 +43,19 @@ export const getBandTreasury = onCall(
       throw new HttpsError('not-found', 'Band not found.');
     }
 
-    // 1. Verify caller is a member
+    // 1. Verify caller is an active member or authorized staff
+    const callerPlatformRole = (request.auth.token?.['role'] as string) || '';
+    const isStaff = ['SUPER_ADMIN', 'CUSTOMER_SUPPORT', 'FINANCE_ANALYST'].includes(callerPlatformRole);
+
     const callerMemberDoc = await bandRef.collection('members').doc(uid).get();
-    if (!callerMemberDoc.exists || callerMemberDoc.data()?.['isActive'] !== true) {
+    const isMember = callerMemberDoc.exists && callerMemberDoc.data()?.['isActive'] === true;
+
+    if (!isMember && !isStaff) {
       throw new HttpsError('permission-denied', 'You are not an active member of this band.');
     }
+
+    const callerRole = callerMemberDoc.exists ? (callerMemberDoc.data()?.['role'] as string) : 'STAFF';
+    const isOwnerOrAdmin = ['BAND_FOUNDER', 'BAND_ADMIN'].includes(callerRole) || isStaff;
 
     const band = bandSnap.data()!;
     const totalTipsReceivedCents = (band['totalTipsReceivedCents'] as number) || 0;
@@ -65,12 +73,13 @@ export const getBandTreasury = onCall(
       }
     }
 
-    // 3. Fetch active members and their earnings/Connect status
+    // 3. Fetch active members with strict Payout-Data Isolation
     const membersSnap = await bandRef.collection('members').where('isActive', '==', true).get();
     const memberSummaries = await Promise.all(
       membersSnap.docs.map(async (doc) => {
         const mData = doc.data();
         const mUid = doc.id;
+        const isSelf = mUid === uid;
 
         // Fetch user document for KYC and balances
         const userDoc = await _db().collection('users').doc(mUid).get();
@@ -82,16 +91,23 @@ export const getBandTreasury = onCall(
         const pendingKycBalanceCents = (uData['pendingKycBalanceCents'] as number) || 0;
         const totalEarnedCents = (uData['totalEarnedCents'] as number) || 0;
 
+        // PAYOUT-DATA ISOLATION:
+        // - Self: Full view of personal balance, KYC, and earnings.
+        // - Owner / Admin: View member KYC readiness (charges/payoutsEnabled) and earnings, but isolate private wallet balances.
+        // - Regular Member: Zero visibility into other members' balances, earnings, or KYC statuses.
+        const canViewFinancials = isSelf;
+        const canViewKycStatus = isSelf || isOwnerOrAdmin;
+
         return {
           uid: mUid,
           displayName: (mData['displayName'] as string) || 'Member',
           role: (mData['role'] as string) || 'BAND_MEMBER',
           splitBps: splitMap.get(mUid) || 0,
-          totalEarnedCents,
-          availableBalanceCents,
-          pendingKycBalanceCents,
-          stripeChargesEnabled: chargesEnabled,
-          stripePayoutsEnabled: payoutsEnabled,
+          totalEarnedCents: canViewFinancials ? totalEarnedCents : 0,
+          availableBalanceCents: canViewFinancials ? availableBalanceCents : 0,
+          pendingKycBalanceCents: canViewFinancials ? pendingKycBalanceCents : 0,
+          stripeChargesEnabled: canViewKycStatus ? chargesEnabled : false,
+          stripePayoutsEnabled: canViewKycStatus ? payoutsEnabled : false,
         };
       }),
     );
