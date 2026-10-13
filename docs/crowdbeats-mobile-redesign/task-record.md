@@ -359,4 +359,40 @@ Tests: each feature owner adds tests in **new** files named after their area. Ch
   - Non-financial navigation, theme and shell work can proceed after design sign-off.
   - Financial implementation (TIP-03..TIP-08, ACC-04, CRS-19..22) is **paused** on B-01..B-04 and B-06.
   - Saved is paused on B-14. Real discovery data needs B-07.
-- **Awaiting:** the user's Phase 2 prompt.
+- **Awaiting:** Phase 2 complete; ready for Phase 3.
+
+---
+
+## 14. Phase 2 — Information Architecture, Navigation & Flow Specifications (GATE REPORT)
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-12 / 2026-10-13 |
+| Owners | UX Coordinator, Flutter Navigation Architect, Creator/Band Lead, Payments Lead, QA Lead |
+| Checkpoint Start | `CP-1`: Commit `45965dd` tagged `redesign-mobile-cp1`. |
+| Deliverables Created | `ia/navigation-architecture.md`, `ia/flow-specifications.md`, `ia/profile-settings-hierarchy.md`, `ia/route-action-matrix.md`, updated `coverage.csv`. |
+| Phase 2 Status | **GATE PASSED**. All journeys mapped; every inventoried screen has a target destination; zero orphan controls. |
+
+### 14.1 Key Architecture Decisions & Resolutions
+
+| Decision ID | Title | Resolution & Rationale |
+|---|---|---|
+| **OD-IA1** | Creator Messages Placement | Placed in AppBar of Following (Tab 1) with unread badge + contextual entry on Performer Profile. |
+| **OD-IA2** | BandShell Retirement | `BandShell` (`/band`) retired completely into unified `CreatorShell` (`/creator`) with dynamic Context Switcher Pill (Solo vs Band). Resolves B-19 & B-22. |
+| **OD-F1** | Authoritative Fee Contract | Server takes 6% platform fee (`createTipIntent.ts:74-95`). Stripe processing fee is absorbed. UI displays server-returned numbers directly; client formulas removed. |
+| **OD-Q1** | Canonical QR Architecture | QR resolves directly to performer tip flow; captures `PendingTipContext` across login; `test_` dev bypass flagged for removal in Phase 5. |
+| **OD-S1** | Saved Acts & Stages | Consolidated under Following hub tab (`/following`) as a filtered segment to eliminate redundant tabs. |
+| **OD-P1** | Canonical Persona IDs | Standardized to `guest`, `fan`, `solo` (aliases: `artist`, `musician`), and `band`. Prohibits Fan-to-Creator switching in router. |
+| **OD-T1** | Typography | Retained DM Sans (via `google_fonts: 6.3.3`) to prevent unnecessary package churn; text scaling respects `fontScale` multiplier. |
+| **OD-L1** | Brand Logo | Preserved official Crowdbeats vector logo; avoids third-party visual bleed. |
+
+### 14.2 Tipping & Lifecycle Validation
+1. **Guest Discovery -> Tip Sent:** 8-step flow with intent preservation in `PendingTipContext`. Resumes exact act and amount after authentication.
+2. **Returning Fan Quick Tipping:** Streamlined to 3 meaningful user actions (Initiate -> Amount -> Confirm & Pay).
+3. **Creator 4-State Lifecycle:** Explicit gates: `Account Created` -> `Profile Completed` -> `Identity Verified` -> `Payout Eligible`.
+4. **Band Governance:** Founder/Admin/Member role hierarchy; splits must sum to 100.0%; locked during active live sessions.
+5. **Settings Hierarchy:** Clean 8-section Uber/Lyft-style hierarchy (Account & Security, Payments, Creator Payouts, Privacy & Safety, Notifications, Preferences, Support, Legal).
+
+### 14.3 Next-Phase Readiness
+* **Phase 2 Gate:** **PASSED**.
+* **Ready for Phase 3:** Stitch visual design, component system, light/dark token sheets, and screen generation across all 4 personas.
