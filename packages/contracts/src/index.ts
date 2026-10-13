@@ -120,6 +120,9 @@ export * from './crm/crmContracts';
 // ─── Admin Command Center Foundation (Phase 7) ────────────────────────────
 export * from './admin/adminCommandCenterContracts';
 
-export const CONTRACTS_VERSION = '0.21.0-unified-admin-crm' as const;
+// ─── Support & Case Management (Phase 9) ──────────────────────────────────
+export * from './support/supportContracts';
+
+export const CONTRACTS_VERSION = '0.22.0-support-case-management' as const;
 
 

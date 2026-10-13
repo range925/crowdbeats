@@ -38,6 +38,27 @@ import type {
   UpdateCrmVerificationStatusResponse,
   AddCrmInternalNoteRequest,
   AddCrmInternalNoteResponse,
+  SupportTicket,
+  SupportTicketStatus,
+  SupportTicketPriority,
+  SupportTicketCategory,
+  SupportMessage,
+  SupportInternalNote,
+  SupportTicketHistoryEntry,
+  CreateSupportTicketRequest,
+  CreateSupportTicketResponse,
+  AssignSupportTicketRequest,
+  AssignSupportTicketResponse,
+  ResolveSupportTicketRequest,
+  ResolveSupportTicketResponse,
+  ReopenSupportTicketRequest,
+  ReopenSupportTicketResponse,
+  AddSupportTicketMessageRequest,
+  AddSupportTicketMessageResponse,
+  AddSupportInternalNoteRequest,
+  AddSupportInternalNoteResponse,
+  GetSupportTicketDetailsRequest,
+  GetSupportTicketDetailsResponse,
 } from '@crowdbeats/contracts';
 import { firebaseApp } from '../firebase/app';
 
@@ -894,6 +915,92 @@ export async function callAddSupportTicketNote(
   return res.data as { success: boolean; message: string };
 }
 
+// ─── Phase 9 Support & Case Management Callables ────────────────────────────
+
+/** Call Cloud Function: createSupportTicketCallable */
+export async function callCreateSupportTicket(
+  req: CreateSupportTicketRequest
+): Promise<CreateSupportTicketResponse> {
+  const fn = httpsCallable<CreateSupportTicketRequest, CreateSupportTicketResponse>(
+    fns(),
+    'createSupportTicketCallable'
+  );
+  const res = await fn(req);
+  return res.data;
+}
+
+/** Call Cloud Function: assignSupportTicketCallable */
+export async function callAssignSupportTicket(
+  req: AssignSupportTicketRequest
+): Promise<AssignSupportTicketResponse> {
+  const fn = httpsCallable<AssignSupportTicketRequest, AssignSupportTicketResponse>(
+    fns(),
+    'assignSupportTicketCallable'
+  );
+  const res = await fn(req);
+  return res.data;
+}
+
+/** Call Cloud Function: resolveSupportTicketCallable */
+export async function callResolveSupportTicket(
+  req: ResolveSupportTicketRequest
+): Promise<ResolveSupportTicketResponse> {
+  const fn = httpsCallable<ResolveSupportTicketRequest, ResolveSupportTicketResponse>(
+    fns(),
+    'resolveSupportTicketCallable'
+  );
+  const res = await fn(req);
+  return res.data;
+}
+
+/** Call Cloud Function: reopenSupportTicketCallable */
+export async function callReopenSupportTicket(
+  req: ReopenSupportTicketRequest
+): Promise<ReopenSupportTicketResponse> {
+  const fn = httpsCallable<ReopenSupportTicketRequest, ReopenSupportTicketResponse>(
+    fns(),
+    'reopenSupportTicketCallable'
+  );
+  const res = await fn(req);
+  return res.data;
+}
+
+/** Call Cloud Function: addSupportTicketMessageCallable */
+export async function callAddSupportTicketMessage(
+  req: AddSupportTicketMessageRequest
+): Promise<AddSupportTicketMessageResponse> {
+  const fn = httpsCallable<AddSupportTicketMessageRequest, AddSupportTicketMessageResponse>(
+    fns(),
+    'addSupportTicketMessageCallable'
+  );
+  const res = await fn(req);
+  return res.data;
+}
+
+/** Call Cloud Function: addSupportInternalNoteCallable */
+export async function callAddSupportInternalNote(
+  req: AddSupportInternalNoteRequest
+): Promise<AddSupportInternalNoteResponse> {
+  const fn = httpsCallable<AddSupportInternalNoteRequest, AddSupportInternalNoteResponse>(
+    fns(),
+    'addSupportInternalNoteCallable'
+  );
+  const res = await fn(req);
+  return res.data;
+}
+
+/** Call Cloud Function: getSupportTicketDetailsCallable */
+export async function callGetSupportTicketDetails(
+  ticketId: string
+): Promise<GetSupportTicketDetailsResponse> {
+  const fn = httpsCallable<GetSupportTicketDetailsRequest, GetSupportTicketDetailsResponse>(
+    fns(),
+    'getSupportTicketDetailsCallable'
+  );
+  const res = await fn({ ticketId });
+  return res.data;
+}
+
 /** Call Cloud Function: runDailyReconciliation */
 export async function callRunDailyReconciliation(): Promise<any> {
   const fn = httpsCallable(fns(), 'runDailyReconciliation');
@@ -973,19 +1080,67 @@ export function useAdminAuditEvents(targetUid?: string, limitN = 50) {
 export interface AdminSupportTicket {
   id: string;
   ticketId?: string;
-  userId?: string;
+  ticketNumber?: string;
+  userId?: string | null;
+  userEmail?: string;
+  userName?: string;
+  userPersona?: string;
   email?: string;
   subject?: string;
   message?: string;
   body?: string;
+  description?: string;
   category?: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: 'open' | 'in_progress' | 'waiting_on_customer' | 'resolved' | 'closed';
   assignedTo?: string | null;
+  assignedStaffName?: string | null;
+  assignedStaffEmail?: string | null;
+  assignedAt?: any;
   priority?: 'low' | 'normal' | 'high' | 'urgent';
   createdAt?: any;
   updatedAt?: any;
-  resolutionNotes?: string;
+  resolvedAt?: any;
+  resolvedBy?: string | null;
+  resolutionNotes?: string | null;
+  reopenedAt?: any;
+  reopenedBy?: string | null;
+  reopenReason?: string | null;
+  slaDueAt?: any;
+  messageCount?: number;
+  noteCount?: number;
+  relatedSessionId?: string | null;
+  relatedTipId?: string | null;
+  relatedCampaignId?: string | null;
   notes?: Array<{ note: string; authorUid: string; authorEmail?: string; createdAt: any }>;
+}
+
+export function useAdminSupportTicketDetails(ticketId: string | null) {
+  const [details, setDetails] = useState<GetSupportTicketDetailsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!ticketId) {
+      setDetails(null);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await callGetSupportTicketDetails(ticketId);
+      setDetails(data);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to fetch ticket details');
+    } finally {
+      setLoading(false);
+    }
+  }, [ticketId]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { details, loading, error, refresh };
 }
 
 export function useAdminSupportTickets(limitN = 50) {

@@ -1222,6 +1222,25 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.get('userId', '') == uid() && request.resource.data.get('status', 'open') == 'open' && !request.resource.data.keys().hasAny(['assignedTo', 'resolutionNotes', 'internalNotes']);
       allow update: if isUserSupportStaff() || isSuperAdmin();
       allow delete: if false;
+
+      // ── Ticket Messages (subcollection) ────────────────────────────────────
+      match /messages/{messageId} {
+        allow read: if isUserSupportStaff() || isSuperAdmin() || (isSignedIn() && get(/databases/$(database)/documents/supportRequests/$(ticketId)).data.get('userId', '') == uid());
+        allow create: if isUserSupportStaff() || isSuperAdmin() || (isSignedIn() && get(/databases/$(database)/documents/supportRequests/$(ticketId)).data.get('userId', '') == uid() && request.resource.data.get('senderUid', '') == uid());
+        allow update, delete: if false;
+      }
+
+      // ── Internal Notes (subcollection) ─────────────────────────────────────
+      // STRICT PRIVACY BOUNDARY: Only staff can read and write. Customers/regular users must NOT be allowed to read or write.
+      match /internalNotes/{noteId} {
+        allow read, write: if isUserSupportStaff() || isSuperAdmin();
+      }
+
+      // ── Ticket History (subcollection) ─────────────────────────────────────
+      match /history/{historyId} {
+        allow read: if isUserSupportStaff() || isSuperAdmin() || (isSignedIn() && get(/databases/$(database)/documents/supportRequests/$(ticketId)).data.get('userId', '') == uid());
+        allow write: if false;
+      }
     }
 
     // ══════════════════════════════════════════════════════════════════════════

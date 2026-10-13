@@ -313,3 +313,14 @@ export {
 export {
   getAdminCommandCenterDataCallable,
 } from './admin/adminCommandCenterCallables.js';
+
+// ─── Support & Case Management Callables (Phase 9) ───────────────────────────
+export {
+  createSupportTicketCallable,
+  assignSupportTicketCallable,
+  resolveSupportTicketCallable,
+  reopenSupportTicketCallable,
+  addSupportTicketMessageCallable,
+  addSupportInternalNoteCallable,
+  getSupportTicketDetailsCallable,
+} from './support/supportCallables.js';

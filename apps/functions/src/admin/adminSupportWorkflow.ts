@@ -119,6 +119,20 @@ export const addSupportTicketNote = onCall(
       updatedAt: now
     });
 
+    if (typeof (ticketRef as any).collection === 'function') {
+      const noteSubRef = (ticketRef as any).collection('internalNotes').doc();
+      batch.set(noteSubRef, {
+        id: noteSubRef.id,
+        ticketId,
+        authorUid: uid,
+        authorName: token.email || 'Staff Agent',
+        authorEmail: token.email || '',
+        authorRole: callerRole,
+        note: note.trim(),
+        createdAt: new Date().toISOString()
+      });
+    }
+
     const auditRef = db.collection('auditEvents').doc();
     batch.set(auditRef, {
       eventId: auditRef.id,
@@ -128,7 +142,7 @@ export const addSupportTicketNote = onCall(
       targetUid: ticketId,
       targetType: 'supportTicket',
       action: 'ADMIN_ADD_SUPPORT_TICKET_NOTE',
-      fieldDiff: ['notes'],
+      fieldDiff: ['notes', 'internalNotes'],
       reason: 'Added internal note to ticket',
       timestamp: now,
       requestId: `tnot_${ticketId}_${Date.now()}`

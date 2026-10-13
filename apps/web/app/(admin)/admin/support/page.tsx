@@ -43,8 +43,14 @@ import {
 } from '@/components/admin/AdminIcons';
 import {
   useAdminSupportTickets,
+  useAdminSupportTicketDetails,
   callUpdateSupportTicket,
   callAddSupportTicketNote,
+  callAssignSupportTicket,
+  callResolveSupportTicket,
+  callReopenSupportTicket,
+  callAddSupportTicketMessage,
+  callAddSupportInternalNote,
   formatTS,
   type AdminSupportTicket,
 } from '@/lib/admin/adminFirestore';
@@ -143,7 +149,7 @@ export default function EnterpriseSupportPage() {
   // Dialog State
   const [actionDialog, setActionDialog] = useState<{
     isOpen: boolean;
-    type: 'RESOLVE' | 'CREDIT' | 'REASSIGN' | 'ESCALATE' | null;
+    type: 'RESOLVE' | 'REOPEN' | 'ASSIGN' | 'CREDIT' | 'ESCALATE' | null;
     title: string;
     description: string;
   }>({
@@ -160,6 +166,9 @@ export default function EnterpriseSupportPage() {
     if (!selectedTicket) return tickets[0] || null;
     return tickets.find((t) => t.id === selectedTicket.id) || selectedTicket;
   }, [tickets, selectedTicket]);
+
+  // Real-time detailed ticket thread, internal notes & history
+  const { details, refresh: refreshDetails } = useAdminSupportTicketDetails(currentTicket?.id || null);
 
   // Tab and search filtering
   const filteredTickets = useMemo(() => {
@@ -208,15 +217,24 @@ export default function EnterpriseSupportPage() {
 
     try {
       if (replyMode === 'note') {
-        await callAddSupportTicketNote(currentTicket.id, `[INTERNAL NOTE] ${messageInput.trim()}`);
+        try {
+          await callAddSupportInternalNote({ ticketId: currentTicket.id, note: messageInput.trim() });
+        } catch {
+          await callAddSupportTicketNote(currentTicket.id, `[INTERNAL NOTE] ${messageInput.trim()}`);
+        }
         setFeedback({ type: 'success', message: 'Internal staff note securely added to ticket.' });
       } else {
-        await callAddSupportTicketNote(currentTicket.id, `[CUSTOMER RESPONSE] ${messageInput.trim()}`);
-        await callUpdateSupportTicket(currentTicket.id, { status: 'in_progress' });
+        try {
+          await callAddSupportTicketMessage({ ticketId: currentTicket.id, message: messageInput.trim() });
+        } catch {
+          await callAddSupportTicketNote(currentTicket.id, `[CUSTOMER RESPONSE] ${messageInput.trim()}`);
+          await callUpdateSupportTicket(currentTicket.id, { status: 'in_progress' });
+        }
         setFeedback({ type: 'success', message: 'Message dispatched to customer.' });
       }
       setMessageInput('');
       await refresh();
+      if (refreshDetails) await refreshDetails();
       setTimeout(() => setFeedback(null), 3500);
     } catch {
       setFeedback({ type: 'error', message: 'Failed to record support message.' });
@@ -231,11 +249,34 @@ export default function EnterpriseSupportPage() {
 
     try {
       if (actionDialog.type === 'RESOLVE') {
-        await callUpdateSupportTicket(currentTicket.id, {
-          status: 'resolved',
-          resolutionNotes: reason,
-        });
+        try {
+          await callResolveSupportTicket({ ticketId: currentTicket.id, resolutionNotes: reason });
+        } catch {
+          await callUpdateSupportTicket(currentTicket.id, {
+            status: 'resolved',
+            resolutionNotes: reason,
+          });
+        }
         setFeedback({ type: 'success', message: `Ticket ${currentTicket.id} marked as resolved.` });
+      } else if (actionDialog.type === 'REOPEN') {
+        try {
+          await callReopenSupportTicket({ ticketId: currentTicket.id, reason });
+        } catch {
+          await callUpdateSupportTicket(currentTicket.id, { status: 'open' });
+          await callAddSupportTicketNote(currentTicket.id, `[TICKET REOPENED] Reason: ${reason}`);
+        }
+        setFeedback({ type: 'success', message: `Ticket ${currentTicket.id} reopened successfully.` });
+      } else if (actionDialog.type === 'ASSIGN') {
+        try {
+          await callAssignSupportTicket({
+            ticketId: currentTicket.id,
+            assignedStaffUid: reason.trim(),
+            assignedStaffName: reason.trim(),
+          });
+        } catch {
+          await callUpdateSupportTicket(currentTicket.id, { assignedTo: reason.trim() });
+        }
+        setFeedback({ type: 'success', message: `Ticket ${currentTicket.id} assigned to ${reason.trim()}.` });
       } else if (actionDialog.type === 'CREDIT') {
         await callAddSupportTicketNote(currentTicket.id, `[GOODWILL CREDIT GRANTED: $10.00] Justification: ${reason}`);
         setFeedback({ type: 'success', message: `$10.00 goodwill credit credited to ${currentTicket.email || currentTicket.userId}.` });
@@ -249,6 +290,7 @@ export default function EnterpriseSupportPage() {
 
       setActionDialog({ isOpen: false, type: null, title: '', description: '' });
       await refresh();
+      if (refreshDetails) await refreshDetails();
       setTimeout(() => setFeedback(null), 4000);
     } catch {
       setFeedback({ type: 'error', message: 'Failed to execute ticket action.' });
@@ -593,51 +635,100 @@ export default function EnterpriseSupportPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                      onClick={() =>
-                        setActionDialog({
-                          isOpen: true,
-                          type: 'RESOLVE',
-                          title: 'Mark Ticket as Resolved',
-                          description: 'Enter resolution summary to close this ticket and notify requester.',
-                        })
-                      }
-                      style={{
-                        background: 'rgba(0, 240, 118, 0.15)',
-                        border: '1px solid var(--status-success)',
-                        color: 'var(--status-success)',
-                        padding: '6px 12px',
-                        borderRadius: 6,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Resolve
-                    </button>
-                    <button
-                      onClick={() =>
-                        setActionDialog({
-                          isOpen: true,
-                          type: 'ESCALATE',
-                          title: 'Escalate to Tier 2 Lead',
-                          description: 'Route this ticket to Tier 2 engineering or compliance triage.',
-                        })
-                      }
-                      style={{
-                        background: 'rgba(239, 68, 68, 0.15)',
-                        border: '1px solid rgba(239, 68, 68, 0.4)',
-                        color: 'var(--status-error)',
-                        padding: '6px 12px',
-                        borderRadius: 6,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Escalate
-                    </button>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {currentTicket.status === 'resolved' || currentTicket.status === 'closed' ? (
+                      <button
+                        onClick={() =>
+                          setActionDialog({
+                            isOpen: true,
+                            type: 'REOPEN',
+                            title: 'Reopen Support Ticket',
+                            description: 'Specify the operational reason for reopening this resolved inquiry.',
+                          })
+                        }
+                        style={{
+                          background: 'rgba(245, 158, 11, 0.15)',
+                          border: '1px solid var(--status-warning)',
+                          color: 'var(--status-warning)',
+                          padding: '6px 12px',
+                          borderRadius: 6,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Reopen Ticket
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() =>
+                            setActionDialog({
+                              isOpen: true,
+                              type: 'RESOLVE',
+                              title: 'Mark Ticket as Resolved',
+                              description: 'Enter resolution summary to close this ticket and notify requester.',
+                            })
+                          }
+                          style={{
+                            background: 'rgba(0, 240, 118, 0.15)',
+                            border: '1px solid var(--status-success)',
+                            color: 'var(--status-success)',
+                            padding: '6px 12px',
+                            borderRadius: 6,
+                            fontSize: 12,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Resolve
+                        </button>
+                        <button
+                          onClick={() =>
+                            setActionDialog({
+                              isOpen: true,
+                              type: 'ASSIGN',
+                              title: 'Assign Ticket to Specialist',
+                              description: 'Enter the UID or email of the staff agent to assign.',
+                            })
+                          }
+                          style={{
+                            background: 'rgba(59, 130, 246, 0.15)',
+                            border: '1px solid rgba(59, 130, 246, 0.4)',
+                            color: '#3B82F6',
+                            padding: '6px 12px',
+                            borderRadius: 6,
+                            fontSize: 12,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Assign
+                        </button>
+                        <button
+                          onClick={() =>
+                            setActionDialog({
+                              isOpen: true,
+                              type: 'ESCALATE',
+                              title: 'Escalate to Tier 2 Lead',
+                              description: 'Route this ticket to Tier 2 engineering or compliance triage.',
+                            })
+                          }
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.15)',
+                            border: '1px solid rgba(239, 68, 68, 0.4)',
+                            color: 'var(--status-error)',
+                            padding: '6px 12px',
+                            borderRadius: 6,
+                            fontSize: 12,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Escalate
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -793,7 +884,7 @@ export default function EnterpriseSupportPage() {
                   {currentTicket.userId && (
                     <div style={{ marginTop: 8 }}>
                       <Link
-                        href={`/admin/users?q=${currentTicket.userId}`}
+                        href={`/admin/crm?q=${currentTicket.userId}`}
                         style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600, textDecoration: 'none' }}
                       >
                         Open Unified CRM Profile ↗
