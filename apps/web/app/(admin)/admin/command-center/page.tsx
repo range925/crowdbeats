@@ -26,7 +26,7 @@ import {
   EmptyState,
   type TimeSeriesPeriod,
 } from '@/components/admin';
-import { usePlatformMetrics, useAdminTips, centsToDollars } from '@/lib/admin/adminFirestore';
+import { usePlatformMetrics, useAdminTips, useAdminCommandCenter, centsToDollars } from '@/lib/admin/adminFirestore';
 
 type CommandTab = 'overview' | 'needs-attention' | 'live-activity' | 'regional' | 'saved-views';
 
@@ -52,6 +52,12 @@ const REGIONAL_SNAPSHOTS: RegionalEntry[] = [
 export default function EnterpriseCommandCenterPage() {
   const { metrics, loading: metricsLoading } = usePlatformMetrics();
   const { tips, loading: tipsLoading } = useAdminTips({ status: 'succeeded' });
+  const {
+    data: commandCenterData,
+    loading: commandCenterLoading,
+    error: commandCenterError,
+    refresh: refreshCommandCenter,
+  } = useAdminCommandCenter();
 
   const [activeTab, setActiveTab] = useState<CommandTab>('overview');
   const [selectedPeriod, setSelectedPeriod] = useState<TimeSeriesPeriod>('7d');
@@ -61,16 +67,20 @@ export default function EnterpriseCommandCenterPage() {
 
   const handleManualRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    refreshCommandCenter().finally(() => {
       setIsRefreshing(false);
       setLastRefreshedAt(new Date());
-    }, 500);
+    });
   };
 
   // Generate period-aware time-series data for GMV and platform net revenue
   const timeSeriesData = useMemo(() => {
-    const totalGmv = (metrics.totalRevenueCents || 1482000) / 100;
-    const feeRate = 0.06; // 6% default Crowdbeats platform fee
+    const totalGmv = commandCenterData
+      ? commandCenterData.verifiedKpis.totalGmvCents / 100
+      : (metrics.totalRevenueCents || 0) / 100;
+    const feeRate = commandCenterData
+      ? commandCenterData.verifiedKpis.effectiveTakeRatePct / 100
+      : 0.06; // 6% default Crowdbeats platform fee
 
     switch (selectedPeriod) {
       case 'today':
@@ -102,20 +112,70 @@ export default function EnterpriseCommandCenterPage() {
           { label: 'W4', value: totalGmv * 0.28, secondaryValue: totalGmv * 0.28 * feeRate },
         ];
     }
-  }, [selectedPeriod, metrics.totalRevenueCents]);
+  }, [selectedPeriod, commandCenterData, metrics.totalRevenueCents]);
 
   const gmvSparkline = useMemo(() => timeSeriesData.map((d) => d.value), [timeSeriesData]);
 
-  // Metric displays
-  const liveSoloDisplay = '18';
-  const liveBandsDisplay = '7';
-  const activeFansDisplay = '412';
-  const gmvDisplay = centsToDollars(metrics.totalRevenueCents || 1482000);
-  const paymentCompDisplay = '98.4%';
-  const paymentCompCount = '1,248 / 1,268';
-  const platformFeeDisplay = centsToDollars((metrics.totalRevenueCents || 1482000) * 0.06);
-  const failedPayoutsDisplay = '2';
-  const overdueCasesDisplay = '3';
+  // Metric displays directly derived from verified command center telemetry
+  const liveSoloDisplay = commandCenterData
+    ? String(commandCenterData.operationalOverview.liveSoloPerformers)
+    : (commandCenterLoading ? '...' : '0');
+
+  const liveBandsDisplay = commandCenterData
+    ? String(commandCenterData.operationalOverview.liveBands)
+    : (commandCenterLoading ? '...' : '0');
+
+  const activeFansDisplay = commandCenterData
+    ? String(commandCenterData.operationalOverview.activeFansNearby)
+    : (commandCenterLoading ? '...' : '0');
+
+  const gmvDisplay = centsToDollars(
+    commandCenterData
+      ? commandCenterData.verifiedKpis.totalGmvCents
+      : (metrics.totalRevenueCents || 0)
+  );
+
+  const paymentCompDisplay = commandCenterData
+    ? `${commandCenterData.verifiedKpis.paymentCompletionRatePct}%`
+    : '100%';
+
+  const paymentCompCount = commandCenterData
+    ? `${commandCenterData.verifiedKpis.totalTipsSucceededCount} / ${commandCenterData.verifiedKpis.totalTipAttemptsCount}`
+    : undefined;
+
+  const platformFeeDisplay = centsToDollars(
+    commandCenterData
+      ? commandCenterData.verifiedKpis.platformFeeCents
+      : ((metrics.totalRevenueCents || 0) * 0.06)
+  );
+
+  const failedPayoutsDisplay = commandCenterData
+    ? String(commandCenterData.pendingActions.failedPayoutsCount)
+    : (commandCenterLoading ? '...' : '0');
+
+  const overdueCasesDisplay = commandCenterData
+    ? String(commandCenterData.pendingActions.overdueSupportTicketsCount)
+    : (commandCenterLoading ? '...' : '0');
+
+  const reconciliationSummary = useMemo(() => {
+    if (!commandCenterData) return undefined;
+    const gmv = commandCenterData.verifiedKpis.totalGmvCents / 100;
+    const fee = commandCenterData.verifiedKpis.platformFeeCents / 100;
+    const variance = commandCenterData.financeHealth.dailyFeeVarianceCents / 100;
+    const failedPayouts = commandCenterData.financeHealth.failedPayoutsCount;
+    return {
+      internalLedgerGrossDollars: gmv,
+      stripeSettledGrossDollars: gmv - variance,
+      varianceDollars: variance,
+      platformFeesCollectedDollars: fee,
+      campaignBudgetHeldDollars: commandCenterData.campaignActivity.totalPledgedCents / 100,
+      lastReconciliationTimestamp: commandCenterData.metadata.timestamp
+        ? new Date(commandCenterData.metadata.timestamp).toLocaleTimeString()
+        : 'Live Telemetry',
+      discrepancyCount: failedPayouts,
+      status: (commandCenterData.financeHealth.reconciliationStatus === 'BALANCED' ? 'BALANCED' : 'DISCREPANCY_DETECTED') as 'BALANCED' | 'DISCREPANCY_DETECTED',
+    };
+  }, [commandCenterData]);
 
   const filteredRegions = useMemo(() => {
     if (activeFilterRegion === 'all') return REGIONAL_SNAPSHOTS;
@@ -242,6 +302,43 @@ export default function EnterpriseCommandCenterPage() {
         </div>
       </header>
 
+      {/* Telemetry Alert Banner */}
+      {commandCenterError && (
+        <div
+          style={{
+            padding: '12px 16px',
+            borderRadius: 8,
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            color: '#B91C1C',
+            fontSize: 13,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <AlertTriangleIcon size={16} />
+            <span>Operational Telemetry Notice: {commandCenterError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleManualRefresh}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#B91C1C',
+              fontWeight: 700,
+              textDecoration: 'underline',
+              cursor: 'pointer',
+            }}
+          >
+            Retry Telemetry
+          </button>
+        </div>
+      )}
+
       {/* ─────────────────────────────────────────────────────────────────────────
           2. SECTION TABS
       ───────────────────────────────────────────────────────────────────────── */}
@@ -257,7 +354,14 @@ export default function EnterpriseCommandCenterPage() {
       >
         {[
           { id: 'overview', label: 'Overview' },
-          { id: 'needs-attention', label: 'Needs Attention', count: 5 },
+          {
+            id: 'needs-attention',
+            label: 'Needs Attention',
+            count:
+              commandCenterData && commandCenterData.pendingActions.items.length > 0
+                ? commandCenterData.pendingActions.items.length
+                : undefined,
+          },
           { id: 'live-activity', label: 'Live Activity' },
           { id: 'regional', label: 'Regional Snapshot' },
           { id: 'saved-views', label: 'Saved Views' },
@@ -330,6 +434,7 @@ export default function EnterpriseCommandCenterPage() {
             trend={{ value: "+3 live", isPositive: true, label: "vs 1h ago" }}
             icon={<ArtistsIcon size={18} strokeWidth={2.2} />}
             accentColor="#10B981"
+            loading={commandCenterLoading}
             tooltip="Solo musicians with an active GPS lease renewed within the last 5 minutes."
             href="/admin/creators?tab=solo"
           />
@@ -342,6 +447,7 @@ export default function EnterpriseCommandCenterPage() {
             trend={{ value: "+1 stage", isPositive: true, label: "Nashville / NY" }}
             icon={<LiveRadarIcon size={18} strokeWidth={2.2} />}
             accentColor="#059669"
+            loading={commandCenterLoading}
             tooltip="Multi-member bands currently broadcasting live sets at registered stages."
             href="/admin/creators?tab=bands"
           />
@@ -354,6 +460,7 @@ export default function EnterpriseCommandCenterPage() {
             trend={{ value: "+14.2%", isPositive: true, label: "vs last hour" }}
             icon={<UsersIcon size={18} strokeWidth={2.2} />}
             accentColor="#3B82F6"
+            loading={commandCenterLoading}
             tooltip="Audience devices in proximity of active stages (coarse 15-min privacy-preserving buckets)."
             href="/admin/discovery"
           />
@@ -366,6 +473,7 @@ export default function EnterpriseCommandCenterPage() {
             trend={{ value: "+12.4%", isPositive: true, label: "vs prior window" }}
             icon={<DollarSignIcon size={18} strokeWidth={2.2} />}
             accentColor="#8B5CF6"
+            loading={commandCenterLoading}
             sparklineData={gmvSparkline}
             tooltip="Total gross monetary value of tips processed and confirmed by Stripe."
             href="/admin/finance"
@@ -381,6 +489,7 @@ export default function EnterpriseCommandCenterPage() {
             trend={{ value: "+0.3%", isPositive: true, label: "success benchmark" }}
             icon={<CreditCardIcon size={18} strokeWidth={2.2} />}
             accentColor="#10B981"
+            loading={commandCenterLoading}
             tooltip="Deduplicated logical tip attempts resulting in successful Stripe authorization."
             href="/admin/finance?tab=transactions"
           />
@@ -393,6 +502,7 @@ export default function EnterpriseCommandCenterPage() {
             trend={{ value: "+11.8%", isPositive: true, label: "vs prior window" }}
             icon={<DollarSignIcon size={18} strokeWidth={2.2} />}
             accentColor="#7C3AED"
+            loading={commandCenterLoading}
             tooltip="Net Crowdbeats 6% platform fees collected after subtracting fee refunds."
             href="/admin/finance?tab=platform-fees"
           />
@@ -402,10 +512,19 @@ export default function EnterpriseCommandCenterPage() {
             value={failedPayoutsDisplay}
             subtitle="Provider requirement blocks"
             period="Unresolved"
-            isAdverse={true}
-            trend={{ value: "2 Critical", isPositive: true, label: "action required" }}
+            isAdverse={(commandCenterData?.pendingActions.failedPayoutsCount ?? 0) > 0}
+            trend={
+              (commandCenterData?.pendingActions.failedPayoutsCount ?? 0) > 0
+                ? {
+                    value: `${commandCenterData?.pendingActions.failedPayoutsCount} Critical`,
+                    isPositive: false,
+                    label: "action required",
+                  }
+                : { value: "All Clear", isPositive: true, label: "0 failures" }
+            }
             icon={<AlertCircleIcon size={18} strokeWidth={2.2} />}
             accentColor="#EF4444"
+            loading={commandCenterLoading}
             tooltip="Creator transfers blocked due to Stripe Connect identity verification or bank failure."
             href="/admin/finance?tab=payouts&status=failed"
           />
@@ -415,10 +534,19 @@ export default function EnterpriseCommandCenterPage() {
             value={overdueCasesDisplay}
             subtitle="SLA breached tickets & abuse"
             period="Open Queue"
-            isAdverse={true}
-            trend={{ value: "3 Overdue", isPositive: true, label: "breached SLA" }}
+            isAdverse={(commandCenterData?.pendingActions.overdueSupportTicketsCount ?? 0) > 0}
+            trend={
+              (commandCenterData?.pendingActions.overdueSupportTicketsCount ?? 0) > 0
+                ? {
+                    value: `${commandCenterData?.pendingActions.overdueSupportTicketsCount} Overdue`,
+                    isPositive: false,
+                    label: "breached SLA",
+                  }
+                : { value: "On Track", isPositive: true, label: "0 overdue" }
+            }
             icon={<AlertTriangleIcon size={18} strokeWidth={2.2} />}
             accentColor="#F59E0B"
+            loading={commandCenterLoading}
             tooltip="Support tickets and Trust & Safety reports exceeding designated SLA response limits."
             href="/admin/trust-safety"
           />
@@ -455,7 +583,12 @@ export default function EnterpriseCommandCenterPage() {
           >
             {/* 7 Columns: Actionable Needs Attention Queue */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <AttentionNeededQueue />
+              <AttentionNeededQueue
+                items={commandCenterData?.pendingActions.items}
+                loading={commandCenterLoading}
+                error={commandCenterError}
+                onRetry={handleManualRefresh}
+              />
             </div>
 
             {/* 5 Columns: Service Health & Discovery Funnel */}
@@ -631,14 +764,172 @@ export default function EnterpriseCommandCenterPage() {
               onPeriodChange={(p) => setSelectedPeriod(p)}
             />
 
-            <LivePlatformPulseStream />
+            <LivePlatformPulseStream loading={commandCenterLoading} />
+          </section>
+
+          {/* Platform Financial Health & Crowdfunding Escrow Section */}
+          <section
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1.8fr) minmax(0, 1.2fr)',
+              gap: 20,
+            }}
+            className="admin-middle-split"
+          >
+            <FinancialReconciliationWidget
+              summary={reconciliationSummary}
+              onRunReconciliation={handleManualRefresh}
+              isReconciling={isRefreshing}
+            />
+
+            {/* Campaign Crowdfunding Escrow Activity */}
+            <div
+              style={{
+                background: 'var(--admin-surface-card, #FFFFFF)',
+                padding: '22px 24px',
+                borderRadius: 12,
+                border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                boxShadow: 'var(--admin-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05))',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <DollarSignIcon size={18} strokeWidth={2.2} style={{ color: 'var(--admin-accent-primary, #7C3AED)' }} />
+                    <h2
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 800,
+                        color: 'var(--admin-text-primary, #0F172A)',
+                        letterSpacing: '-0.02em',
+                        margin: 0,
+                      }}
+                    >
+                      Campaign Crowdfunding Activity
+                    </h2>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: 12,
+                      background: 'rgba(124, 58, 237, 0.1)',
+                      color: '#7C3AED',
+                      border: '1px solid rgba(124, 58, 237, 0.25)',
+                    }}
+                  >
+                    Escrow Telemetry
+                  </span>
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--admin-text-secondary, #64748B)', margin: '0 0 16px 0' }}>
+                  Live all-or-nothing crowdfunding campaigns and backer pledge volume.
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+                  <div
+                    style={{
+                      background: 'var(--admin-surface-raised, #F8FAFC)',
+                      border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 8,
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-secondary, #64748B)', fontWeight: 600 }}>Active Campaigns</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--admin-text-primary, #0F172A)', marginTop: 4 }}>
+                      {commandCenterLoading ? '...' : (commandCenterData?.campaignActivity.activeCampaignsCount ?? 0)}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-tertiary, #94A3B8)', marginTop: 2 }}>In funding window</div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: 'var(--admin-surface-raised, #F8FAFC)',
+                      border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 8,
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-secondary, #64748B)', fontWeight: 600 }}>Pledged in Escrow</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: '#10B981', marginTop: 4 }}>
+                      {commandCenterLoading ? '...' : centsToDollars(commandCenterData?.campaignActivity.totalPledgedCents ?? 0)}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-tertiary, #94A3B8)', marginTop: 2 }}>Held until goal</div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: 'var(--admin-surface-raised, #F8FAFC)',
+                      border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 8,
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-secondary, #64748B)', fontWeight: 600 }}>Funded Campaigns</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--admin-text-primary, #0F172A)', marginTop: 4 }}>
+                      {commandCenterLoading ? '...' : (commandCenterData?.campaignActivity.fundedCampaignsCount ?? 0)}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-tertiary, #94A3B8)', marginTop: 2 }}>Successfully reached 100%</div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: 'var(--admin-surface-raised, #F8FAFC)',
+                      border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 8,
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-secondary, #64748B)', fontWeight: 600 }}>Avg Backers / Campaign</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--admin-text-primary, #0F172A)', marginTop: 4 }}>
+                      {commandCenterLoading ? '...' : (commandCenterData?.campaignActivity.averageBackersPerCampaign ?? 0)}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-tertiary, #94A3B8)', marginTop: 2 }}>Backer engagement</div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: 14,
+                  paddingTop: 12,
+                  borderTop: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Link
+                  href="/admin/campaigns"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: 'var(--admin-accent-primary, #7C3AED)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Manage All Campaigns →
+                </Link>
+                <span style={{ fontSize: 11, color: 'var(--admin-text-tertiary, #64748B)' }}>
+                  Stripe authorized holds
+                </span>
+              </div>
+            </div>
           </section>
         </>
       )}
 
       {activeTab === 'needs-attention' && (
         <section style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <AttentionNeededQueue />
+          <AttentionNeededQueue
+            items={commandCenterData?.pendingActions.items}
+            loading={commandCenterLoading}
+            error={commandCenterError}
+            onRetry={handleManualRefresh}
+          />
         </section>
       )}
 
@@ -646,7 +937,7 @@ export default function EnterpriseCommandCenterPage() {
         <section style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 20 }}>
             <LiveStageRadarVisualizer />
-            <LivePlatformPulseStream />
+            <LivePlatformPulseStream loading={commandCenterLoading} />
           </div>
         </section>
       )}

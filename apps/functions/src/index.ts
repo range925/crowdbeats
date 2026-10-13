@@ -305,3 +305,8 @@ export {
   getCrmFinancialReferencesCallable,
   addCrmInternalNoteCallable,
 } from './crm/crmCallables.js';
+
+// ─── Admin Command Center Foundation Callables (Phase 7) ─────────────────────
+export {
+  getAdminCommandCenterDataCallable,
+} from './admin/adminCommandCenterCallables.js';

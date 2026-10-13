@@ -19,6 +19,7 @@ export interface AdminKpiCardProps {
   accentColor?: string;
   tooltip?: string;
   sparklineData?: number[];
+  loading?: boolean;
   onClick?: () => void;
   href?: string;
   className?: string;
@@ -37,6 +38,7 @@ export const AdminKpiCard: React.FC<AdminKpiCardProps> = ({
   accentColor = 'var(--admin-accent-primary, #7C3AED)',
   tooltip,
   sparklineData,
+  loading = false,
   onClick,
   href,
   className = '',
@@ -160,19 +162,31 @@ export const AdminKpiCard: React.FC<AdminKpiCardProps> = ({
               marginTop: 4,
             }}
           >
-            <div
-              className="admin-tabular-nums"
-              style={{
-                fontSize: 26,
-                fontWeight: 800,
-                color: 'var(--admin-text-primary, var(--text-primary, #0F172A))',
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1.15,
-              }}
-            >
-              {value}
-            </div>
+            {loading ? (
+              <div
+                style={{
+                  height: 28,
+                  width: 90,
+                  borderRadius: 6,
+                  background: 'var(--admin-surface-raised, #F1F5F9)',
+                  opacity: 0.7,
+                }}
+              />
+            ) : (
+              <div
+                className="admin-tabular-nums"
+                style={{
+                  fontSize: 26,
+                  fontWeight: 800,
+                  color: 'var(--admin-text-primary, var(--text-primary, #0F172A))',
+                  letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1.15,
+                }}
+              >
+                {value}
+              </div>
+            )}
             {countLabel && (
               <span
                 className="admin-tabular-nums"

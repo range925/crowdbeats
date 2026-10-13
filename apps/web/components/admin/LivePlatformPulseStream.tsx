@@ -72,6 +72,7 @@ const DEFAULT_EVENTS: PulseEvent[] = [
 
 interface LivePlatformPulseStreamProps {
   events?: PulseEvent[];
+  loading?: boolean;
   className?: string;
   style?: React.CSSProperties;
   initialPaused?: boolean;
@@ -80,6 +81,7 @@ interface LivePlatformPulseStreamProps {
 
 export const LivePlatformPulseStream: React.FC<LivePlatformPulseStreamProps> = ({
   events = DEFAULT_EVENTS,
+  loading = false,
   className = '',
   style,
   initialPaused = false,
@@ -372,7 +374,66 @@ export const LivePlatformPulseStream: React.FC<LivePlatformPulseStreamProps> = (
 
         {/* Event List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {filteredEvents.length === 0 ? (
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[1, 2, 3].map((idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 14px',
+                    borderRadius: 8,
+                    background: 'var(--admin-surface-raised, var(--surface-raised, #F8FAFC))',
+                    border: '1px solid var(--admin-border-subtle, var(--border-subtle, #E2E8F0))',
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 6,
+                        background: 'var(--admin-border-subtle, #E2E8F0)',
+                        opacity: 0.6,
+                      }}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                      <div
+                        style={{
+                          width: '40%',
+                          height: 12,
+                          background: 'var(--admin-border-subtle, #E2E8F0)',
+                          borderRadius: 4,
+                          opacity: 0.8,
+                        }}
+                      />
+                      <div
+                        style={{
+                          width: '75%',
+                          height: 11,
+                          background: 'var(--admin-border-subtle, #E2E8F0)',
+                          borderRadius: 4,
+                          opacity: 0.5,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 10,
+                      background: 'var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 4,
+                      opacity: 0.5,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : filteredEvents.length === 0 ? (
             <div
               style={{
                 padding: '24px 16px',

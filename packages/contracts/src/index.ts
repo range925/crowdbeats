@@ -117,5 +117,8 @@ export * from './camera/index';
 // ─── Shared CRM Event & Data Foundation (Phase 6) ─────────────────────────
 export * from './crm/crmContracts';
 
-export const CONTRACTS_VERSION = '0.19.0-shared-crm' as const;
+// ─── Admin Command Center Foundation (Phase 7) ────────────────────────────
+export * from './admin/adminCommandCenterContracts';
+
+export const CONTRACTS_VERSION = '0.20.0-admin-command-center' as const;
 

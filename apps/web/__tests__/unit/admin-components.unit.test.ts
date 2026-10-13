@@ -305,4 +305,53 @@ describe('Enterprise Admin Component Suite', () => {
     expect(html).toContain('Resume');
     expect(html).toContain('Live updates paused');
   });
+
+  test('AdminKpiCard renders skeleton pulse placeholder when loading', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AdminKpiCard, {
+        title: 'Active Fans Nearby',
+        value: '412',
+        loading: true,
+      })
+    );
+    expect(html).toContain('Active Fans Nearby');
+    expect(html).toContain('opacity:0.7');
+    expect(html).not.toContain('>412<');
+  });
+
+  test('AttentionNeededQueue renders skeleton items when loading', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AttentionNeededQueue, { loading: true })
+    );
+    expect(html).toContain('Attention Needed');
+    expect(html).toContain('Checking...');
+    expect(html).not.toContain('Flagged Live Audio Stream');
+  });
+
+  test('AttentionNeededQueue renders error state when error is provided', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AttentionNeededQueue, { error: 'Failed to fetch queue from Firestore' })
+    );
+    expect(html).toContain('Attention Needed');
+    expect(html).toContain('Failed to load operational exceptions');
+    expect(html).toContain('Failed to fetch queue from Firestore');
+  });
+
+  test('AttentionNeededQueue renders clear empty state when items array is empty', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AttentionNeededQueue, { items: [] })
+    );
+    expect(html).toContain('Attention Needed');
+    expect(html).toContain('Clear (0)');
+    expect(html).toContain('All queues clear');
+    expect(html).toContain('No pending exceptions requiring administrator attention.');
+  });
+
+  test('LivePlatformPulseStream renders skeleton state when loading', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(LivePlatformPulseStream, { loading: true })
+    );
+    expect(html).toContain('Live Telemetry &amp; Activity Pulse');
+    expect(html).not.toContain('Fan @sarah_m');
+  });
 });

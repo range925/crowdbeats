@@ -10,11 +10,13 @@ import {
   CreditCardIcon,
   ZapIcon,
   RefreshIcon,
+  CheckCircleIcon,
+  SupportIcon,
 } from './AdminIcons';
 
 export interface ExceptionQueueItem {
   id: string;
-  category: 'MODERATION' | 'PAYOUT' | 'DISPUTE' | 'WEBHOOK';
+  category: 'MODERATION' | 'PAYOUT' | 'DISPUTE' | 'WEBHOOK' | 'SUPPORT';
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
   title: string;
   description: string;
@@ -66,14 +68,20 @@ const DEFAULT_EXCEPTIONS: ExceptionQueueItem[] = [
   },
 ];
 
-interface AttentionNeededQueueProps {
+export interface AttentionNeededQueueProps {
   items?: ExceptionQueueItem[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
 export const AttentionNeededQueue: React.FC<AttentionNeededQueueProps> = ({
   items = DEFAULT_EXCEPTIONS,
+  loading = false,
+  error = null,
+  onRetry,
   className = '',
   style,
 }) => {
@@ -130,14 +138,38 @@ export const AttentionNeededQueue: React.FC<AttentionNeededQueueProps> = ({
                 fontSize: 11,
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
-                color: 'var(--admin-status-error, #EF4444)',
-                background: 'var(--admin-status-error-bg, rgba(239, 68, 68, 0.10))',
-                border: '1px solid rgba(239, 68, 68, 0.25)',
+                color: loading
+                  ? 'var(--admin-text-secondary, #64748B)'
+                  : error
+                  ? 'var(--admin-status-error, #EF4444)'
+                  : items.length > 0
+                  ? 'var(--admin-status-error, #EF4444)'
+                  : 'var(--admin-status-success, #10B981)',
+                background: loading
+                  ? 'var(--admin-surface-raised, #F1F5F9)'
+                  : error
+                  ? 'var(--admin-status-error-bg, rgba(239, 68, 68, 0.10))'
+                  : items.length > 0
+                  ? 'var(--admin-status-error-bg, rgba(239, 68, 68, 0.10))'
+                  : 'var(--admin-status-success-bg, rgba(16, 185, 129, 0.10))',
+                border: loading
+                  ? '1px solid var(--admin-border-subtle, #E2E8F0)'
+                  : error
+                  ? '1px solid rgba(239, 68, 68, 0.25)'
+                  : items.length > 0
+                  ? '1px solid rgba(239, 68, 68, 0.25)'
+                  : '1px solid rgba(16, 185, 129, 0.25)',
                 padding: '2px 8px',
                 borderRadius: 12,
               }}
             >
-              {items.length} Pending {criticalCount > 0 ? `(${criticalCount} Urgent)` : ''}
+              {loading
+                ? 'Checking...'
+                : error
+                ? 'Error'
+                : items.length === 0
+                ? 'Clear (0)'
+                : `${items.length} Pending ${criticalCount > 0 ? `(${criticalCount} Urgent)` : ''}`}
             </span>
           </div>
         </div>
@@ -153,159 +185,304 @@ export const AttentionNeededQueue: React.FC<AttentionNeededQueueProps> = ({
         </p>
 
         {/* Exception Items List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {items.map((item) => {
-            const isCritical = item.severity === 'CRITICAL';
-            const isHigh = item.severity === 'HIGH';
-
-            const badgeBorder = isCritical
-              ? 'rgba(239, 68, 68, 0.3)'
-              : isHigh
-              ? 'rgba(245, 158, 11, 0.3)'
-              : 'var(--admin-border-subtle, #E2E8F0)';
-
-            const badgeColor = isCritical
-              ? 'var(--admin-status-error, #EF4444)'
-              : isHigh
-              ? 'var(--admin-status-warning, #F59E0B)'
-              : 'var(--admin-text-tertiary, #64748B)';
-
-            const badgeBg = isCritical
-              ? 'var(--admin-status-error-bg, rgba(239, 68, 68, 0.08))'
-              : isHigh
-              ? 'var(--admin-status-warning-bg, rgba(245, 158, 11, 0.08))'
-              : 'var(--admin-surface-raised, #F1F5F9)';
-
-            const CategoryIcon =
-              item.category === 'MODERATION'
-                ? ShieldBadgeIcon
-                : item.category === 'PAYOUT' || item.category === 'DISPUTE'
-                ? CreditCardIcon
-                : ZapIcon;
-
-            return (
+        {loading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[1, 2, 3].map((idx) => (
               <div
-                key={item.id}
+                key={idx}
                 style={{
                   background: 'var(--admin-surface-raised, var(--surface-raised, #F8FAFC))',
-                  border: `1px solid var(--admin-border-subtle, var(--border-subtle, #E2E8F0))`,
-                  borderLeft: `3px solid ${badgeColor}`,
+                  border: '1px solid var(--admin-border-subtle, var(--border-subtle, #E2E8F0))',
+                  borderLeft: '3px solid var(--admin-border-subtle, #E2E8F0)',
                   borderRadius: 8,
-                  padding: '10px 12px',
+                  padding: '12px 14px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 6,
-                  transition: 'background 0.15s ease, border-color 0.15s ease',
+                  gap: 8,
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <CategoryIcon size={13} style={{ color: badgeColor, flexShrink: 0 }} />
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                        color: badgeColor,
-                      }}
-                    >
-                      {item.category}
-                    </span>
-                    <span
-                      style={{
-                        color: 'var(--admin-text-tertiary, #94A3B8)',
-                        fontSize: 10,
-                      }}
-                    >
-                      ·
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        color: badgeColor,
-                        background: badgeBg,
-                        border: `1px solid ${badgeBorder}`,
-                        padding: '1px 5px',
-                        borderRadius: 4,
-                      }}
-                    >
-                      {item.severity}
-                    </span>
-                  </div>
-
-                  <span
-                    className="admin-tabular-nums"
-                    style={{
-                      fontSize: 10,
-                      color: 'var(--admin-text-tertiary, #64748B)',
-                      fontWeight: 600,
-                      fontVariantNumeric: 'tabular-nums',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {item.timestamp}
-                  </span>
-                </div>
-
-                <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div
                     style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: 'var(--admin-text-primary, var(--text-primary, #0F172A))',
-                      lineHeight: 1.3,
+                      width: 110,
+                      height: 14,
+                      background: 'var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 4,
+                      opacity: 0.6,
                     }}
-                  >
-                    {item.title}
-                  </div>
+                  />
                   <div
                     style={{
-                      fontSize: 11,
-                      color: 'var(--admin-text-secondary, var(--text-secondary, #64748B))',
-                      marginTop: 2,
-                      lineHeight: 1.35,
+                      width: 48,
+                      height: 12,
+                      background: 'var(--admin-border-subtle, #E2E8F0)',
+                      borderRadius: 4,
+                      opacity: 0.6,
                     }}
-                  >
-                    {item.description}
-                  </div>
+                  />
                 </div>
-
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    marginTop: 2,
+                    width: '65%',
+                    height: 14,
+                    background: 'var(--admin-border-subtle, #E2E8F0)',
+                    borderRadius: 4,
+                    opacity: 0.8,
                   }}
-                >
-                  <Link
-                    href={item.actionHref}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: 'var(--admin-accent-primary, #7C3AED)',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <span>{item.actionLabel}</span>
-                    <ChevronRightIcon size={12} strokeWidth={2.2} />
-                  </Link>
-                </div>
+                />
+                <div
+                  style={{
+                    width: '88%',
+                    height: 12,
+                    background: 'var(--admin-border-subtle, #E2E8F0)',
+                    borderRadius: 4,
+                    opacity: 0.5,
+                  }}
+                />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div
+            style={{
+              padding: '24px 16px',
+              textAlign: 'center',
+              color: 'var(--admin-status-error, #EF4444)',
+              fontSize: 13,
+              borderRadius: 8,
+              background: 'rgba(239, 68, 68, 0.06)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <AlertCircleIcon size={24} style={{ color: 'var(--admin-status-error, #EF4444)' }} />
+            <div>
+              <div style={{ fontWeight: 700 }}>Failed to load operational exceptions</div>
+              <div style={{ fontSize: 12, color: 'var(--admin-text-secondary, #64748B)', marginTop: 2 }}>{error}</div>
+            </div>
+            {onRetry && (
+              <button
+                type="button"
+                onClick={onRetry}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginTop: 6,
+                  padding: '6px 12px',
+                  borderRadius: 6,
+                  background: 'var(--admin-surface-card, #FFFFFF)',
+                  border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                  color: 'var(--admin-text-primary, #0F172A)',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                <RefreshIcon size={12} />
+                <span>Retry Queue</span>
+              </button>
+            )}
+          </div>
+        ) : items.length === 0 ? (
+          <div
+            style={{
+              padding: '32px 20px',
+              textAlign: 'center',
+              color: 'var(--admin-text-secondary, #64748B)',
+              fontSize: 13,
+              borderRadius: 8,
+              background: 'var(--admin-surface-raised, #F8FAFC)',
+              border: '1px dashed var(--admin-border-subtle, #E2E8F0)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: 'var(--admin-status-success-bg, rgba(16, 185, 129, 0.10))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--admin-status-success, #10B981)',
+              }}
+            >
+              <CheckCircleIcon size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, color: 'var(--admin-text-primary, #0F172A)' }}>
+                All queues clear
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--admin-text-secondary, #64748B)', marginTop: 2 }}>
+                No pending exceptions requiring administrator attention.
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {items.map((item) => {
+              const isCritical = item.severity === 'CRITICAL';
+              const isHigh = item.severity === 'HIGH';
+
+              const badgeBorder = isCritical
+                ? 'rgba(239, 68, 68, 0.3)'
+                : isHigh
+                ? 'rgba(245, 158, 11, 0.3)'
+                : 'var(--admin-border-subtle, #E2E8F0)';
+
+              const badgeColor = isCritical
+                ? 'var(--admin-status-error, #EF4444)'
+                : isHigh
+                ? 'var(--admin-status-warning, #F59E0B)'
+                : 'var(--admin-text-tertiary, #64748B)';
+
+              const badgeBg = isCritical
+                ? 'var(--admin-status-error-bg, rgba(239, 68, 68, 0.08))'
+                : isHigh
+                ? 'var(--admin-status-warning-bg, rgba(245, 158, 11, 0.08))'
+                : 'var(--admin-surface-raised, #F1F5F9)';
+
+              const CategoryIcon =
+                item.category === 'MODERATION'
+                  ? ShieldBadgeIcon
+                  : item.category === 'PAYOUT' || item.category === 'DISPUTE'
+                  ? CreditCardIcon
+                  : item.category === 'SUPPORT'
+                  ? SupportIcon
+                  : ZapIcon;
+
+              return (
+                <div
+                  key={item.id}
+                  style={{
+                    background: 'var(--admin-surface-raised, var(--surface-raised, #F8FAFC))',
+                    border: `1px solid var(--admin-border-subtle, var(--border-subtle, #E2E8F0))`,
+                    borderLeft: `3px solid ${badgeColor}`,
+                    borderRadius: 8,
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                    transition: 'background 0.15s ease, border-color 0.15s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                      <CategoryIcon size={13} style={{ color: badgeColor, flexShrink: 0 }} />
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                          color: badgeColor,
+                        }}
+                      >
+                        {item.category}
+                      </span>
+                      <span
+                        style={{
+                          color: 'var(--admin-text-tertiary, #94A3B8)',
+                          fontSize: 10,
+                        }}
+                      >
+                        ·
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 600,
+                          color: badgeColor,
+                          background: badgeBg,
+                          border: `1px solid ${badgeBorder}`,
+                          padding: '1px 5px',
+                          borderRadius: 4,
+                        }}
+                      >
+                        {item.severity}
+                      </span>
+                    </div>
+
+                    <span
+                      className="admin-tabular-nums"
+                      style={{
+                        fontSize: 10,
+                        color: 'var(--admin-text-tertiary, #64748B)',
+                        fontWeight: 600,
+                        fontVariantNumeric: 'tabular-nums',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.timestamp}
+                    </span>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: 'var(--admin-text-primary, var(--text-primary, #0F172A))',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {item.title}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--admin-text-secondary, var(--text-secondary, #64748B))',
+                        marginTop: 2,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {item.description}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      marginTop: 2,
+                    }}
+                  >
+                    <Link
+                      href={item.actionHref}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: 'var(--admin-accent-primary, #7C3AED)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <span>{item.actionLabel}</span>
+                      <ChevronRightIcon size={12} strokeWidth={2.2} />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Footer Quick Links to Support, CRM, and Finance */}
