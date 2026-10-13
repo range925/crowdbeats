@@ -78,7 +78,7 @@ export function AppleMediaRail() {
             <button
               type="button"
               className={styles.navCircleButton}
-              style={{ width: '36px', height: '36px' }}
+              style={{ width: '44px', height: '44px' }}
               onClick={() => scroll('left')}
               aria-label="Scroll channels left"
             >
@@ -89,7 +89,7 @@ export function AppleMediaRail() {
             <button
               type="button"
               className={styles.navCircleButton}
-              style={{ width: '36px', height: '36px' }}
+              style={{ width: '44px', height: '44px' }}
               onClick={() => scroll('right')}
               aria-label="Scroll channels right"
             >

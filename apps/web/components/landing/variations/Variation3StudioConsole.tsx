@@ -259,7 +259,7 @@ export function Variation3StudioConsole() {
           {/* Console Workbench Card */}
           <div
             style={{
-              backgroundColor: 'var(--cb-surface-1, #0F1017)',
+              backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
               borderRadius: 20,
               border: '1px solid var(--cb-border-medium, rgba(255, 255, 255, 0.12))',
               padding: 'clamp(20px, 4vw, 36px)',
@@ -371,19 +371,19 @@ export function Variation3StudioConsole() {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #0F1017)' }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #FFFFFF)' }}>
                     <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #64748B)', display: 'block' }}>Jake (Vocals) - {jakePct}%</span>
                     <span style={{ fontSize: 16, fontWeight: 800, fontFamily: 'var(--font-mono, monospace)' }}>${payoutJake}</span>
                   </div>
-                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #0F1017)' }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #FFFFFF)' }}>
                     <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #64748B)', display: 'block' }}>Maya (Keys) - {mayaPct}%</span>
                     <span style={{ fontSize: 16, fontWeight: 800, fontFamily: 'var(--font-mono, monospace)' }}>${payoutMaya}</span>
                   </div>
-                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #0F1017)' }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #FFFFFF)' }}>
                     <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #64748B)', display: 'block' }}>Devon (Drums) - {devonPct}%</span>
                     <span style={{ fontSize: 16, fontWeight: 800, fontFamily: 'var(--font-mono, monospace)' }}>${payoutDevon}</span>
                   </div>
-                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #0F1017)' }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'var(--cb-surface-1, #FFFFFF)' }}>
                     <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #64748B)', display: 'block' }}>Leo (Bass) - {leoPct}%</span>
                     <span style={{ fontSize: 16, fontWeight: 800, fontFamily: 'var(--font-mono, monospace)' }}>${payoutLeo}</span>
                   </div>
@@ -407,7 +407,7 @@ export function Variation3StudioConsole() {
                 <div
                   key={p.id}
                   style={{
-                    backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                    backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                     borderRadius: 14,
                     padding: '16px 20px',
                     border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))',

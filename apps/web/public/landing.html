@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="light" lang="en" data-theme="light">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -158,11 +158,6 @@
       </nav>
 
       <div class="flex items-center gap-3">
-        <!-- Interactive Dark/Light Theme Toggle -->
-        <button id="themeToggleBtn" onclick="toggleTheme()" type="button" aria-label="Toggle light or dark theme" class="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-200 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-500/40 transition-all cursor-pointer">
-          <span class="material-symbols-outlined text-xl" id="themeToggleIcon">dark_mode</span>
-        </button>
-
         <a class="hidden md:inline-flex items-center text-sm font-semibold text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white px-3 py-2 transition-colors" href="#radar">
           Explore Stages
         </a>
@@ -837,34 +832,28 @@
     </div>
   </footer>
 
-  <!-- INTERACTIVE SCRIPTS (Calculator, Band Splits, and Dark/Light Mode Theme Toggle) -->
+  <!-- INTERACTIVE SCRIPTS (Calculator, Band Splits, and Web Light Mode) -->
   <script>
-    // Theme Engine: Defaults to dark mode first (per user requirement)
+    // Theme Engine: Standardized Web Light Mode Policy
     function initTheme() {
-      const savedTheme = localStorage.getItem('crowdbeats_theme');
-      const isDark = savedTheme ? savedTheme === 'dark' : true; // Default darkmode first primary
-      setThemeMode(isDark);
+      setThemeMode(false);
     }
 
     function setThemeMode(isDark) {
       const html = document.documentElement;
       const icon = document.getElementById('themeToggleIcon');
-      if (isDark) {
-        html.classList.add('dark');
-        html.classList.remove('light');
-        if (icon) icon.innerText = 'light_mode';
-        localStorage.setItem('crowdbeats_theme', 'dark');
-      } else {
-        html.classList.remove('dark');
-        html.classList.add('light');
-        if (icon) icon.innerText = 'dark_mode';
+      html.classList.remove('dark');
+      html.classList.add('light');
+      html.setAttribute('data-theme', 'light');
+      if (icon) icon.innerText = 'light_mode';
+      try {
         localStorage.setItem('crowdbeats_theme', 'light');
-      }
+        localStorage.setItem('crowdbeats-theme-preference', 'light');
+      } catch (e) {}
     }
 
     function toggleTheme() {
-      const isDark = document.documentElement.classList.contains('dark');
-      setThemeMode(!isDark);
+      setThemeMode(false);
     }
 
     // Tip Calculator

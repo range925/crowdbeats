@@ -309,7 +309,7 @@ export function Variation4DynamicHub() {
             </div>
 
             {/* Audio Waveform Ribbon (Stitch Iteration 3) */}
-            <div style={{ maxWidth: 440, margin: '0 auto 28px', padding: '10px 18px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #0F1017)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
+            <div style={{ maxWidth: 440, margin: '0 auto 28px', padding: '10px 18px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #FFFFFF)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                 <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--cb-text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Acoustic Stage Waveform
@@ -370,7 +370,7 @@ export function Variation4DynamicHub() {
               <div
                 key={card.id}
                 style={{
-                  backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                   borderRadius: 20,
                   border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))',
                   padding: '24px',
@@ -412,7 +412,7 @@ export function Variation4DynamicHub() {
           <div
             id="calculator"
             style={{
-              backgroundColor: 'var(--cb-surface-1, #0F1017)',
+              backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
               borderRadius: 24,
               border: '1px solid var(--cb-border-medium, rgba(168, 85, 247, 0.3))',
               padding: '32px',

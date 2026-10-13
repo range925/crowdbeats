@@ -380,7 +380,7 @@ export function Variation1ProMinimal() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                 border: '1px solid var(--cb-border-medium, rgba(255, 255, 255, 0.14))',
                 borderRadius: 9999,
                 padding: '6px 6px 6px 20px',
@@ -438,7 +438,7 @@ export function Variation1ProMinimal() {
                   top: 'calc(100% + 8px)',
                   left: 0,
                   right: 0,
-                  backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                   borderRadius: 16,
                   border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.1))',
                   padding: '8px 0',
@@ -501,7 +501,7 @@ export function Variation1ProMinimal() {
             style={{
               width: '100%',
               maxWidth: 720,
-              backgroundColor: 'var(--cb-surface-1, #0F1017)',
+              backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
               borderRadius: 20,
               border: '1px solid var(--cb-border-medium, rgba(255, 255, 255, 0.12))',
               padding: '16px 20px',
@@ -628,7 +628,7 @@ export function Variation1ProMinimal() {
             <div
               style={{
                 display: 'inline-flex',
-                backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                 borderRadius: 9999,
                 padding: 4,
                 border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))',
@@ -665,7 +665,7 @@ export function Variation1ProMinimal() {
                 style={{
                   padding: '6px 14px',
                   borderRadius: 9999,
-                  backgroundColor: selectedGenre === genre ? 'var(--cb-purple-dim, rgba(124, 58, 237, 0.15))' : 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: selectedGenre === genre ? 'var(--cb-purple-dim, rgba(124, 58, 237, 0.15))' : 'var(--cb-surface-1, #FFFFFF)',
                   border: '1px solid ' + (selectedGenre === genre ? 'var(--cb-purple-light, #A855F7)' : 'var(--cb-border-subtle, rgba(255, 255, 255, 0.08))'),
                   color: selectedGenre === genre ? 'var(--cb-text-primary, #FFFFFF)' : 'var(--cb-text-secondary, #94A3B8)',
                   fontSize: 12,
@@ -684,7 +684,7 @@ export function Variation1ProMinimal() {
               <article
                 key={performer.id}
                 style={{
-                  backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                   borderRadius: 20,
                   border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))',
                   overflow: 'hidden',
@@ -829,7 +829,7 @@ export function Variation1ProMinimal() {
               {/* Interactive Calculator Card */}
               <div
                 style={{
-                  backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                   borderRadius: 24,
                   padding: '32px',
                   border: '1px solid var(--cb-border-medium, rgba(168, 85, 247, 0.3))',
@@ -942,7 +942,7 @@ export function Variation1ProMinimal() {
 
                 <div
                   style={{
-                    backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                    backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                     border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))',
                     borderRadius: 20,
                     padding: '24px',
@@ -986,7 +986,7 @@ export function Variation1ProMinimal() {
 
           <div
             style={{
-              backgroundColor: 'var(--cb-surface-1, #0F1017)',
+              backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
               borderRadius: 24,
               padding: 'clamp(20px, 4vw, 36px)',
               border: '1px solid var(--cb-border-medium, rgba(56, 189, 248, 0.25))',
@@ -1117,7 +1117,7 @@ export function Variation1ProMinimal() {
                     padding: '8px 18px',
                     borderRadius: 9999,
                     border: '1px solid ' + (activePersona === p.id ? 'var(--cb-purple-main, #7C3AED)' : 'var(--cb-border-subtle, rgba(255, 255, 255, 0.1))'),
-                    backgroundColor: activePersona === p.id ? 'var(--cb-purple-main, #7C3AED)' : 'var(--cb-surface-1, #0F1017)',
+                    backgroundColor: activePersona === p.id ? 'var(--cb-purple-main, #7C3AED)' : 'var(--cb-surface-1, #FFFFFF)',
                     color: activePersona === p.id ? '#FFFFFF' : 'var(--cb-text-secondary, #94A3B8)',
                     fontSize: 13,
                     fontWeight: 700,
@@ -1132,7 +1132,7 @@ export function Variation1ProMinimal() {
 
             <div
               style={{
-                backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                 borderRadius: 24,
                 padding: 'clamp(24px, 5vw, 44px)',
                 border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.1))',

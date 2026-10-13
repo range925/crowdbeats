@@ -120,7 +120,6 @@ export function PerformerPreviewModal({
           onClose();
         }
       }}
-      aria-hidden="true"
     >
       <div
         ref={modalRef}

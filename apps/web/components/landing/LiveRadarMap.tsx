@@ -284,7 +284,7 @@ export function LiveRadarMap({
   const [selectedVenue, setSelectedVenue] = useState<PublicVenueItem | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'live' | 'bands' | 'solo'>('all');
-  const [layerMode, setLayerMode] = useState<LayerMode>('night');
+  const [layerMode, setLayerMode] = useState<LayerMode>('radar');
   const [compassRotation, setCompassRotation] = useState(0);
   const [isLocationPulsing, setIsLocationPulsing] = useState(false);
   const [soundwavesActive, setSoundwavesActive] = useState(true);
@@ -1524,21 +1524,13 @@ export function LiveRadarMap({
           </div>
         </button>
 
-        {/* Layer Mode Toggle (Dark OSM / Standard OSM / Satellite OSM) */}
+        {/* Layer Mode Toggle (Standard OSM / Satellite OSM) */}
         <button
           type="button"
           onClick={() =>
-            setLayerMode((prev) =>
-              prev === 'night' ? 'radar' : prev === 'radar' ? 'density' : 'night'
-            )
+            setLayerMode((prev) => (prev === 'radar' ? 'density' : 'radar'))
           }
-          title={`Layer Mode: ${
-            layerMode === 'night'
-              ? 'Dark Matter'
-              : layerMode === 'radar'
-              ? 'Standard'
-              : 'Satellite'
-          }`}
+          title={`Layer Mode: ${layerMode === 'radar' ? 'Standard Light' : 'Satellite'}`}
           aria-label={`Layer Mode: ${layerMode}`}
           style={{
             width: 44,
@@ -1556,7 +1548,7 @@ export function LiveRadarMap({
             fontSize: 17,
           }}
         >
-          {layerMode === 'night' ? '🌙' : layerMode === 'radar' ? '🗺️' : '🛰️'}
+          {layerMode === 'radar' ? '🗺️' : '🛰️'}
         </button>
 
         {/* Live Soundwave Equalizer Toggle */}

@@ -106,6 +106,21 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 480px) {
+  .searchBar {
+    height: 48px;
+    padding: 0 6px 0 14px;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .searchBar {
+    padding: 0 4px 0 10px;
+    gap: 6px;
+  }
+}
+
 .searchBar:hover {
   border-color: var(--l-ink-3);
 }
@@ -141,6 +156,18 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 480px) {
+  .searchInput {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .searchInput {
+    font-size: 13px;
+  }
+}
+
 .searchInput::placeholder {
   color: var(--l-ink-3);
   opacity: 0.85;
@@ -159,6 +186,17 @@
   cursor: pointer;
   flex: none;
   transition: background-color 140ms ease, color 140ms ease;
+  position: relative;
+}
+
+.clearBtn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .clearBtn:hover {
@@ -184,6 +222,17 @@
   cursor: pointer;
   flex: none;
   transition: opacity 140ms ease, transform 140ms ease;
+  position: relative;
+}
+
+.submitBtn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .submitBtn:hover:not(:disabled) {
@@ -1371,7 +1420,7 @@
 
 .groupBadgeLive {
   background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  color: #047857;
   border-color: rgba(16, 185, 129, 0.25);
 }
 
@@ -1465,6 +1514,14 @@
   }
 }
 
+@media (max-width: 480px) {
+  .mapPanel34 {
+    height: clamp(280px, 42vh, 380px);
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+}
+
 .noticeBannerWrapper {
   width: 100%;
   max-width: 100%;
@@ -1517,6 +1574,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 44px;
+  box-sizing: border-box;
   padding: 9px 18px;
   border-radius: 9999px;
   border: none;
@@ -1529,6 +1588,22 @@
   white-space: nowrap;
   transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+}
+
+@media (max-width: 480px) {
+  .tabBtn {
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .tabBtn {
+    padding: 6px 9px;
+    font-size: 12px;
+    gap: 4px;
+  }
 }
 
 .tabBtn:hover {
@@ -1725,6 +1800,16 @@
     flex: 0 0 280px;
     max-width: 320px;
     scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .gridNearest5 > li,
+  .gridPopularFull > li,
+  .gridCampaignsFull > li {
+    flex: 0 0 calc(86vw - 20px);
+    max-width: 300px;
+    min-width: 250px;
   }
 }
 

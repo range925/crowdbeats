@@ -248,7 +248,7 @@ export function Variation2ResonanceKeynote() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                   borderRadius: 9999,
                   border: '1px solid var(--cb-border-medium, rgba(168, 85, 247, 0.3))',
                   padding: '6px 8px 6px 20px',
@@ -292,7 +292,7 @@ export function Variation2ResonanceKeynote() {
                     top: 'calc(100% + 8px)',
                     left: 0,
                     right: 0,
-                    backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                    backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                     borderRadius: 16,
                     border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.1))',
                     padding: '8px 0',
@@ -343,7 +343,7 @@ export function Variation2ResonanceKeynote() {
               <div
                 key={p.id}
                 style={{
-                  backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                   borderRadius: 24,
                   border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))',
                   padding: '24px',
@@ -428,7 +428,7 @@ export function Variation2ResonanceKeynote() {
 
             <div
               style={{
-                backgroundColor: 'var(--cb-surface-1, #0F1017)',
+                backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                 borderRadius: 24,
                 padding: '36px',
                 border: '1px solid var(--cb-border-medium, rgba(168, 85, 247, 0.3))',
@@ -482,19 +482,19 @@ export function Variation2ResonanceKeynote() {
             Every fan tip divides into member bank accounts automatically: Lead (40%), Keys (25%), Drums (20%), Bass (15%).
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 48 }}>
-            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #0F1017)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
+            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #FFFFFF)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
               <span style={{ fontSize: 12, color: 'var(--cb-text-secondary, #94A3B8)', display: 'block' }}>Lead Vocals (40%)</span>
               <span style={{ fontSize: 22, fontWeight: 800 }}>${splitJake}</span>
             </div>
-            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #0F1017)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
+            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #FFFFFF)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
               <span style={{ fontSize: 12, color: 'var(--cb-text-secondary, #94A3B8)', display: 'block' }}>Keyboards (25%)</span>
               <span style={{ fontSize: 22, fontWeight: 800 }}>${splitMaya}</span>
             </div>
-            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #0F1017)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
+            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #FFFFFF)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
               <span style={{ fontSize: 12, color: 'var(--cb-text-secondary, #94A3B8)', display: 'block' }}>Drums (20%)</span>
               <span style={{ fontSize: 22, fontWeight: 800 }}>${splitDevon}</span>
             </div>
-            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #0F1017)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
+            <div style={{ padding: '16px 24px', borderRadius: 16, backgroundColor: 'var(--cb-surface-1, #FFFFFF)', border: '1px solid var(--cb-border-subtle, rgba(255, 255, 255, 0.08))' }}>
               <span style={{ fontSize: 12, color: 'var(--cb-text-secondary, #94A3B8)', display: 'block' }}>Bass (15%)</span>
               <span style={{ fontSize: 22, fontWeight: 800 }}>${splitLeo}</span>
             </div>

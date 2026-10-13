@@ -11,6 +11,7 @@
   overflow: hidden;
   isolation: isolate;
   background: transparent;
+  touch-action: pan-y;
 }
 
 .mapContainer:fullscreen {
@@ -441,6 +442,23 @@
   height: 1px;
   background: rgba(255, 255, 255, 0.14);
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .topControlBtn,
+  .controlBtn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .zoomBtn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 /* ── Bottom-Left: Floating Action Buttons (Directions & Open in Maps) ───── */

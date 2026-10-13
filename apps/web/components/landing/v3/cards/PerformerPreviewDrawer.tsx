@@ -116,7 +116,6 @@ export function PerformerPreviewDrawer({
           onClose();
         }
       }}
-      aria-hidden="true"
     >
       <div
         ref={drawerRef}
