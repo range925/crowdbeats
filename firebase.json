@@ -72,7 +72,8 @@
         "node_modules",
         ".git",
         "firebase-debug.log",
-        "firebase-debug.*.log"
+        "firebase-debug.*.log",
+        "crowdbeats-v2-*.tgz"
       ],
       "predeploy": [
         "npm --prefix apps/functions run build"

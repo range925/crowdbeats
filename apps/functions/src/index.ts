@@ -30,8 +30,9 @@ if (admin.apps.length === 0) {
 // Set global defaults for all Gen 2 functions
 setGlobalOptions({
   region: 'us-central1',
-  maxInstances: 10,
+  maxInstances: 5,
   memory: '256MiB',
+  cpu: 'gcf_gen1',
   // App Check enforcement is added in Phase 5
   // enforceAppCheck: true,
 });
