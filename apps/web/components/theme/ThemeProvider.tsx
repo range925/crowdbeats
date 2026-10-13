@@ -34,25 +34,18 @@ export const THEME_STORAGE_KEY = 'crowdbeats-theme-preference';
 export const LEGACY_THEME_STORAGE_KEY = 'crowdbeats_theme';
 
 function getSystemTheme(): ResolvedTheme {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light';
-  try {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  } catch {
-    return 'light';
-  }
+  // Web Theme Policy: Standardized approved light mode
+  return 'light';
 }
 
-function applyThemeToDom(resolvedTheme: ResolvedTheme) {
+function applyThemeToDom(_resolvedTheme?: ResolvedTheme) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
-  root.setAttribute('data-theme', resolvedTheme);
-  root.dataset.theme = resolvedTheme;
-  root.style.colorScheme = resolvedTheme;
-  if (resolvedTheme === 'dark') {
-    root.classList.add('dark');
-  } else {
-    root.classList.remove('dark');
-  }
+  // Crowdbeats V2 — Standardized Web Light Mode Policy
+  root.setAttribute('data-theme', 'light');
+  root.dataset.theme = 'light';
+  root.style.colorScheme = 'light';
+  root.classList.remove('dark');
 }
 
 function useOptionalAuth() {
@@ -65,54 +58,28 @@ function useOptionalAuth() {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const auth = useOptionalAuth();
-  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>('light');
   const [preference, setPreference] = useState<ThemePreference>('light');
-  const [isMounted, setIsMounted] = useState(false);
 
-  // Compute resolved theme — support dark, light, and system
-  const resolvedTheme: ResolvedTheme = useMemo(() => {
-    if (preference === 'dark') return 'dark';
-    if (preference === 'light') return 'light';
-    return systemTheme;
-  }, [preference, systemTheme]);
+  // Compute resolved theme — locked to 'light' for web
+  const resolvedTheme: ResolvedTheme = 'light';
+  const systemTheme: ResolvedTheme = 'light';
 
-  // Initial load from localStorage & setup OS listener
+  // Initial load: ensure light mode is applied to DOM and overwrite any legacy dark preferences
   useEffect(() => {
-    setIsMounted(true);
+    applyThemeToDom('light');
 
-    let initialPref: ThemePreference = 'light';
     try {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemePreference | null;
-      if (stored === 'light' || stored === 'dark' || stored === 'system') {
-        initialPref = stored;
-      }
+      localStorage.setItem(THEME_STORAGE_KEY, 'light');
+      localStorage.setItem(LEGACY_THEME_STORAGE_KEY, 'light');
+      localStorage.setItem('crowdbeats_admin_theme', 'light');
+      localStorage.setItem('crowdbeats_theme', 'light');
     } catch {
       // LocalStorage access may fail in private mode
     }
-
-    const sysTheme = getSystemTheme();
-    setSystemTheme(sysTheme);
-    setPreference(initialPref);
-    const resolved = initialPref === 'system' ? sysTheme : initialPref;
-    applyThemeToDom(resolved);
   }, []);
 
-  // System theme dynamic listener
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    try {
-      const media = window.matchMedia('(prefers-color-scheme: dark)');
-      const handler = (e: MediaQueryListEvent) => {
-        setSystemTheme(e.matches ? 'dark' : 'light');
-      };
-      media.addEventListener('change', handler);
-      return () => media.removeEventListener('change', handler);
-    } catch {
-      // Ignored in unsupported environments
-    }
-  }, []);
-
-  // Sync preference with authenticated Firestore user profile
+  // Sync preference with authenticated Firestore user profile (for cross-platform profile integrity)
+  // but NEVER allow cloud dark preference to activate web dark mode
   useEffect(() => {
     const uid = auth?.uid;
     if (!uid) return;
@@ -121,10 +88,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     getUserThemePreference(uid)
       .then((cloudPref) => {
         if (!isSubscribed || !cloudPref) return;
-        setPreference(cloudPref);
-        try {
-          localStorage.setItem(THEME_STORAGE_KEY, cloudPref);
-        } catch {}
+        // Keep web DOM light even if user has a dark preference stored from mobile
+        applyThemeToDom('light');
       })
       .catch((err) => {
         console.warn('[ThemeProvider] Cloud theme sync error:', err);
@@ -135,20 +100,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, [auth?.uid]);
 
-  // Apply DOM attributes on resolved theme change
+  // Apply DOM attributes on mount and updates
   useEffect(() => {
-    applyThemeToDom(resolvedTheme);
-  }, [resolvedTheme]);
+    applyThemeToDom('light');
+  }, []);
 
   const setThemePreference = useCallback(
     (newPref: ThemePreference) => {
-      setPreference(newPref);
+      // Web Theme Policy: Web stays light mode
+      setPreference('light');
       try {
-        localStorage.setItem(THEME_STORAGE_KEY, newPref);
+        localStorage.setItem(THEME_STORAGE_KEY, 'light');
       } catch {}
 
-      // If user is authenticated, sync to Firestore
-      if (auth?.uid) {
+      // If user is authenticated, sync to Firestore for mobile native apps
+      if (auth?.uid && newPref) {
         updateUserThemePreference(auth.uid, newPref).catch((err) => {
           console.warn('[ThemeProvider] Failed to persist theme to Firestore:', err);
         });
@@ -166,9 +132,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 
   const toggleTheme = useCallback(() => {
-    const next: ResolvedTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
-    setThemePreference(next);
-  }, [resolvedTheme, setThemePreference]);
+    // Web stays light mode
+    setThemePreference('light');
+  }, [setThemePreference]);
 
   return (
     <ThemeContext.Provider
@@ -184,7 +150,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     >
       <div
         className="cb-theme-transition"
-        data-theme={resolvedTheme}
+        data-theme="light"
         style={{ minHeight: '100%' }}
       >
         {children}

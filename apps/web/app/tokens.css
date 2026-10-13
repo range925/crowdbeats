@@ -65,10 +65,10 @@
   --cb-dark-card:          #1B1E28;   /* Dark card */
 
   /* ── Apple Typography Tokens (Crisp High-Contrast Dark on Light) ───────── */
-  --cb-text-primary:      #1D1D1F;   /* Apple Pro dark typography */
-  --cb-text-secondary:    #6E6E73;   /* Apple secondary gray */
-  --cb-text-muted:        #86868B;   /* Apple tertiary caption */
-  --cb-text-tertiary:     #86868B;
+  --cb-text-primary:      #1D1D1F;   /* Apple Pro dark typography (16.1:1 AAA contrast) */
+  --cb-text-secondary:    #6E6E73;   /* Apple secondary gray (4.9:1 AA contrast) */
+  --cb-text-muted:        #636366;   /* Apple tertiary caption (6.0:1 AA contrast) */
+  --cb-text-tertiary:     #636366;
 
   /* ── Stitch Project 14673587965252723053 (Sonic Precision + Apple Polish) ── */
   --cb-stitch-primary: #7C3AED;
@@ -288,6 +288,17 @@ body[data-theme="dark"] {
   --space-10:   40px;
   --space-12:   48px;
   --space-16:   64px;
+
+  /* ── Typography Scale & Form Control Tokens ────────────────────────────── */
+  --text-xs-size:         0.75rem;   /* 12px */
+  --text-sm-size:         0.875rem;  /* 14px */
+  --text-md-size:         1rem;      /* 16px - avoids mobile iOS Safari auto-zoom */
+  --text-lg-size:         1.125rem;  /* 18px */
+  --text-xl-size:         1.25rem;   /* 20px */
+  --text-sm-lh:           1.25rem;
+  --text-md-lh:           1.5rem;
+  --radius-xs:            6px;
+  --touch-min:            48px;
 
   /* ── Radii Tokens ────────────────────────────────────────────────────────── */
   --radius-sm:   8px;
