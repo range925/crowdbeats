@@ -636,10 +636,19 @@ service cloud.firestore {
     // ══════════════════════════════════════════════════════════════════════════
 
     match /notifications/{notifUid}/items/{notifId} {
-      allow read: if isOwner(notifUid);
+      allow read: if isOwner(notifUid) || isUserSupportStaff() || isSuperAdmin();
       allow update: if isOwner(notifUid) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readAt']);
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readAt', 'isRead']);
       allow create, delete: if false;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // NOTIFICATION DEAD-LETTER QUEUE — /notificationDlq/{dlqId} (Phase 16)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /notificationDlq/{dlqId} {
+      allow read: if isUserSupportStaff() || isSuperAdmin();
+      allow create, update, delete: if false; // Server-managed only
     }
 
     // ══════════════════════════════════════════════════════════════════════════

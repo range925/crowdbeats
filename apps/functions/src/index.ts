@@ -190,10 +190,16 @@ export { approveStaffRefund }  from './admin/approveStaffRefund.js';
 export { adminUpdateUserProfile } from './admin/adminUpdateUserProfile.js';
 export { updateSupportTicket, addSupportTicketNote } from './admin/adminSupportWorkflow.js';
 
-// ─── Phase 11 Integration & Notification Functions ────────────────────────────
+// ─── Phase 11 & Phase 16 Notification & Automation Functions ──────────────
 
 export { registerDeviceToken }   from './notifications/registerDeviceToken.js';
 export { unregisterDeviceToken } from './notifications/unregisterDeviceToken.js';
+export {
+  markNotificationRead,
+  markAllNotificationsRead,
+  listInAppNotifications,
+  processNotificationRetry,
+} from './notifications/notificationCallables.js';
 export { getSignedUploadUrl }    from './storage/getSignedUploadUrl.js';
 export { uploadProfileImage }    from './storage/uploadProfileImage.js';
 
