@@ -332,3 +332,11 @@ export {
   resolveIncidentAlertCallable,
   acknowledgeIncidentAlertCallable,
 } from './operations/operationsMonitoringCallables.js';
+
+// ─── Solo Musician Creator CRM Callables (Phase 11) ──────────────────────────
+export {
+  getCreatorSupportersCallable,
+  getCreatorTipAnalyticsCallable,
+  getCreatorSupporterDetailsCallable,
+  sendCreatorThankYouNoteCallable,
+} from './creator/creatorCrmCallables.js';

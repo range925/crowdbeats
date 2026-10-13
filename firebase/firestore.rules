@@ -527,7 +527,9 @@ service cloud.firestore {
 
     match /contributions/{contributionId} {
       allow read: if isSignedIn() &&
-        (resource.data.fanUid == uid() || isUserSupportStaff());
+        (resource.data.fanUid == uid() ||
+         resource.data.get('creatorId', '') == uid() ||
+         isUserSupportStaff());
       allow create, update, delete: if false;
     }
 

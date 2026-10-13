@@ -126,6 +126,9 @@ export * from './support/supportContracts';
 // ─── Real-Time Operations Monitoring (Phase 10) ───────────────────────────
 export * from './operations/operationsMonitoringContracts';
 
-export const CONTRACTS_VERSION = '0.23.0-operations-monitoring' as const;
+// ─── Solo Musician Creator CRM (Phase 11) ──────────────────────────────────
+export * from './creator/creatorCrmContracts';
+
+export const CONTRACTS_VERSION = '0.24.0-creator-crm' as const;
 
 
