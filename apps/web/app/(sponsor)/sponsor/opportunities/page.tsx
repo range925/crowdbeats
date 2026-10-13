@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Crowdbeats V2 — Sponsor Opportunities & Match Pools (Phase 9)
  * Create and manage open tip match pools and RFPs.
  */
@@ -54,32 +54,34 @@ export default function SponsorOpportunitiesPage() {
 
       {/* Match Pools List */}
       <div style={{ background: 'var(--surface-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
-          <thead>
-            <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
-              <th style={{ padding: '14px 20px', fontWeight: 600 }}>Pool Target</th>
-              <th style={{ padding: '14px 20px', fontWeight: 600 }}>Match Multiplier</th>
-              <th style={{ padding: '14px 20px', fontWeight: 600 }}>Total Pool</th>
-              <th style={{ padding: '14px 20px', fontWeight: 600 }}>Remaining</th>
-              <th style={{ padding: '14px 20px', fontWeight: 600 }}>Status</th>
-              <th style={{ padding: '14px 20px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={6} style={{ padding: '48px 20px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>🎯</div>
-                <div style={{ fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>No Active Match Pools</div>
-                <div style={{ fontSize: 12 }}>Create a 1:1 tip matching pool to boost live audience support for performers.</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13, minWidth: 640 }}>
+            <thead>
+              <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Pool Target</th>
+                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Match Multiplier</th>
+                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Total Pool</th>
+                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Remaining</th>
+                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Status</th>
+                <th style={{ padding: '14px 20px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colSpan={6} style={{ padding: '48px 20px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>🎯</div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>No Active Match Pools</div>
+                  <div style={{ fontSize: 12 }}>Create a 1:1 tip matching pool to boost live audience support for performers.</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Create Match Pool Modal */}
       {showCreateModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
           <div style={{ background: 'var(--surface-card)', width: 460, padding: 28, borderRadius: 14, border: '1px solid var(--border-subtle)' }}>
             <h3 style={{ margin: '0 0 8px', color: 'var(--text-primary)', fontSize: 18, fontWeight: 700 }}>
               Create Tip Match Pool

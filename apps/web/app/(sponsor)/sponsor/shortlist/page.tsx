@@ -161,18 +161,19 @@ export default function SponsorShortlistPage() {
         </div>
       ) : (
         <div style={{ background: 'var(--surface-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
-            <thead>
-              <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Performer</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Genre & City</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Audience Cohort</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Tip Engagement</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Added</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13, minWidth: 680 }}>
+              <thead>
+                <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Performer</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Genre & City</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Audience Cohort</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Tip Engagement</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Added</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
               {items.map((item) => (
                 <tr key={item.recipientId} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                   <td style={{ padding: '16px 20px', fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -262,6 +263,7 @@ export default function SponsorShortlistPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
@@ -274,6 +276,7 @@ export default function SponsorShortlistPage() {
             position: 'fixed',
             inset: 0,
             background: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

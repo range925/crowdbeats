@@ -295,7 +295,14 @@ export default function UnifiedAdminCrmPage() {
       header: 'Lifetime Volume',
       align: 'right',
       cell: (item) => (
-        <div style={{ fontWeight: 600, color: 'var(--admin-text-primary, #0F172A)' }}>
+        <div
+          style={{
+            fontWeight: 600,
+            color: 'var(--admin-text-primary, #0F172A)',
+            fontFamily: 'var(--cb-font-mono, monospace)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {centsToDollars(item.totalMonetaryCents)}
         </div>
       ),
@@ -327,7 +334,7 @@ export default function UnifiedAdminCrmPage() {
               fontWeight: 600,
               borderRadius: 4,
               border: '1px solid var(--admin-border-subtle, #E2E8F0)',
-              background: '#FFFFFF',
+              background: 'var(--admin-surface-card, #FFFFFF)',
               color: 'var(--admin-accent-primary, #7C3AED)',
               cursor: 'pointer',
             }}
@@ -377,7 +384,7 @@ export default function UnifiedAdminCrmPage() {
               padding: '8px 14px',
               borderRadius: 6,
               border: '1px solid var(--admin-border-subtle, #E2E8F0)',
-              background: '#FFFFFF',
+              background: 'var(--admin-surface-card, #FFFFFF)',
               fontSize: 13,
               fontWeight: 600,
               color: 'var(--admin-text-primary, #0F172A)',
@@ -493,7 +500,7 @@ export default function UnifiedAdminCrmPage() {
                 padding: '6px 10px',
                 borderRadius: 6,
                 border: '1px solid var(--admin-border-subtle, #E2E8F0)',
-                background: '#FFFFFF',
+                background: 'var(--admin-surface-card, #FFFFFF)',
                 fontSize: 12,
                 color: 'var(--admin-text-primary, #0F172A)',
                 cursor: 'pointer',
@@ -513,7 +520,7 @@ export default function UnifiedAdminCrmPage() {
                 padding: '6px 10px',
                 borderRadius: 6,
                 border: '1px solid var(--admin-border-subtle, #E2E8F0)',
-                background: '#FFFFFF',
+                background: 'var(--admin-surface-card, #FFFFFF)',
                 fontSize: 12,
                 color: 'var(--admin-text-primary, #0F172A)',
                 cursor: 'pointer',
@@ -634,32 +641,32 @@ export default function UnifiedAdminCrmPage() {
 
               {/* Statistics Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-                <div style={{ padding: 12, borderRadius: 6, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
-                  <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase', fontWeight: 600 }}>
+                <div style={{ padding: 12, borderRadius: 8, border: '1px solid var(--admin-border-subtle, #E2E8F0)', background: 'var(--admin-surface-card, #FFFFFF)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--admin-text-secondary, #64748B)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.02em' }}>
                     Lifetime Financial Volume
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginTop: 4 }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--admin-text-primary, #0F172A)', marginTop: 4, fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
                     {centsToDollars(selectedItem.totalMonetaryCents)}
                   </div>
                 </div>
-                <div style={{ padding: 12, borderRadius: 6, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
-                  <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase', fontWeight: 600 }}>
+                <div style={{ padding: 12, borderRadius: 8, border: '1px solid var(--admin-border-subtle, #E2E8F0)', background: 'var(--admin-surface-card, #FFFFFF)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--admin-text-secondary, #64748B)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.02em' }}>
                     Connected Network
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginTop: 4 }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--admin-text-primary, #0F172A)', marginTop: 4 }}>
                     {selectedItem.relationshipsCount} followers / peers
                   </div>
                 </div>
               </div>
 
               {/* Verification Governance Section */}
-              <div style={{ padding: 16, borderRadius: 8, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ padding: 16, borderRadius: 8, border: '1px solid var(--admin-border-subtle, #E2E8F0)', background: 'var(--admin-surface-card, #FFFFFF)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--admin-text-primary, #0F172A)' }}>
                       Verification Status
                     </div>
-                    <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: 'var(--admin-text-secondary, #64748B)', marginTop: 2 }}>
                       {selectedItem.verificationStatus === 'verified'
                         ? 'Profile holds verified platform authenticity badge.'
                         : 'Profile is unverified. Staff review required for badge.'}
@@ -694,14 +701,14 @@ export default function UnifiedAdminCrmPage() {
               </div>
 
               {/* Stripe Connect Section */}
-              <div style={{ padding: 16, borderRadius: 8, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ padding: 16, borderRadius: 8, border: '1px solid var(--admin-border-subtle, #E2E8F0)', background: 'var(--admin-surface-card, #FFFFFF)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <CreditCardIcon size={18} color="#64748B" />
+                  <CreditCardIcon size={18} color="var(--admin-text-secondary, #64748B)" />
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--admin-text-primary, #0F172A)' }}>
                       Stripe Connect Payout Status
                     </div>
-                    <div style={{ fontSize: 12, color: '#64748B' }}>
+                    <div style={{ fontSize: 12, color: 'var(--admin-text-secondary, #64748B)' }}>
                       {selectedItem.stripeConnected
                         ? 'Connected & capable of receiving payouts.'
                         : 'No Stripe Connect account attached.'}
@@ -714,7 +721,7 @@ export default function UnifiedAdminCrmPage() {
 
           {drawerTab === 'notes' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ fontSize: 13, color: '#64748B' }}>
+              <div style={{ fontSize: 13, color: 'var(--admin-text-secondary, #64748B)' }}>
                 Internal administrative notes are strictly restricted to authorized staff roles. Dual-written to audit trails.
               </div>
 
@@ -728,7 +735,9 @@ export default function UnifiedAdminCrmPage() {
                     width: '100%',
                     padding: 10,
                     borderRadius: 6,
-                    border: '1px solid #E2E8F0',
+                    border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                    background: 'var(--admin-surface-card, #FFFFFF)',
+                    color: 'var(--admin-text-primary, #0F172A)',
                     fontSize: 13,
                     fontFamily: 'inherit',
                     resize: 'vertical',
@@ -766,11 +775,11 @@ export default function UnifiedAdminCrmPage() {
           {drawerTab === 'cases' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {casesLoading ? (
-                <div style={{ padding: 24, textAlign: 'center', color: '#64748B', fontSize: 13 }}>
+                <div style={{ padding: 24, textAlign: 'center', color: 'var(--admin-text-secondary, #64748B)', fontSize: 13 }}>
                   Loading case history...
                 </div>
               ) : cases.length === 0 ? (
-                <div style={{ padding: 24, textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+                <div style={{ padding: 24, textAlign: 'center', color: 'var(--admin-text-tertiary, #94A3B8)', fontSize: 13 }}>
                   No active support requests, reports, or payout compliance holds found for this profile.
                 </div>
               ) : (
@@ -779,16 +788,16 @@ export default function UnifiedAdminCrmPage() {
                     key={c.caseId}
                     style={{
                       padding: 14,
-                      borderRadius: 6,
-                      border: '1px solid #E2E8F0',
-                      background: '#FFFFFF',
+                      borderRadius: 8,
+                      border: '1px solid var(--admin-border-subtle, #E2E8F0)',
+                      background: 'var(--admin-surface-card, #FFFFFF)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 6,
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#7C3AED' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--admin-accent-primary, #7C3AED)' }}>
                         {c.type}
                       </span>
                       <AdminStatusBadge
@@ -796,8 +805,8 @@ export default function UnifiedAdminCrmPage() {
                         label={c.status}
                       />
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{c.title}</div>
-                    <div style={{ fontSize: 11, color: '#94A3B8' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--admin-text-primary, #0F172A)' }}>{c.title}</div>
+                    <div style={{ fontSize: 11, color: 'var(--admin-text-tertiary, #94A3B8)' }}>
                       Opened: {new Date(c.createdAt).toLocaleDateString()}
                     </div>
                   </div>

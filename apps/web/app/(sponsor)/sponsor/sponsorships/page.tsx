@@ -188,18 +188,19 @@ export default function SponsorSponsorshipsPage() {
         </div>
       ) : (
         <div style={{ background: 'var(--surface-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
-            <thead>
-              <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Agreement Title</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Performer</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Value</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Signatures</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600 }}>Status</th>
-                <th style={{ padding: '14px 20px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13, minWidth: 700 }}>
+              <thead>
+                <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Agreement Title</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Performer</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Value</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Signatures</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600 }}>Status</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
               {filteredDeals.map((d) => {
                 const isOrgSigned = Boolean(d.signedByOrgAt);
                 const isArtistSigned = Boolean(d.signedByArtistAt);
@@ -299,6 +300,7 @@ export default function SponsorSponsorshipsPage() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
@@ -311,6 +313,7 @@ export default function SponsorSponsorshipsPage() {
             position: 'fixed',
             inset: 0,
             background: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

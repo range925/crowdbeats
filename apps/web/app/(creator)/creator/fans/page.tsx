@@ -161,7 +161,7 @@ export default function CreatorFansPage() {
           <Link href="/creator/messages" style={{ textDecoration: 'none' }}>
             <button
               style={{
-                background: '#000000',
+                background: 'var(--cb-purple-main, #7C3AED)',
                 color: '#FFFFFF',
                 border: 'none',
                 padding: '8px 16px',
@@ -169,6 +169,7 @@ export default function CreatorFansPage() {
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
+                transition: 'opacity 0.15s ease',
               }}
             >
               💬 Open Creator Inbox
@@ -197,16 +198,16 @@ export default function CreatorFansPage() {
       {/* ── Top Analytics Bento ─────────────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 28 }}>
         <div style={{ background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 14, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', marginBottom: 4 }}>TOTAL SUPPORTERS</div>
-          <div style={{ fontSize: 26, fontWeight: 800 }}>{totalCount}</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>TOTAL SUPPORTERS</div>
+          <div style={{ fontSize: 26, fontWeight: 800, fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>{totalCount}</div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary, #6E6E73)', marginTop: 4 }}>
             Followers & financial patrons
           </div>
         </div>
 
         <div style={{ background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 14, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', marginBottom: 4 }}>REPEAT SUPPORTER RATE</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: '#8B5CF6' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>REPEAT SUPPORTER RATE</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--cb-purple-main, #8B5CF6)', fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
             {analytics?.repeatSupporterRatePct ?? 0}%
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary, #6E6E73)', marginTop: 4 }}>
@@ -215,8 +216,8 @@ export default function CreatorFansPage() {
         </div>
 
         <div style={{ background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 14, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', marginBottom: 4 }}>LIFETIME TIPS RECEIVED</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: '#10B981' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>LIFETIME TIPS RECEIVED</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--cb-live-green, #10B981)', fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
             ${((analytics?.totalTipsReceivedCents ?? 0) / 100).toFixed(2)}
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary, #6E6E73)', marginTop: 4 }}>
@@ -225,8 +226,8 @@ export default function CreatorFansPage() {
         </div>
 
         <div style={{ background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 14, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', marginBottom: 4 }}>AVERAGE TIP SIZE</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: '#3B82F6' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>AVERAGE TIP SIZE</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: '#3B82F6', fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
             ${((analytics?.averageTipCents ?? 0) / 100).toFixed(2)}
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary, #6E6E73)', marginTop: 4 }}>
@@ -235,11 +236,16 @@ export default function CreatorFansPage() {
         </div>
 
         <div style={{ background: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', borderRadius: 14, padding: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', marginBottom: 4 }}>TOP STAGE SESSION</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #6E6E73)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>TOP STAGE SESSION</span>
+            {analytics?.topTippingSession && (
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} title="Live Session Active" />
+            )}
+          </div>
           <div style={{ fontSize: 16, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {analytics?.topTippingSession?.sessionTitle || 'No stage session yet'}
           </div>
-          <div style={{ fontSize: 12, color: '#10B981', fontWeight: 700, marginTop: 6 }}>
+          <div style={{ fontSize: 12, color: 'var(--cb-live-green, #10B981)', fontWeight: 700, marginTop: 6, fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
             {analytics?.topTippingSession ? `$${(analytics.topTippingSession.totalCents / 100).toFixed(2)} (${analytics.topTippingSession.tipsCount} tips)` : 'Go live to see stats'}
           </div>
         </div>
@@ -265,7 +271,7 @@ export default function CreatorFansPage() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 border: 'none',
-                background: segmentFilter === tab.id ? '#000000' : 'var(--surface-raised, #F5F5F7)',
+                background: segmentFilter === tab.id ? 'var(--cb-purple-main, #7C3AED)' : 'var(--surface-raised, #F5F5F7)',
                 color: segmentFilter === tab.id ? '#FFFFFF' : 'var(--text-secondary, #6E6E73)',
                 whiteSpace: 'nowrap',
                 transition: 'all 0.15s ease',
@@ -296,7 +302,14 @@ export default function CreatorFansPage() {
       </div>
 
       {/* ── Main Layout: Table and Dossier Drawer ───────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: selectedSupporterId ? '1fr 440px' : '1fr', gap: 20, alignItems: 'start' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: selectedSupporterId ? 'minmax(0, 1fr) minmax(360px, 440px)' : '1fr',
+          gap: 20,
+          alignItems: 'start',
+        }}
+      >
         {/* Left: Supporters Table */}
         <div style={{ background: 'var(--surface-card, #FFFFFF)', borderRadius: 14, border: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', overflow: 'hidden' }}>
           {loading ? (
@@ -312,163 +325,167 @@ export default function CreatorFansPage() {
               </div>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: 'var(--surface-raised, #F5F5F7)', borderBottom: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', color: 'var(--text-secondary, #6E6E73)' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: 600 }}>Supporter & Identity</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600 }}>Segment</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600 }}>Lifetime Value</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600 }}>Contributions</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600 }}>Follower Status</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600 }}>Consent & Privacy</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {supporters.map((s) => {
-                  const badge = getSegmentBadge(s.segment);
-                  const isSelected = selectedSupporterId === s.supporterId;
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13, minWidth: 700 }}>
+                <thead>
+                  <tr style={{ background: 'var(--surface-raised, #F5F5F7)', borderBottom: '1px solid var(--border-subtle, rgba(0,0,0,0.08))', color: 'var(--text-secondary, #6E6E73)' }}>
+                    <th style={{ padding: '12px 16px', fontWeight: 600 }}>Supporter & Identity</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 600 }}>Segment</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 600 }}>Lifetime Value</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 600 }}>Contributions</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 600 }}>Follower Status</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 600 }}>Consent & Privacy</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {supporters.map((s) => {
+                    const badge = getSegmentBadge(s.segment);
+                    const isSelected = selectedSupporterId === s.supporterId;
 
-                  return (
-                    <tr
-                      key={s.supporterId}
-                      onClick={() => setSelectedSupporterId(isSelected ? null : s.supporterId)}
-                      style={{
-                        borderBottom: '1px solid var(--border-subtle, rgba(0,0,0,0.06))',
-                        cursor: 'pointer',
-                        background: isSelected ? 'rgba(0, 0, 0, 0.03)' : 'transparent',
-                        transition: 'background 0.15s ease',
-                      }}
-                    >
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div
+                    return (
+                      <tr
+                        key={s.supporterId}
+                        onClick={() => setSelectedSupporterId(isSelected ? null : s.supporterId)}
+                        style={{
+                          borderBottom: '1px solid var(--border-subtle, rgba(0,0,0,0.06))',
+                          cursor: 'pointer',
+                          background: isSelected ? 'var(--cb-purple-dim, rgba(124, 58, 237, 0.08))' : 'transparent',
+                          transition: 'background 0.15s ease',
+                        }}
+                      >
+                        <td style={{ padding: '14px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div
+                              style={{
+                                width: 34,
+                                height: 34,
+                                borderRadius: '50%',
+                                background: s.isAnonymous ? '#9CA3AF' : 'var(--cb-purple-main, #7C3AED)',
+                                color: '#FFFFFF',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 700,
+                                fontSize: 13,
+                                overflow: 'hidden',
+                              }}
+                            >
+                              {s.isAnonymous ? '👤' : s.photoUrl ? (
+                                <img src={s.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                s.displayName.slice(0, 2).toUpperCase()
+                              )}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, color: s.isAnonymous ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
+                                {s.displayName}
+                              </div>
+                              <div style={{ fontSize: 11, color: 'var(--text-tertiary, #86868B)' }}>
+                                {s.lastSupportedAt ? `Last active ${new Date(s.lastSupportedAt).toLocaleDateString()}` : 'Follower'}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td style={{ padding: '14px 16px' }}>
+                          <span
                             style={{
-                              width: 34,
-                              height: 34,
-                              borderRadius: '50%',
-                              background: s.isAnonymous ? '#9CA3AF' : '#1D1D1F',
-                              color: '#FFFFFF',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              fontSize: 10,
                               fontWeight: 700,
-                              fontSize: 13,
-                              overflow: 'hidden',
+                              padding: '3px 8px',
+                              borderRadius: 6,
+                              background: badge.bg,
+                              color: badge.color,
+                              border: badge.border,
+                              letterSpacing: '0.02em',
                             }}
                           >
-                            {s.isAnonymous ? '👤' : s.photoUrl ? (
-                              <img src={s.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              s.displayName.slice(0, 2).toUpperCase()
+                            {badge.label}
+                          </span>
+                        </td>
+
+                        <td style={{ padding: '14px 16px', fontWeight: 800, color: s.lifetimeValueCents > 0 ? 'var(--cb-live-green, #10B981)' : 'var(--text-secondary)', fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
+                          ${(s.lifetimeValueCents / 100).toFixed(2)}
+                        </td>
+
+                        <td style={{ padding: '14px 16px' }}>
+                          <div style={{ fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
+                            {s.tipsCount} tips (${(s.totalTipsCents / 100).toFixed(2)})
+                          </div>
+                          {s.campaignsCount > 0 && (
+                            <div style={{ fontSize: 11, color: '#EC4899', fontWeight: 600, marginTop: 2 }}>
+                              {s.campaignsCount} campaigns backed
+                            </div>
+                          )}
+                        </td>
+
+                        <td style={{ padding: '14px 16px' }}>
+                          {s.isFollower ? (
+                            <span style={{ color: 'var(--cb-live-green, #10B981)', fontWeight: 600 }}>✓ Following</span>
+                          ) : (
+                            <span style={{ color: 'var(--text-secondary)' }}>Not following</span>
+                          )}
+                        </td>
+
+                        <td style={{ padding: '14px 16px' }}>
+                          {s.isAnonymous ? (
+                            <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>🔒 Anonymous (Contact Disabled)</span>
+                          ) : s.allowsDirectMessaging ? (
+                            <span style={{ fontSize: 11, color: 'var(--cb-live-green, #10B981)', fontWeight: 600 }}>✉️ Messaging Allowed</span>
+                          ) : (
+                            <span style={{ fontSize: 11, color: '#F59E0B', fontWeight: 600 }}>🚫 Direct Messages Opted-Out</span>
+                          )}
+                        </td>
+
+                        <td style={{ padding: '14px 16px', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                            {s.allowsDirectMessaging && !s.isAnonymous && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setMessagingSupporter(s);
+                                }}
+                                style={{
+                                  background: 'var(--cb-purple-main, #7C3AED)',
+                                  color: '#FFFFFF',
+                                  border: 'none',
+                                  padding: '5px 12px',
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Say Thanks
+                              </button>
                             )}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, color: s.isAnonymous ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
-                              {s.displayName}
-                            </div>
-                            <div style={{ fontSize: 11, color: 'var(--text-tertiary, #86868B)' }}>
-                              {s.lastSupportedAt ? `Last active ${new Date(s.lastSupportedAt).toLocaleDateString()}` : 'Follower'}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td style={{ padding: '14px 16px' }}>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            padding: '3px 8px',
-                            borderRadius: 6,
-                            background: badge.bg,
-                            color: badge.color,
-                            border: badge.border,
-                            letterSpacing: '0.02em',
-                          }}
-                        >
-                          {badge.label}
-                        </span>
-                      </td>
-
-                      <td style={{ padding: '14px 16px', fontWeight: 800, color: s.lifetimeValueCents > 0 ? '#10B981' : 'var(--text-secondary)' }}>
-                        ${(s.lifetimeValueCents / 100).toFixed(2)}
-                      </td>
-
-                      <td style={{ padding: '14px 16px' }}>
-                        <div>{s.tipsCount} tips (${(s.totalTipsCents / 100).toFixed(2)})</div>
-                        {s.campaignsCount > 0 && (
-                          <div style={{ fontSize: 11, color: '#EC4899', fontWeight: 600 }}>
-                            {s.campaignsCount} campaigns backed
-                          </div>
-                        )}
-                      </td>
-
-                      <td style={{ padding: '14px 16px' }}>
-                        {s.isFollower ? (
-                          <span style={{ color: '#10B981', fontWeight: 600 }}>✓ Following</span>
-                        ) : (
-                          <span style={{ color: 'var(--text-secondary)' }}>Not following</span>
-                        )}
-                      </td>
-
-                      <td style={{ padding: '14px 16px' }}>
-                        {s.isAnonymous ? (
-                          <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>🔒 Anonymous (Contact Disabled)</span>
-                        ) : s.allowsDirectMessaging ? (
-                          <span style={{ fontSize: 11, color: '#10B981', fontWeight: 600 }}>✉️ Messaging Allowed</span>
-                        ) : (
-                          <span style={{ fontSize: 11, color: '#F59E0B', fontWeight: 600 }}>🚫 Direct Messages Opted-Out</span>
-                        )}
-                      </td>
-
-                      <td style={{ padding: '14px 16px', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                          {s.allowsDirectMessaging && !s.isAnonymous && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setMessagingSupporter(s);
+                                setSelectedSupporterId(isSelected ? null : s.supporterId);
                               }}
                               style={{
-                                background: '#000000',
-                                color: '#FFFFFF',
-                                border: 'none',
-                                padding: '4px 10px',
+                                background: isSelected ? 'var(--cb-purple-dim, rgba(124, 58, 237, 0.12))' : 'var(--surface-raised, #F5F5F7)',
+                                border: '1px solid var(--border-subtle, rgba(0,0,0,0.1))',
+                                color: isSelected ? 'var(--cb-purple-main, #7C3AED)' : 'var(--text-primary)',
+                                padding: '5px 12px',
                                 borderRadius: 6,
                                 fontSize: 12,
                                 fontWeight: 600,
                                 cursor: 'pointer',
                               }}
                             >
-                              Say Thanks
+                              {isSelected ? 'Close' : 'Dossier'}
                             </button>
-                          )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedSupporterId(isSelected ? null : s.supporterId);
-                            }}
-                            style={{
-                              background: 'var(--surface-raised, #F5F5F7)',
-                              border: '1px solid var(--border-subtle, rgba(0,0,0,0.1))',
-                              color: 'var(--text-primary)',
-                              padding: '4px 10px',
-                              borderRadius: 6,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {isSelected ? 'Close' : 'Dossier'}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
@@ -512,7 +529,7 @@ export default function CreatorFansPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, background: 'var(--surface-raised, #F5F5F7)', padding: 14, borderRadius: 10 }}>
                   <div>
                     <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Lifetime Contributed</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: '#10B981', marginTop: 2 }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--cb-live-green, #10B981)', marginTop: 2, fontFamily: 'var(--cb-font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
                       ${(details.supporter.lifetimeValueCents / 100).toFixed(2)}
                     </div>
                   </div>
@@ -526,7 +543,7 @@ export default function CreatorFansPage() {
 
                 {/* Privacy & Consent Status */}
                 <div style={{ fontSize: 12, background: details.supporter.allowsDirectMessaging ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)', padding: 12, borderRadius: 8, border: `1px solid ${details.supporter.allowsDirectMessaging ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}` }}>
-                  <div style={{ fontWeight: 700, color: details.supporter.allowsDirectMessaging ? '#059669' : '#DC2626' }}>
+                  <div style={{ fontWeight: 700, color: details.supporter.allowsDirectMessaging ? 'var(--cb-live-green, #059669)' : '#DC2626' }}>
                     {details.supporter.allowsDirectMessaging ? '✓ Fan Consent Granted' : '🔒 Direct Contact Restricted'}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
@@ -546,7 +563,7 @@ export default function CreatorFansPage() {
                       <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>No events recorded yet.</div>
                     ) : (
                       details.engagementHistory.map((evt) => (
-                        <div key={evt.eventId} style={{ borderLeft: '2px solid #000000', paddingLeft: 10, fontSize: 12 }}>
+                        <div key={evt.eventId} style={{ borderLeft: '2px solid var(--cb-purple-main, #7C3AED)', paddingLeft: 10, fontSize: 12 }}>
                           <div style={{ fontWeight: 600 }}>{evt.summary}</div>
                           <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 1 }}>
                             {new Date(evt.timestamp).toLocaleString()}
@@ -563,7 +580,7 @@ export default function CreatorFansPage() {
                     onClick={() => setMessagingSupporter(details.supporter)}
                     style={{
                       width: '100%',
-                      background: '#000000',
+                      background: 'var(--cb-purple-main, #7C3AED)',
                       color: '#FFFFFF',
                       border: 'none',
                       padding: '10px 16px',
@@ -572,6 +589,7 @@ export default function CreatorFansPage() {
                       fontWeight: 700,
                       cursor: 'pointer',
                       marginTop: 10,
+                      transition: 'opacity 0.15s ease',
                     }}
                   >
                     💌 Send Personalized Thank You Note
@@ -590,6 +608,7 @@ export default function CreatorFansPage() {
             position: 'fixed',
             inset: 0,
             background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -599,34 +618,35 @@ export default function CreatorFansPage() {
         >
           <div
             style={{
-              background: '#FFFFFF',
+              background: 'var(--cb-surface-1, #FFFFFF)',
               borderRadius: 14,
-              border: '1px solid rgba(0,0,0,0.1)',
+              border: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.1))',
+              color: 'var(--cb-text-primary, #1D1D1F)',
               width: '100%',
               maxWidth: 500,
               padding: 24,
-              boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+              boxShadow: '0 12px 36px -8px rgba(0,0,0,0.3)',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E5E7EB', paddingBottom: 12, marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--cb-border-subtle, #E5E7EB)', paddingBottom: 12, marginBottom: 16 }}>
               <div>
-                <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: 'var(--cb-text-primary, #1D1D1F)' }}>
                   Send Note to {messagingSupporter.displayName}
                 </h3>
-                <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'var(--cb-text-secondary, #6B7280)', marginTop: 2 }}>
                   Direct artist note delivered into the fan's inbox with notification.
                 </div>
               </div>
               <button
                 onClick={() => setMessagingSupporter(null)}
-                style={{ background: 'transparent', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6B7280' }}
+                style={{ background: 'transparent', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--cb-text-secondary, #6B7280)' }}
               >
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSendThankYouSubmit}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--cb-text-secondary, #374151)', marginBottom: 6 }}>
                 Your Message
               </label>
               <textarea
@@ -638,7 +658,9 @@ export default function CreatorFansPage() {
                   width: '100%',
                   padding: '10px 12px',
                   borderRadius: 8,
-                  border: '1px solid #D1D5DB',
+                  border: '1px solid var(--cb-border-subtle, #D1D5DB)',
+                  background: 'var(--cb-surface-2, #F4F4F6)',
+                  color: 'var(--cb-text-primary, #1D1D1F)',
                   fontSize: 13,
                   resize: 'vertical',
                   marginBottom: 16,
@@ -652,9 +674,9 @@ export default function CreatorFansPage() {
                   type="button"
                   onClick={() => setMessagingSupporter(null)}
                   style={{
-                    background: '#F3F4F6',
-                    border: '1px solid #E5E7EB',
-                    color: '#374151',
+                    background: 'var(--cb-surface-2, #F3F4F6)',
+                    border: '1px solid var(--cb-border-subtle, #E5E7EB)',
+                    color: 'var(--cb-text-primary, #374151)',
                     borderRadius: 6,
                     padding: '8px 14px',
                     fontSize: 13,
@@ -668,7 +690,7 @@ export default function CreatorFansPage() {
                   type="submit"
                   disabled={isSendingMessage}
                   style={{
-                    background: '#000000',
+                    background: 'var(--cb-purple-main, #7C3AED)',
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: 6,
@@ -676,6 +698,7 @@ export default function CreatorFansPage() {
                     fontSize: 13,
                     fontWeight: 700,
                     cursor: 'pointer',
+                    opacity: isSendingMessage ? 0.7 : 1,
                   }}
                 >
                   {isSendingMessage ? 'Sending...' : 'Send Note'}
