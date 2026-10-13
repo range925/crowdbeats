@@ -315,7 +315,28 @@ export async function handleChargeRefunded(
     .limit(1)
     .get();
 
-  if (tipsSnap.empty) return;
+  if (tipsSnap.empty) {
+    const contribsSnap = await db
+      .collection('contributions')
+      .where('stripePaymentIntentId', '==', piId)
+      .limit(1)
+      .get();
+    if (!contribsSnap.empty) {
+      const contribDoc = contribsSnap.docs[0];
+      const contribData = contribDoc.data();
+      const campaignId = contribData['campaignId'];
+      const contributionId = contribDoc.id;
+      if (campaignId) {
+        const { campaignSyncService } = await import('../campaign/campaignSyncService.js');
+        await campaignSyncService.refundContribution('system_webhook', ['SUPER_ADMIN'], {
+          campaignId,
+          contributionId,
+          reason: 'Stripe charge.refunded webhook event',
+        });
+      }
+    }
+    return;
+  }
 
   const tipDoc = tipsSnap.docs[0];
   const tipId = tipDoc.id;

@@ -365,3 +365,13 @@ export {
   getSponsorshipDeals,
   getSponsorshipDealDetails,
 } from './sponsor/sponsorCrmCallables.js';
+
+// ─── Campaign & Supporter Synchronization Callables (Phase 14) ───────────────
+export {
+  createContributionIntent,
+  refundContribution,
+  reviewCampaign,
+  updateRewardFulfillment,
+  getAdminCampaigns,
+  getCampaignContributors,
+} from './campaign/campaignSyncCallables.js';

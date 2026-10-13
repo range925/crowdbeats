@@ -135,6 +135,9 @@ export * from './band/bandCrmContracts';
 // ─── Sponsor Relationship Management (Phase 13) ───────────────────────────
 export * from './sponsorship/sponsorCrmContracts';
 
-export const CONTRACTS_VERSION = '0.26.0-sponsor-crm' as const;
+// ─── Campaign & Supporter Synchronization (Phase 14) ──────────────────────
+export * from './campaign/campaignSyncContracts';
+
+export const CONTRACTS_VERSION = '0.27.0-campaign-sync' as const;
 
 

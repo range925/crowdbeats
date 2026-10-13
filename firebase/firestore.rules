@@ -540,7 +540,8 @@ service cloud.firestore {
         (resource.data.fanUid == uid() ||
          resource.data.get('creatorId', '') == uid() ||
          (resource.data.get('creatorType', '') == 'band' && isBandMember(resource.data.get('creatorId', ''))) ||
-         isUserSupportStaff());
+         isUserSupportStaff() ||
+         isSuperAdmin());
       allow create, update, delete: if false;
     }
 
@@ -577,31 +578,6 @@ service cloud.firestore {
 
     match /idempotencyKeys/{key} {
       allow read, write: if false;
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // CAMPAIGNS — /campaigns/{campaignId}
-    // ══════════════════════════════════════════════════════════════════════════
-
-    match /campaigns/{campaignId} {
-      allow read: if isSignedIn();
-      allow create: if false; // Via createCampaign callable
-      allow update: if isSignedIn() && (
-        resource.data.creatorId == uid() ||
-        (resource.data.get('creatorType', '') == 'band' && isBandAdmin(resource.data.get('creatorId', '')))
-      ) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(
-          ['title', 'description', 'coverUrl', 'updatedAt', 'v']
-        ) &&
-        request.resource.data.v == resource.data.v + 1 &&
-        immutableOnUpdate(['campaignId', 'creatorId', 'creatorType', 'goalAmountCents',
-          'currency', 'raisedAmountCents', 'contributionCount', 'createdAt']);
-      allow delete: if false;
-
-      match /rewards/{rewardId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if false;
-      }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -1046,32 +1022,49 @@ service cloud.firestore {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // CAMPAIGNS — Phase 7
-    // Public read for active campaigns; server-only writes for all state.
+    // CAMPAIGNS — /campaigns/{campaignId} (Phase 14 Consolidated)
     // ══════════════════════════════════════════════════════════════════════════
 
     match /campaigns/{campaignId} {
-      // Active campaigns are publicly readable (discovery)
-      // Draft/submitted visible to creator only
-      allow read: if resource.data.status == 'active'
-        || (isSignedIn() && resource.data.creatorId == uid());
+      allow read: if resource.data.status == 'active' ||
+        (isSignedIn() && (
+          resource.data.creatorId == uid() ||
+          (resource.data.get('creatorType', '') == 'band' && isBandMember(resource.data.creatorId)) ||
+          isUserSupportStaff() ||
+          isSuperAdmin()
+        ));
+      allow create, delete: if false; // via callables only
+      allow update: if isSignedIn() &&
+        (resource.data.creatorId == uid() ||
+         (resource.data.get('creatorType', '') == 'band' && isBandAdmin(resource.data.creatorId))) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'coverUrl', 'updatedAt', 'v']) &&
+        request.resource.data.v == resource.data.v + 1 &&
+        immutableOnUpdate(['campaignId', 'creatorId', 'creatorType', 'goalAmountCents', 'currency', 'raisedAmountCents', 'contributionCount', 'createdAt']);
 
-      // All state transitions are server-only callables
-      allow create, update, delete: if false;
-
-      // Campaign updates: publicly readable on active campaigns
       match /updates/{updateId} {
-        allow read: if get(/databases/$(database)/documents/campaigns/$(campaignId)).data.status == 'active'
-          || (isSignedIn() && get(/databases/$(database)/documents/campaigns/$(campaignId)).data.creatorId == uid());
+        allow read: if get(/databases/$(database)/documents/campaigns/$(campaignId)).data.status == 'active' ||
+          (isSignedIn() && (
+            get(/databases/$(database)/documents/campaigns/$(campaignId)).data.creatorId == uid() ||
+            (get(/databases/$(database)/documents/campaigns/$(campaignId)).data.get('creatorType', '') == 'band' && isBandMember(get(/databases/$(database)/documents/campaigns/$(campaignId)).data.creatorId)) ||
+            isUserSupportStaff() ||
+            isSuperAdmin()
+          ));
         allow create, update, delete: if false;
       }
 
-      // Contributions: fan reads own; creator reads all for their campaign; server writes
       match /contributions/{contributionId} {
         allow read: if isSignedIn() && (
-          resource.data.fanUid == uid()
-          || get(/databases/$(database)/documents/campaigns/$(campaignId)).data.creatorId == uid()
+          resource.data.fanUid == uid() ||
+          get(/databases/$(database)/documents/campaigns/$(campaignId)).data.creatorId == uid() ||
+          (get(/databases/$(database)/documents/campaigns/$(campaignId)).data.get('creatorType', '') == 'band' && isBandMember(get(/databases/$(database)/documents/campaigns/$(campaignId)).data.creatorId)) ||
+          isUserSupportStaff() ||
+          isSuperAdmin()
         );
+        allow create, update, delete: if false;
+      }
+
+      match /rewards/{rewardId} {
+        allow read: if isSignedIn();
         allow create, update, delete: if false;
       }
     }

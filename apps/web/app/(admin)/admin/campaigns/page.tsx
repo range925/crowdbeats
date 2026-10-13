@@ -19,6 +19,7 @@ import {
   type Column,
 } from '@/components/admin';
 import { centsToDollars } from '@/lib/admin/adminFirestore';
+import { useAdminCampaigns, reviewCampaignApi } from '@/lib/campaign/campaignSync';
 
 type CampaignTab = 'pending-review' | 'active' | 'completed' | 'rejected' | 'flagged' | 'rewards' | 'updates' | 'reports';
 
@@ -137,8 +138,33 @@ export default function EnterpriseCampaignsPage() {
     campaign: AdminCampaign;
   } | null>(null);
 
+  const { campaigns: liveCampaigns, stats, refresh: refreshLiveCampaigns } = useAdminCampaigns();
+
+  const combinedCampaigns: AdminCampaign[] = useMemo(() => {
+    if (liveCampaigns && liveCampaigns.length > 0) {
+      return liveCampaigns.map((c) => ({
+        id: c.campaignId,
+        title: c.title,
+        creatorName: c.creatorName,
+        creatorUid: c.creatorId,
+        creatorVerified: c.creatorVerified,
+        goalCents: c.goalCents,
+        pledgedCents: c.pledgedCents,
+        backersCount: c.backerCount,
+        status: (c.status.toUpperCase() === 'SUBMITTED' ? 'PENDING_REVIEW' : c.status.toUpperCase()) as any,
+        submittedAt: c.submittedAt || c.createdAt,
+        ageDays: Math.max(1, Math.floor((Date.now() - new Date(c.createdAt).getTime()) / 86400000)),
+        flagsCount: c.flagsCount,
+        category: 'Music Project',
+        story: '',
+        rewards: [],
+      }));
+    }
+    return SAMPLE_CAMPAIGNS;
+  }, [liveCampaigns]);
+
   const filteredCampaigns = useMemo(() => {
-    let list = SAMPLE_CAMPAIGNS;
+    let list = combinedCampaigns;
     if (activeTab === 'pending-review') {
       list = list.filter((c) => c.status === 'PENDING_REVIEW');
     } else if (activeTab === 'active') {
@@ -160,7 +186,7 @@ export default function EnterpriseCampaignsPage() {
       ));
     }
     return list;
-  }, [activeTab, search]);
+  }, [combinedCampaigns, activeTab, search]);
 
   const handleRowClick = (c: AdminCampaign) => {
     setSelectedCampaign(c);
@@ -169,7 +195,16 @@ export default function EnterpriseCampaignsPage() {
 
   const handleDecision = async (reason: string) => {
     if (!decisionAction) return;
-    alert(`Campaign ${decisionAction.campaign.id} actioned: ${decisionAction.type.toUpperCase()} with reason: ${reason}`);
+    try {
+      await reviewCampaignApi({
+        campaignId: decisionAction.campaign.id,
+        decision: decisionAction.type === 'pause' ? 'flag' : decisionAction.type,
+        notes: reason,
+      });
+      refreshLiveCampaigns();
+    } catch (err: any) {
+      console.error('Error executing campaign review:', err);
+    }
     setDecisionAction(null);
   };
 

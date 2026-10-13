@@ -25,6 +25,7 @@ import {
   handlePayoutPaid,
   handlePayoutFailed,
 } from '../connect/connectWebhookHandlers.js';
+import { campaignSyncService } from '../campaign/campaignSyncService.js';
 
 const _db = () => admin.firestore();
 
@@ -214,6 +215,16 @@ export const stripeConnectWebhook = onRequest(
 
 async function _handlePaymentSucceeded(pi: Record<string, unknown>): Promise<void> {
   const metadata = pi['metadata'] as Record<string, string> | undefined;
+
+  // Phase 14: Route campaign contribution payments
+  if (
+    metadata?.['type'] === 'campaign_contribution' ||
+    (metadata?.['campaignId'] && metadata?.['contributionId'])
+  ) {
+    await campaignSyncService.handleCampaignContributionSucceeded(pi);
+    return;
+  }
+
   const tipId = metadata?.['tipId'];
   if (!tipId) {
     console.warn('payment_intent.succeeded: no tipId in metadata', pi['id']);
@@ -412,6 +423,16 @@ function _distributeLargestRemainder(
 
 async function _handlePaymentFailed(pi: Record<string, unknown>): Promise<void> {
   const metadata = pi['metadata'] as Record<string, string> | undefined;
+
+  // Phase 14: Route campaign contribution failures
+  if (
+    metadata?.['type'] === 'campaign_contribution' ||
+    (metadata?.['campaignId'] && metadata?.['contributionId'])
+  ) {
+    await campaignSyncService.handleCampaignContributionFailed(pi);
+    return;
+  }
+
   const tipId = metadata?.['tipId'];
   if (!tipId) return;
 
