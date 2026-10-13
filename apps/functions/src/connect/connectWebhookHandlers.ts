@@ -230,6 +230,10 @@ export async function handleDisputeCreated(
       const tipDoc = tipsSnap.docs[0];
       tipId = tipDoc.id;
       recipientId = tipDoc.data()['recipientId'] as string;
+      if (tipDoc.data()['status'] === 'disputed') {
+        // Idempotent replay: already disputed
+        return;
+      }
     }
   }
 
@@ -260,7 +264,27 @@ export async function handleDisputeCreated(
     });
   }
 
-  // 3. Audit Log
+  // 3. Place compliance hold on recipient creator to prevent fraudulent payout drain
+  if (recipientId) {
+    const userRef = db.collection('users').doc(recipientId);
+    const artistRef = db.collection('artistProfiles').doc(recipientId);
+    batch.update(userRef, {
+      complianceHold: true,
+      payoutHoldReason: PayoutHoldReasonCode.PAYOUT_HOLD_CHARGEBACK,
+      updatedAt: serverNow,
+    });
+    batch.set(
+      artistRef,
+      {
+        complianceHold: true,
+        payoutHoldReason: PayoutHoldReasonCode.PAYOUT_HOLD_CHARGEBACK,
+        updatedAt: serverNow,
+      },
+      { merge: true },
+    );
+  }
+
+  // 4. Audit Log
   const auditRef = db.collection('auditLogs').doc(uuidv4());
   batch.set(auditRef, {
     action: 'CHARGE_DISPUTE_CREATED',
@@ -298,6 +322,11 @@ export async function handleChargeRefunded(
   const tipData = tipDoc.data();
   const serverNow = admin.firestore.FieldValue.serverTimestamp();
 
+  // If already refunded, idempotent no-op
+  if (tipData['status'] === 'refunded' && tipData['refundedAt']) {
+    return;
+  }
+
   const batch = db.batch();
 
   batch.update(tipDoc.ref, {
@@ -305,6 +334,25 @@ export async function handleChargeRefunded(
     refundedAt: serverNow,
     updatedAt: serverNow,
   });
+
+  const recipientId = tipData['recipientId'] as string;
+  const recipientType = tipData['recipientType'] as string;
+  const amountCents = (tipData['amountCents'] as number) || 0;
+  const platformFeeCents = (tipData['platformFeeCents'] as number) || 0;
+  const netAmountCents = (tipData['netAmountCents'] as number) ?? (amountCents - platformFeeCents);
+
+  // Decrement creator available balance if solo artist
+  if (recipientId && recipientType !== 'band') {
+    const artistRef = db.collection('artistProfiles').doc(recipientId);
+    batch.set(
+      artistRef,
+      {
+        availableBalanceCents: admin.firestore.FieldValue.increment(-netAmountCents),
+        updatedAt: serverNow,
+      },
+      { merge: true },
+    );
+  }
 
   // Write REFUND ledger record
   const ledgerRef = db.collection('paymentLedger').doc(uuidv4());
@@ -390,6 +438,11 @@ export async function handlePayoutPaid(
   const payoutDoc = await _findPayoutDoc(db, payoutObj);
   if (!payoutDoc) {
     console.warn(`[handlePayoutPaid] No payout document matched: ${payoutObj['id']}`);
+    return;
+  }
+
+  // Idempotency: if already marked paid, return early
+  if (payoutDoc.data()?.['status'] === 'paid' && payoutDoc.data()?.['paidAt']) {
     return;
   }
 

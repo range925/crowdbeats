@@ -43,6 +43,26 @@ export const requestPayout = onCall(
 
     const amountCents = data['amountCents'] as unknown;
     const currency = (data['currency'] as string | undefined ?? 'USD').toUpperCase();
+    const idempotencyKey = typeof data['idempotencyKey'] === 'string' && data['idempotencyKey'].trim().length > 0
+      ? data['idempotencyKey'].trim()
+      : undefined;
+
+    // ── Idempotency Check (Fast-path replay) ─────────────────────────────────
+    if (idempotencyKey) {
+      const idemRef = _db().collection('idempotencyKeys').doc(idempotencyKey);
+      const idemSnap = await idemRef.get();
+      if (idemSnap.exists) {
+        const idemData = idemSnap.data()!;
+        if (idemData['uid'] !== uid && idemData['creatorId'] !== uid && idemData['fanUid'] !== uid) {
+          throw new HttpsError('permission-denied', 'Idempotency key mismatch.');
+        }
+        return {
+          payoutId: idemData['payoutId'],
+          amountCents: idemData['amountCents'],
+          stripeTransferId: idemData['stripeTransferId'],
+        };
+      }
+    }
 
     if (typeof amountCents !== 'number' || !Number.isInteger(amountCents)) {
       throw new HttpsError('invalid-argument', 'amountCents must be an integer.');
@@ -116,7 +136,7 @@ export const requestPayout = onCall(
         currency,
         destinationAccountId: accountId,
         metadata: { payoutId, creatorId: uid },
-        idempotencyKey: `payout_${payoutId}`,
+        idempotencyKey: idempotencyKey ? `payout_${idempotencyKey}` : `payout_${payoutId}`,
       });
     } catch (transferErr: any) {
       // Rollback deduction ONLY if Stripe transfer failed (funds were not sent)
@@ -144,6 +164,18 @@ export const requestPayout = onCall(
       });
     } catch (dbErr: any) {
       console.error(`CRITICAL: Stripe transfer ${transfer.id} succeeded but payout doc ${payoutId} update failed:`, dbErr);
+    }
+
+    // Record idempotency key for replay protection
+    if (idempotencyKey) {
+      await _db().collection('idempotencyKeys').doc(idempotencyKey).set({
+        uid,
+        creatorId: uid,
+        payoutId,
+        amountCents,
+        stripeTransferId: transfer.id,
+        createdAt: now,
+      }).catch((e) => console.error('Failed to store payout idempotency key:', e));
     }
 
     // Audit

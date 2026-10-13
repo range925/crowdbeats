@@ -99,7 +99,7 @@ async function _handleStripeWebhook(req: any, res: any): Promise<void> {
     const eventSnap = await eventRef.get();
     if (eventSnap.exists) {
       const existingData = eventSnap.data();
-      if (existingData?.status === 'COMPLETED' || !existingData?.status) {
+      if (existingData?.status === 'COMPLETED' || existingData?.status === 'PROCESSING' || !existingData?.status) {
         res.status(200).send({ received: true, deduplicated: true });
         return;
       }
