@@ -149,9 +149,9 @@ describe('Enterprise Admin Layout (JSDOM)', () => {
     expect(container.textContent).toContain('Live Operations');
     expect(container.textContent).toContain('SUPER ADMIN');
 
-    // 8. Verify Theme Switcher
-    const themeButtons = container.querySelectorAll('.admin-theme-btn');
-    expect(themeButtons.length).toBe(3); // System, Light, Dark
+    // 8. Verify Theme Switcher (Removed per Web Light-Mode Standardization Policy)
+    const themeSwitch = container.querySelector('.admin-theme-switch');
+    expect(themeSwitch).toBeNull();
   });
 
   test('quick search filters navigation items dynamically', async () => {

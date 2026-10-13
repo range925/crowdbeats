@@ -91,6 +91,7 @@ export function AdminDataTable<T extends { id?: string | number } = any>({
       style={{
         width: '100%',
         overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
         background: 'var(--admin-surface-card, var(--surface-card, #FFFFFF))',
         borderRadius: '10px',
         border: '1px solid var(--admin-border-subtle, var(--border-subtle, #E2E8F0))',
@@ -101,6 +102,7 @@ export function AdminDataTable<T extends { id?: string | number } = any>({
       <table
         style={{
           width: '100%',
+          minWidth: 640,
           borderCollapse: 'collapse',
           textAlign: 'left',
         }}
@@ -277,7 +279,9 @@ export function AdminDataTable<T extends { id?: string | number } = any>({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '6px 12px',
+                padding: '8px 14px',
+                minHeight: '40px',
+                minWidth: '40px',
                 borderRadius: '6px',
                 border: '1px solid var(--admin-border-subtle, #E2E8F0)',
                 background:
@@ -294,6 +298,7 @@ export function AdminDataTable<T extends { id?: string | number } = any>({
                 opacity: currentPage <= 1 ? 0.45 : 1,
                 transition: 'all 0.15s ease',
               }}
+              aria-label="Previous page"
             >
               <ChevronLeftIcon size={14} strokeWidth={2} />
               <span>Previous</span>
@@ -306,7 +311,9 @@ export function AdminDataTable<T extends { id?: string | number } = any>({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '6px 12px',
+                padding: '8px 14px',
+                minHeight: '40px',
+                minWidth: '40px',
                 borderRadius: '6px',
                 border: '1px solid var(--admin-border-subtle, #E2E8F0)',
                 background:
@@ -323,6 +330,7 @@ export function AdminDataTable<T extends { id?: string | number } = any>({
                 opacity: currentPage >= totalPages ? 0.45 : 1,
                 transition: 'all 0.15s ease',
               }}
+              aria-label="Next page"
             >
               <span>Next</span>
               <ChevronRightIcon size={14} strokeWidth={2} />

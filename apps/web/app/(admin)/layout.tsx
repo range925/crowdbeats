@@ -67,7 +67,7 @@ interface NavSection {
   items: NavItem[];
 }
 
-const ADMIN_NAV_SECTIONS: NavSection[] = [
+export const ADMIN_NAV_SECTIONS: NavSection[] = [
   {
     title: 'OVERVIEW',
     items: [
@@ -475,7 +475,7 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
           aria-label="Crowdbeats Control Plane"
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <CrowdbeatsLogo variant="horizontal" height={22} surface={theme === 'light' ? 'light' : 'dark'} />
+            <CrowdbeatsLogo variant="horizontal" height={22} surface="light" />
             <span className="sr-only" style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>CROWDBEATS</span>
             <div className="admin-brand-badge" style={{ paddingLeft: '2px' }}>CONTROL PLANE</div>
           </div>
@@ -939,8 +939,10 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
           display: none;
           background: none;
           border: 1px solid var(--border-subtle);
-          border-radius: 6px;
-          padding: 6px;
+          border-radius: 8px;
+          padding: 10px;
+          min-width: 44px;
+          min-height: 44px;
           cursor: pointer;
           color: var(--text-primary);
           align-items: center;
@@ -1063,14 +1065,16 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
         }
         .admin-drawer-close {
           position: absolute;
-          top: 14px;
-          right: 14px;
+          top: 10px;
+          right: 10px;
           background: none;
           border: none;
           cursor: pointer;
           color: var(--text-secondary);
-          padding: 6px;
-          border-radius: 6px;
+          padding: 10px;
+          min-width: 44px;
+          min-height: 44px;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1134,6 +1138,8 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
                 className="admin-hamburger-btn"
                 onClick={() => setSidebarOpen(true)}
                 aria-label="Open navigation menu"
+                aria-expanded={sidebarOpen}
+                aria-controls="admin-mobile-drawer"
               >
                 <MenuIcon size={18} />
               </button>
@@ -1160,43 +1166,6 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
                 <ShieldBadgeIcon size={13} color="var(--accent-primary, #7C3AED)" />
                 <span>{platformRole.replace(/_/g, ' ') || 'STAFF'}</span>
               </div>
-
-              {/* Theme Selector Segmented Control */}
-              <div className="admin-theme-switch" role="radiogroup" aria-label="Color theme selector">
-                <button
-                  type="button"
-                  className={`admin-theme-btn ${theme === 'system' ? 'active' : ''}`}
-                  onClick={() => handleThemeChange('system')}
-                  title="System Theme"
-                  aria-label="System Theme"
-                  role="radio"
-                  aria-checked={theme === 'system'}
-                >
-                  <MonitorIcon size={13} />
-                </button>
-                <button
-                  type="button"
-                  className={`admin-theme-btn ${theme === 'light' ? 'active' : ''}`}
-                  onClick={() => handleThemeChange('light')}
-                  title="Light Theme"
-                  aria-label="Light Theme"
-                  role="radio"
-                  aria-checked={theme === 'light'}
-                >
-                  <SunIcon size={13} />
-                </button>
-                <button
-                  type="button"
-                  className={`admin-theme-btn ${theme === 'dark' ? 'active' : ''}`}
-                  onClick={() => handleThemeChange('dark')}
-                  title="Dark Theme"
-                  aria-label="Dark Theme"
-                  role="radio"
-                  aria-checked={theme === 'dark'}
-                >
-                  <MoonIcon size={13} />
-                </button>
-              </div>
             </div>
           </header>
 
@@ -1214,6 +1183,7 @@ export default function EnterpriseAdminLayout({ children }: AdminLayoutProps) {
 
           {/* ── Mobile Drawer ── */}
           <div
+            id="admin-mobile-drawer"
             className={`admin-drawer ${sidebarOpen ? 'open' : ''}`}
             role="dialog"
             aria-label="Navigation menu"
