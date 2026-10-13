@@ -244,8 +244,8 @@ export default function BandOnboardingPage() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#101218',
-        color: '#FFFFFF',
+        backgroundColor: 'var(--cb-bg-app, #FBFBFD)',
+        color: 'var(--cb-text-primary, #0A0A0B)',
         display: 'flex',
         justifyContent: 'center',
         padding: '36px 16px 80px',
@@ -265,11 +265,11 @@ export default function BandOnboardingPage() {
             {/* Form Column */}
             <div
               style={{
-                backgroundColor: '#1B1E28',
+                backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
                 borderRadius: 24,
-                border: '1px solid #2B2D44',
+                border: '1px solid var(--cb-border, #E2E8F0)',
                 padding: '28px 26px',
-                boxShadow: '0 16px 40px rgba(0, 0, 0, 0.4)',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
               }}
             >
               {/* STEP 1: Band Identity */}
@@ -286,7 +286,7 @@ export default function BandOnboardingPage() {
                   />
 
                   {errorMessage && (
-                    <div style={{ padding: '10px 14px', borderRadius: 10, backgroundColor: 'rgba(239, 68, 68, 0.15)', border: '1px solid #EF4444', color: '#F87171', fontSize: 13, marginBottom: 18 }}>
+                    <div style={{ padding: '10px 14px', borderRadius: 10, backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid var(--cb-error-red, #DC2626)', color: 'var(--cb-error-red, #DC2626)', fontSize: 13, marginBottom: 18 }}>
                       {errorMessage}
                     </div>
                   )}
@@ -304,7 +304,7 @@ export default function BandOnboardingPage() {
 
                   {/* Band Name */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
                       Band / Group Name <span style={{ color: '#2563EB' }}>*</span>
                     </label>
                     <input
@@ -314,24 +314,26 @@ export default function BandOnboardingPage() {
                       onChange={(e) => handleBandNameChange(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '13px 16px',
+                        minHeight: 48,
+                        padding: '12px 16px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 14,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
 
                   {/* Handle */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
                       Band Handle & Profile Slug <span style={{ color: '#2563EB' }}>*</span>
                     </label>
                     <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 16, top: 13, color: '#64748B', fontSize: 14, fontWeight: 600 }}>
+                      <span style={{ position: 'absolute', left: 16, top: 14, color: 'var(--cb-text-secondary, #64748B)', fontSize: 15, fontWeight: 600 }}>
                         @
                       </span>
                       <input
@@ -341,25 +343,27 @@ export default function BandOnboardingPage() {
                         onChange={(e) => handleHandleChange(e.target.value)}
                         style={{
                           width: '100%',
-                          padding: '13px 16px 13px 34px',
+                          minHeight: 48,
+                          padding: '12px 16px 12px 34px',
                           borderRadius: 14,
-                          backgroundColor: '#151722',
-                          border: `1px solid ${handleState === 'invalid' ? '#EF4444' : handleState === 'valid' ? '#10B981' : '#2B2D44'}`,
-                          color: '#FFFFFF',
-                          fontSize: 14,
+                          backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                          border: `1px solid ${handleState === 'invalid' ? 'var(--cb-error-red, #DC2626)' : handleState === 'valid' ? 'var(--cb-live-green, #059669)' : 'var(--cb-border, #CBD5E1)'}`,
+                          color: 'var(--cb-text-primary, #0A0A0B)',
+                          fontSize: 16,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </div>
                     <InlineValidation state={handleState} message={handleMessage} />
-                    <p style={{ margin: '4px 0 0', fontSize: 11, color: '#64748B' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>
                       Public URL: crowdbeats.com/band/{handle || 'band-handle'}
                     </p>
                   </div>
 
                   {/* Your Name as Founder */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
                       Your Name as Band Founder <span style={{ color: '#2563EB' }}>*</span>
                     </label>
                     <input
@@ -369,23 +373,25 @@ export default function BandOnboardingPage() {
                       onChange={(e) => setFounderName(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '13px 16px',
+                        minHeight: 48,
+                        padding: '12px 16px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 14,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
-                    <p style={{ margin: '4px 0 0', fontSize: 11, color: '#64748B' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>
                       You are assigned the <strong>Band Founder</strong> role with financial & roster management authority.
                     </p>
                   </div>
 
                   {/* Genres */}
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 8 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 8 }}>
                       Primary Genres <span style={{ color: '#2563EB' }}>* (Pick 1 to 3)</span>
                     </label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -403,8 +409,8 @@ export default function BandOnboardingPage() {
 
                   {/* Public Base Region */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
-                      Home Base Region <span style={{ fontSize: 11, color: '#64748B' }}>(Optional)</span>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
+                      Home Base Region <span style={{ fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>(Optional)</span>
                     </label>
                     <input
                       type="text"
@@ -413,13 +419,15 @@ export default function BandOnboardingPage() {
                       onChange={(e) => setRegion(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '13px 16px',
+                        minHeight: 48,
+                        padding: '12px 16px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 14,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
@@ -448,7 +456,7 @@ export default function BandOnboardingPage() {
 
                   {/* Current Roster */}
                   <div style={{ marginBottom: 20 }}>
-                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#CBD5E1', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
                       Current Band Roster ({members.length})
                     </span>
 
@@ -459,8 +467,8 @@ export default function BandOnboardingPage() {
                           style={{
                             padding: '12px 16px',
                             borderRadius: 14,
-                            backgroundColor: '#151722',
-                            border: '1px solid #2B2D44',
+                            backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                            border: '1px solid var(--cb-border, #E2E8F0)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
@@ -472,9 +480,9 @@ export default function BandOnboardingPage() {
                                 width: 36,
                                 height: 36,
                                 borderRadius: '50%',
-                                backgroundColor: idx === 0 ? 'rgba(37, 99, 235, 0.2)' : '#1E2032',
-                                color: idx === 0 ? '#38BDF8' : '#CBD5E1',
-                                border: '1px solid #2B2D44',
+                                backgroundColor: idx === 0 ? 'rgba(37, 99, 235, 0.15)' : 'var(--cb-surface-card, #FFFFFF)',
+                                color: idx === 0 ? '#2563EB' : 'var(--cb-text-primary, #0A0A0B)',
+                                border: '1px solid var(--cb-border, #CBD5E1)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -485,8 +493,8 @@ export default function BandOnboardingPage() {
                               {m.name[0]}
                             </div>
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>{m.name}</div>
-                              <div style={{ fontSize: 11, color: '#94A3B8' }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>{m.name}</div>
+                              <div style={{ fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>
                                 {m.role === 'BAND_FOUNDER'
                                   ? 'Founder (Full Financial & Profile Authority)'
                                   : m.role === 'BAND_MANAGER'
@@ -503,7 +511,7 @@ export default function BandOnboardingPage() {
                               style={{
                                 background: 'none',
                                 border: 'none',
-                                color: '#EF4444',
+                                color: 'var(--cb-error-red, #DC2626)',
                                 fontSize: 12,
                                 fontWeight: 600,
                                 cursor: 'pointer',
@@ -522,12 +530,12 @@ export default function BandOnboardingPage() {
                     style={{
                       padding: 16,
                       borderRadius: 16,
-                      backgroundColor: '#151722',
-                      border: '1px solid #2B2D44',
+                      backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                      border: '1px solid var(--cb-border, #E2E8F0)',
                       marginBottom: 20,
                     }}
                   >
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 10 }}>
                       + Invite a Bandmate
                     </div>
                     <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
@@ -538,13 +546,15 @@ export default function BandOnboardingPage() {
                         onChange={(e) => setNewMemberName(e.target.value)}
                         style={{
                           flex: 2,
+                          minHeight: 48,
                           padding: '10px 14px',
                           borderRadius: 10,
-                          backgroundColor: '#1E2032',
-                          border: '1px solid #2B2D44',
-                          color: '#FFFFFF',
-                          fontSize: 13,
+                          backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+                          border: '1px solid var(--cb-border, #CBD5E1)',
+                          color: 'var(--cb-text-primary, #0A0A0B)',
+                          fontSize: 16,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       />
                       <select
@@ -552,13 +562,15 @@ export default function BandOnboardingPage() {
                         onChange={(e) => setNewMemberRole(e.target.value as any)}
                         style={{
                           flex: 1,
+                          minHeight: 48,
                           padding: '10px 10px',
                           borderRadius: 10,
-                          backgroundColor: '#1E2032',
-                          border: '1px solid #2B2D44',
-                          color: '#FFFFFF',
-                          fontSize: 12,
+                          backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+                          border: '1px solid var(--cb-border, #CBD5E1)',
+                          color: 'var(--cb-text-primary, #0A0A0B)',
+                          fontSize: 16,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       >
                         <option value="BAND_MEMBER">Member</option>
@@ -572,12 +584,13 @@ export default function BandOnboardingPage() {
                       disabled={!newMemberName.trim()}
                       style={{
                         width: '100%',
+                        minHeight: 44,
                         padding: '10px 0',
                         borderRadius: 10,
-                        backgroundColor: newMemberName.trim() ? '#2563EB' : '#27272A',
-                        color: newMemberName.trim() ? '#FFFFFF' : '#71717A',
+                        backgroundColor: newMemberName.trim() ? '#2563EB' : 'var(--cb-border, #CBD5E1)',
+                        color: newMemberName.trim() ? '#FFFFFF' : 'var(--cb-text-secondary, #64748B)',
                         border: 'none',
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: 600,
                         cursor: newMemberName.trim() ? 'pointer' : 'not-allowed',
                       }}
@@ -610,7 +623,7 @@ export default function BandOnboardingPage() {
                   />
 
                   {errorMessage && (
-                    <div style={{ padding: '10px 14px', borderRadius: 10, backgroundColor: 'rgba(239, 68, 68, 0.15)', border: '1px solid #EF4444', color: '#F87171', fontSize: 13, marginBottom: 18 }}>
+                    <div style={{ padding: '10px 14px', borderRadius: 10, backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid var(--cb-error-red, #DC2626)', color: 'var(--cb-error-red, #DC2626)', fontSize: 13, marginBottom: 18 }}>
                       {errorMessage}
                     </div>
                   )}
@@ -618,14 +631,14 @@ export default function BandOnboardingPage() {
                   {/* Split Matrix */}
                   <div style={{ marginBottom: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#CBD5E1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         Allocation Table
                       </span>
                       <span
                         style={{
                           fontSize: 12,
                           fontWeight: 700,
-                          color: isSplitValid ? '#10B981' : '#EF4444',
+                          color: isSplitValid ? 'var(--cb-live-green, #059669)' : 'var(--cb-error-red, #DC2626)',
                         }}
                       >
                         Total: {(totalBps / 100).toFixed(1)}% {isSplitValid ? '✓' : '(Must be 100.0%)'}
@@ -634,15 +647,14 @@ export default function BandOnboardingPage() {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {members.map((m) => {
-                        const pct = (m.splitBps / 100).toFixed(1);
                         return (
                           <div
                             key={m.id}
                             style={{
                               padding: '14px 16px',
                               borderRadius: 14,
-                              backgroundColor: '#151722',
-                              border: '1px solid #2B2D44',
+                              backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                              border: '1px solid var(--cb-border, #E2E8F0)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
@@ -650,8 +662,8 @@ export default function BandOnboardingPage() {
                             }}
                           >
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>{m.name}</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>{m.splitBps} basis points</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>{m.name}</div>
+                              <div style={{ fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>{m.splitBps} basis points</div>
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -666,19 +678,21 @@ export default function BandOnboardingPage() {
                                   handleSplitChange(m.id, val * 100);
                                 }}
                                 style={{
-                                  width: 64,
+                                  width: 72,
+                                  minHeight: 40,
                                   padding: '8px 10px',
                                   borderRadius: 8,
-                                  backgroundColor: '#1E2032',
-                                  border: '1px solid #2B2D44',
-                                  color: '#FFFFFF',
-                                  fontSize: 14,
+                                  backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+                                  border: '1px solid var(--cb-border, #CBD5E1)',
+                                  color: 'var(--cb-text-primary, #0A0A0B)',
+                                  fontSize: 16,
                                   fontWeight: 700,
                                   textAlign: 'right',
                                   outline: 'none',
+                                  boxSizing: 'border-box',
                                 }}
                               />
-                              <span style={{ fontSize: 14, fontWeight: 700, color: '#CBD5E1' }}>%</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>%</span>
                             </div>
                           </div>
                         );
@@ -691,18 +705,18 @@ export default function BandOnboardingPage() {
                     style={{
                       padding: '14px 16px',
                       borderRadius: 14,
-                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                      border: '1px solid rgba(37, 99, 235, 0.3)',
+                      backgroundColor: '#EFF6FF',
+                      border: '1px solid #BFDBFE',
                       marginBottom: 20,
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                       <span style={{ fontSize: 16 }}>🎸</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#60A5FA' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1D4ED8' }}>
                         Band Proceeds Distribution Rule
                       </span>
                     </div>
-                    <p style={{ margin: 0, fontSize: 12, color: '#CBD5E1', lineHeight: 1.4 }}>
+                    <p style={{ margin: 0, fontSize: 12, color: '#1E40AF', lineHeight: 1.4 }}>
                       Band tips are pooled into a single transaction. Crowdbeats deducts 6% technology fee plus Stripe card processing, and the <strong>net proceeds pool</strong> is routed automatically to each verified member's connected bank account according to this matrix.
                     </p>
                   </div>
@@ -723,11 +737,11 @@ export default function BandOnboardingPage() {
               {/* Band Profile Fan Card Preview */}
               <div
                 style={{
-                  backgroundColor: '#1B1E28',
+                  backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
                   borderRadius: 24,
-                  border: '1px solid #2B2D44',
+                  border: '1px solid var(--cb-border, #E2E8F0)',
                   overflow: 'hidden',
-                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
                 }}
               >
                 <div style={{ height: 160, position: 'relative' }}>
@@ -740,7 +754,7 @@ export default function BandOnboardingPage() {
                     style={{
                       position: 'absolute',
                       inset: 0,
-                      background: 'linear-gradient(to bottom, rgba(16,18,24,0.1), #1B1E28)',
+                      background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), var(--cb-surface-card, #FFFFFF))',
                     }}
                   />
                   <div style={{ position: 'absolute', top: 12, left: 12 }}>
@@ -752,18 +766,18 @@ export default function BandOnboardingPage() {
 
                 <div style={{ padding: '16px 20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#FFFFFF' }}>
+                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)' }}>
                       {bandName || 'Band Name'}
                     </h3>
-                    <span style={{ fontSize: 13, color: '#38BDF8', fontWeight: 700 }}>
+                    <span style={{ fontSize: 13, color: '#2563EB', fontWeight: 700 }}>
                       @{handle || 'bandhandle'}
                     </span>
                   </div>
-                  <p style={{ margin: '0 0 12px', fontSize: 12, color: '#94A3B8' }}>
+                  <p style={{ margin: '0 0 12px', fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
                     {genres.length > 0 ? genres.join(' · ') : 'Live Music'} · {region || 'Public Group'}
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#CBD5E1' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
                     <span>👥 {members.length} {members.length === 1 ? 'member' : 'members'}</span>
                     <span>·</span>
                     <span>⚡ Group Tip Jar Active</span>
@@ -774,9 +788,9 @@ export default function BandOnboardingPage() {
               {/* Group QR Resolution Card */}
               <div
                 style={{
-                  backgroundColor: '#151722',
+                  backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
                   borderRadius: 18,
-                  border: '1px solid #2B2D44',
+                  border: '1px solid var(--cb-border, #E2E8F0)',
                   padding: '16px 18px',
                   display: 'flex',
                   alignItems: 'center',
@@ -789,6 +803,7 @@ export default function BandOnboardingPage() {
                     height: 56,
                     borderRadius: 12,
                     backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--cb-border, #CBD5E1)',
                     padding: 4,
                     display: 'flex',
                     alignItems: 'center',
@@ -798,10 +813,10 @@ export default function BandOnboardingPage() {
                   <span style={{ fontSize: 32 }}>🎸</span>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>
                     Band Group QR Code
                   </div>
-                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#94A3B8' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
                     Resolves strictly to the band, not an arbitrary member. Tips split automatically.
                   </p>
                 </div>

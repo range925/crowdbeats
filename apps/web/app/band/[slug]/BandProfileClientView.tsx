@@ -73,14 +73,14 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
         style={{
           minHeight: 240,
           borderRadius: 24,
-          background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.45) 0%, rgba(15, 17, 26, 0.95) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #9333EA 0%, #4F46E5 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.25)',
           display: 'flex',
           alignItems: 'flex-end',
           padding: 28,
           position: 'relative',
           marginBottom: 32,
-          boxShadow: '0 16px 40px rgba(0, 0, 0, 0.45)',
+          boxShadow: '0 8px 30px rgba(147, 51, 234, 0.25)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
@@ -89,13 +89,13 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
               width: 96,
               height: 96,
               borderRadius: 24,
-              backgroundColor: '#1E2032',
-              border: '3px solid #A855F7',
+              backgroundColor: '#FFFFFF',
+              border: '3px solid #FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 44,
-              boxShadow: '0 8px 28px rgba(0, 0, 0, 0.5)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
               overflow: 'hidden',
               flexShrink: 0,
             }}
@@ -115,9 +115,9 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
               {performer.isVerified && (
                 <span
                   style={{
-                    backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                    border: '1px solid #A855F7',
-                    color: '#A855F7',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                    color: '#FFFFFF',
                     padding: '2px 8px',
                     borderRadius: 9999,
                     fontSize: 12,
@@ -132,7 +132,7 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
 
             {/* Tagline */}
             {performer.tagline && (
-              <div style={{ color: '#E879F9', fontSize: 15, fontWeight: 600, marginTop: 4 }}>
+              <div style={{ color: '#F3E8FF', fontSize: 15, fontWeight: 600, marginTop: 4 }}>
                 {performer.tagline}
               </div>
             )}
@@ -160,16 +160,16 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                 </span>
               )}
               {performer.currentVenueName && (
-                <span style={{ color: 'var(--cb-text-secondary, #94A3B8)', fontSize: 14 }}>
+                <span style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 14 }}>
                   📍 @ {performer.currentVenueName} · {performer.distanceMiles ?? 0.3} mi away
                 </span>
               )}
               {performer.originCity && (
-                <span style={{ color: 'var(--cb-text-secondary, #94A3B8)', fontSize: 14 }}>
+                <span style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 14 }}>
                   🏡 {performer.originCity}
                 </span>
               )}
-              <span style={{ color: 'var(--cb-text-secondary, #94A3B8)', fontSize: 14 }}>
+              <span style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 14 }}>
                 👥 {followersCount.toLocaleString()} followers
               </span>
             </div>
@@ -190,7 +190,7 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
       </div>
 
       {/* Grid: Details & Tipping */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 32 }}>
+      <div className="cb-profile-layout">
         {/* Left Column: Bio, Audio Player, Roster, DNA, Sets, Fan Love */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
 
@@ -223,25 +223,18 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
           </div>
 
           {/* Story & Biography */}
-          <section
-            style={{
-              backgroundColor: 'var(--cb-surface-1, #151722)',
-              borderRadius: 20,
-              padding: 24,
-              border: '1px solid var(--cb-border-subtle, #2B2D44)',
-            }}
-          >
-            <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 14px', color: '#FFFFFF' }}>
+          <section className="cb-profile-card">
+            <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 14px', color: 'var(--cb-text-primary, #1D1D1F)' }}>
               About the Band
             </h2>
-            <p style={{ color: 'var(--cb-text-secondary, #94A3B8)', lineHeight: 1.7, fontSize: 15, margin: '0 0 20px' }}>
+            <p style={{ color: 'var(--cb-text-secondary, #3A3A3C)', lineHeight: 1.7, fontSize: 15, margin: '0 0 20px' }}>
               {performer.bio}
             </p>
 
             {/* Accolades & Badges */}
             {performer.accolades && performer.accolades.length > 0 && (
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#00F076', marginBottom: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#059669', marginBottom: 10 }}>
                   ★ Band Honors &amp; Milestones
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -251,9 +244,9 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                       style={{
                         padding: '4px 12px',
                         borderRadius: 8,
-                        backgroundColor: 'rgba(0, 240, 118, 0.1)',
-                        border: '1px solid rgba(0, 240, 118, 0.25)',
-                        color: '#00F076',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        border: '1px solid rgba(5, 150, 105, 0.25)',
+                        color: '#059669',
                         fontSize: 12,
                         fontWeight: 600,
                       }}
@@ -268,15 +261,8 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
 
           {/* Band Member Roster Showcase */}
           {performer.rosterPreview && performer.rosterPreview.length > 0 && (
-            <section
-              style={{
-                backgroundColor: 'var(--cb-surface-1, #151722)',
-                borderRadius: 20,
-                padding: 24,
-                border: '1px solid var(--cb-border-subtle, #2B2D44)',
-              }}
-            >
-              <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 16px', color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <section className="cb-profile-card">
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 16px', color: 'var(--cb-text-primary, #1D1D1F)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>🤝</span> Band Lineup &amp; Musicians
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
@@ -284,10 +270,10 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                   <div
                     key={member.name}
                     style={{
-                      backgroundColor: '#1E2032',
+                      backgroundColor: '#F8F9FA',
                       padding: '16px',
                       borderRadius: 14,
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      border: '1px solid #E5E5EA',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
@@ -298,8 +284,8 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                         width: 44,
                         height: 44,
                         borderRadius: '50%',
-                        backgroundColor: '#2B2D44',
-                        border: '2px solid #A855F7',
+                        backgroundColor: '#F2F2F7',
+                        border: '2px solid #7C3AED',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -310,13 +296,13 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                       🎵
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#FFFFFF' }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--cb-text-primary, #1D1D1F)' }}>
                         {member.name}
                       </div>
-                      <div style={{ fontSize: 12, color: '#A855F7', fontWeight: 600 }}>
+                      <div style={{ fontSize: 12, color: '#7C3AED', fontWeight: 600 }}>
                         {member.role}
                       </div>
-                      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: 'var(--cb-text-secondary, #636366)', marginTop: 2 }}>
                         {member.instrument}
                       </div>
                     </div>
@@ -328,77 +314,59 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
 
           {/* Musical DNA: Instruments & Influences */}
           {((performer.instruments && performer.instruments.length > 0) || (performer.influences && performer.influences.length > 0)) && (
-            <section
-              style={{
-                backgroundColor: 'var(--cb-surface-1, #151722)',
-                borderRadius: 20,
-                padding: 24,
-                border: '1px solid var(--cb-border-subtle, #2B2D44)',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 20,
-              }}
-            >
-              {performer.instruments && (
-                <div>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', color: '#94A3B8', margin: '0 0 10px', letterSpacing: '0.05em' }}>
-                    🥁 Instruments &amp; Gear
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {performer.instruments.map((inst) => (
-                      <div key={inst} style={{ fontSize: 13, color: '#E2E8F0', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ color: '#A855F7' }}>•</span> {inst}
-                      </div>
-                    ))}
+            <section className="cb-profile-card">
+              <div className="cb-profile-dna-grid">
+                {performer.instruments && (
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: 'var(--cb-text-secondary, #636366)', margin: '0 0 10px', letterSpacing: '0.05em' }}>
+                      🥁 Instruments &amp; Gear
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {performer.instruments.map((inst) => (
+                        <div key={inst} style={{ fontSize: 13, color: 'var(--cb-text-primary, #1D1D1F)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ color: '#7C3AED' }}>•</span> {inst}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {performer.influences && (
-                <div>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', color: '#94A3B8', margin: '0 0 10px', letterSpacing: '0.05em' }}>
-                    🎧 Sonic Influences
-                  </h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {performer.influences.map((inf) => (
-                      <span
-                        key={inf}
-                        style={{
-                          padding: '3px 10px',
-                          borderRadius: 6,
-                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          fontSize: 12,
-                          color: '#CBD5E1',
-                        }}
-                      >
-                        {inf}
-                      </span>
-                    ))}
+                {performer.influences && (
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: 'var(--cb-text-secondary, #636366)', margin: '0 0 10px', letterSpacing: '0.05em' }}>
+                      🎧 Sonic Influences
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {performer.influences.map((inf) => (
+                        <span
+                          key={inf}
+                          style={{
+                            padding: '3px 10px',
+                            borderRadius: 6,
+                            backgroundColor: '#F2F2F7',
+                            border: '1px solid #E5E5EA',
+                            fontSize: 12,
+                            color: 'var(--cb-text-primary, #1D1D1F)',
+                          }}
+                        >
+                          {inf}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </section>
           )}
 
           {/* Upcoming Live Sets */}
-          <section
-            style={{
-              backgroundColor: 'var(--cb-surface-1, #151722)',
-              borderRadius: 20,
-              padding: 22,
-              border: '1px solid var(--cb-border-subtle, #2B2D44)',
-            }}
-          >
-            <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 14px', color: '#FFFFFF' }}>
+          <section className="cb-profile-card">
+            <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 14px', color: 'var(--cb-text-primary, #1D1D1F)' }}>
               Upcoming Live Gig
             </h2>
             <div
+              className="cb-profile-subcard"
               style={{
-                backgroundColor: '#1E2032',
-                borderRadius: 14,
-                padding: 16,
-                border: '1px solid rgba(0, 240, 118, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -409,10 +377,10 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ fontSize: 32 }}>🏟️</div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 16, color: '#FFFFFF' }}>
+                  <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--cb-text-primary, #1D1D1F)' }}>
                     {performer.currentVenueName ?? 'Main Stage'}
                   </div>
-                  <div style={{ color: 'var(--cb-text-secondary, #94A3B8)', fontSize: 13, marginTop: 2 }}>
+                  <div style={{ color: 'var(--cb-text-secondary, #636366)', fontSize: 13, marginTop: 2 }}>
                     Saturday · 9:00 PM - 11:30 PM PST
                   </div>
                 </div>
@@ -422,9 +390,9 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                 style={{
                   padding: '8px 16px',
                   borderRadius: 10,
-                  backgroundColor: 'rgba(0, 240, 118, 0.15)',
-                  border: '1px solid rgba(0, 240, 118, 0.4)',
-                  color: '#00F076',
+                  backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                  border: '1px solid rgba(5, 150, 105, 0.3)',
+                  color: '#059669',
                   fontSize: 13,
                   fontWeight: 700,
                   textDecoration: 'none',
@@ -440,19 +408,12 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
 
           {/* Recent Fan Love / Tippers Wall */}
           {performer.recentTippers && performer.recentTippers.length > 0 && (
-            <section
-              style={{
-                backgroundColor: 'var(--cb-surface-1, #151722)',
-                borderRadius: 20,
-                padding: 24,
-                border: '1px solid var(--cb-border-subtle, #2B2D44)',
-              }}
-            >
+            <section className="cb-profile-card">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--cb-text-primary, #1D1D1F)', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span>💜</span> Recent Band Support
                 </h2>
-                <span style={{ fontSize: 12, color: '#00F076', fontWeight: 600 }}>
+                <span style={{ fontSize: 12, color: '#059669', fontWeight: 600 }}>
                   ⚖️ Split automatically across all 4 members
                 </span>
               </div>
@@ -462,10 +423,10 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                   <div
                     key={tip.id}
                     style={{
-                      backgroundColor: '#1E2032',
+                      backgroundColor: '#F8F9FA',
                       padding: '12px 16px',
                       borderRadius: 12,
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      border: '1px solid #E5E5EA',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -474,16 +435,16 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                   >
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontWeight: 700, fontSize: 14, color: '#FFFFFF' }}>{tip.fanName}</span>
-                        <span style={{ fontSize: 12, color: '#94A3B8' }}>• {tip.timeAgo}</span>
+                        <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--cb-text-primary, #1D1D1F)' }}>{tip.fanName}</span>
+                        <span style={{ fontSize: 12, color: 'var(--cb-text-secondary, #636366)' }}>• {tip.timeAgo}</span>
                       </div>
                       {tip.message && (
-                        <div style={{ fontSize: 13, color: '#CBD5E1', marginTop: 4, fontStyle: 'italic' }}>
+                        <div style={{ fontSize: 13, color: 'var(--cb-text-secondary, #3A3A3C)', marginTop: 4, fontStyle: 'italic' }}>
                           "{tip.message}"
                         </div>
                       )}
                     </div>
-                    <div style={{ fontWeight: 800, fontSize: 15, color: '#00F076', flexShrink: 0 }}>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: '#059669', flexShrink: 0 }}>
                       +{tip.amountFormatted}
                     </div>
                   </div>
@@ -496,23 +457,21 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
         {/* Right Column: Real-Time Tip Box */}
         <div>
           <div
+            className="cb-profile-card"
             style={{
-              backgroundColor: 'var(--cb-surface-1, #151722)',
-              border: '1px solid rgba(168, 85, 247, 0.35)',
-              borderRadius: 24,
-              padding: 26,
-              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4)',
+              border: '1px solid rgba(124, 58, 237, 0.25)',
               display: 'flex',
               flexDirection: 'column',
               gap: 18,
               position: 'sticky',
               top: 24,
+              boxShadow: '0 8px 24px rgba(124, 58, 237, 0.08)',
             }}
           >
-            <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: '#FFFFFF' }}>
+            <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--cb-text-primary, #1D1D1F)' }}>
               Tip {performer.name}
             </h3>
-            <p style={{ fontSize: 13, color: 'var(--cb-text-secondary, #94A3B8)', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: 'var(--cb-text-secondary, #636366)', margin: 0, lineHeight: 1.5 }}>
               100% goes directly to the band and is automatically distributed to each member according to verified splits.
             </p>
 
@@ -529,21 +488,23 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                   style={{
                     padding: '14px 0',
                     borderRadius: 12,
-                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#FFFFFF',
+                    backgroundColor: '#F2F2F7',
+                    border: '1px solid #E5E5EA',
+                    color: 'var(--cb-text-primary, #1D1D1F)',
                     fontWeight: 700,
                     fontSize: 16,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(168, 85, 247, 0.3)';
-                    e.currentTarget.style.borderColor = '#A855F7';
+                    e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.1)';
+                    e.currentTarget.style.borderColor = '#7C3AED';
+                    e.currentTarget.style.color = '#7C3AED';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.backgroundColor = '#F2F2F7';
+                    e.currentTarget.style.borderColor = '#E5E5EA';
+                    e.currentTarget.style.color = 'var(--cb-text-primary, #1D1D1F)';
                   }}
                 >
                   {preset.label}
@@ -558,28 +519,28 @@ export const BandProfileClientView: React.FC<BandProfileClientViewProps> = ({
                 width: '100%',
                 padding: '16px',
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)',
+                background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
                 color: '#FFFFFF',
                 fontWeight: 800,
                 fontSize: 16,
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(168, 85, 247, 0.4)',
+                boxShadow: '0 8px 24px rgba(124, 58, 237, 0.35)',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 12px 28px rgba(168, 85, 247, 0.6)';
+                e.currentTarget.style.boxShadow = '0 12px 28px rgba(124, 58, 237, 0.5)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(168, 85, 247, 0.4)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(124, 58, 237, 0.35)';
               }}
             >
               Tip the Band Now
             </button>
 
-            <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--cb-text-secondary, #94A3B8)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--cb-text-secondary, #636366)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               <span>⚖️</span> Verified Largest-Remainder Split Engine
             </div>
           </div>

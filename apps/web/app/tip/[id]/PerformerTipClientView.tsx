@@ -92,28 +92,28 @@ function AuthenticatedCheckoutForm({
 
   return (
     <form onSubmit={handleConfirm} style={{ marginTop: 24 }}>
-      <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 12 }}>
+      <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 12 }}>
         Confirm Tip Payment
       </h3>
 
       <div
         style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'var(--cb-surface-2, #F8FAFC)',
+          border: '1px solid var(--cb-border, #E2E8F0)',
           borderRadius: 14,
           padding: 16,
           marginBottom: 16,
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-          <span style={{ color: 'var(--text-secondary, #999)' }}>Contribution to {recipientName}:</span>
-          <span style={{ color: '#FFFFFF', fontWeight: 700 }}>${(amountCents / 100).toFixed(2)}</span>
+          <span style={{ color: 'var(--cb-text-secondary, #64748B)' }}>Contribution to {recipientName}:</span>
+          <span style={{ color: 'var(--cb-text-primary, #0A0A0B)', fontWeight: 700 }}>${(amountCents / 100).toFixed(2)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
-          <span style={{ color: 'var(--text-secondary, #999)' }}>Crowdbeats 6% Platform Fee:</span>
-          <span style={{ color: 'var(--text-secondary, #999)' }}>${(platformFeeCents / 100).toFixed(2)}</span>
+          <span style={{ color: 'var(--cb-text-secondary, #64748B)' }}>Crowdbeats 6% Platform Fee:</span>
+          <span style={{ color: 'var(--cb-text-secondary, #64748B)' }}>${(platformFeeCents / 100).toFixed(2)}</span>
         </div>
-        <p style={{ fontSize: 12, color: 'var(--text-tertiary, #666)', margin: '8px 0 0', lineHeight: 1.4 }}>
+        <p style={{ fontSize: 12, color: 'var(--cb-text-muted, #94A3B8)', margin: '8px 0 0', lineHeight: 1.4 }}>
           Crowdbeats charges a 6% platform fee. Stripe payment-processing and applicable Stripe Connect fees are additional.
         </p>
       </div>
@@ -122,8 +122,8 @@ function AuthenticatedCheckoutForm({
         style={{
           padding: '12px 14px',
           borderRadius: 10,
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          background: '#0D0D10',
+          border: '1px solid var(--cb-border, #CBD5E1)',
+          background: 'var(--cb-surface, #FFFFFF)',
           marginBottom: 16,
         }}
       >
@@ -131,9 +131,9 @@ function AuthenticatedCheckoutForm({
           options={{
             style: {
               base: {
-                fontSize: '15px',
-                color: '#FFFFFF',
-                '::placeholder': { color: '#666666' },
+                fontSize: '16px',
+                color: '#0A0A0B',
+                '::placeholder': { color: '#94A3B8' },
               },
             },
           }}
@@ -219,13 +219,13 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
     return (
       <div style={{ maxWidth: 500, margin: '60px auto', padding: 24, textAlign: 'center' }}>
         <div style={{ fontSize: 36, marginBottom: 12 }}>🔒</div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary, #FFFFFF)', marginBottom: 8 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 8 }}>
           Performer Unavailable
         </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-secondary, #999)', marginBottom: 12 }}>
-          Performer identifier: <code style={{ fontFamily: 'monospace' }}>{id}</code>
+        <p style={{ fontSize: 14, color: 'var(--cb-text-secondary, #64748B)', marginBottom: 12 }}>
+          Performer identifier: <code style={{ fontFamily: 'monospace', padding: '2px 6px', borderRadius: 4, background: 'var(--cb-surface-2, #F8FAFC)', border: '1px solid var(--cb-border, #E2E8F0)' }}>{id}</code>
         </p>
-        <p style={{ fontSize: 13, color: 'var(--text-tertiary, #666)', lineHeight: 1.5, marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: 'var(--cb-text-muted, #94A3B8)', lineHeight: 1.5, marginBottom: 24 }}>
           Crowdbeats never substitutes another recipient when a direct performer link is unavailable or unregistered.
         </p>
         <Link href="/">
@@ -253,11 +253,11 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
     return (
       <div style={{ maxWidth: 480, margin: '48px auto', padding: 24, textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 8 }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 8 }}>
           Tip Confirmed!
         </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-secondary, #999)', marginBottom: 20 }}>
-          Thank you for supporting <strong style={{ color: '#FFFFFF' }}>{recipient.displayName}</strong>.
+        <p style={{ fontSize: 14, color: 'var(--cb-text-secondary, #64748B)', marginBottom: 20 }}>
+          Thank you for supporting <strong style={{ color: 'var(--cb-text-primary, #0A0A0B)' }}>{recipient.displayName}</strong>.
         </p>
         <button
           type="button"
@@ -289,12 +289,12 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
       {/* Performer Profile Card */}
       <div
         style={{
-          background: 'var(--surface-card, #131315)',
-          border: '1px solid var(--border-subtle, #28282C)',
+          background: 'var(--cb-surface-card, #FFFFFF)',
+          border: '1px solid var(--cb-border, #E2E8F0)',
           borderRadius: 24,
           padding: 24,
           marginBottom: 20,
-          boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -320,20 +320,20 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+              <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)', margin: 0 }}>
                 {recipient.displayName}
               </h1>
 
               {recipient.isVerified && (
                 <span
                   style={{
-                    backgroundColor: 'rgba(3, 218, 198, 0.15)',
-                    color: '#03DAC6',
+                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                    color: '#059669',
                     fontSize: 11,
                     fontWeight: 700,
                     padding: '2px 8px',
                     borderRadius: 9999,
-                    border: '1px solid rgba(3, 218, 198, 0.3)',
+                    border: '1px solid rgba(5, 150, 105, 0.25)',
                   }}
                 >
                   Verified
@@ -343,7 +343,7 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
               {recipient.isLive && (
                 <span
                   style={{
-                    backgroundColor: '#EF4444',
+                    backgroundColor: '#DC2626',
                     color: '#FFFFFF',
                     fontSize: 11,
                     fontWeight: 800,
@@ -360,26 +360,27 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4, flexWrap: 'wrap' }}>
               <span
                 style={{
-                  backgroundColor: 'rgba(124, 58, 237, 0.15)',
-                  color: '#A855F7',
+                  backgroundColor: 'rgba(124, 58, 237, 0.08)',
+                  color: '#7C3AED',
                   fontSize: 11,
                   fontWeight: 700,
                   padding: '2px 8px',
                   borderRadius: 9999,
+                  border: '1px solid rgba(124, 58, 237, 0.2)',
                 }}
               >
                 {isSolo ? 'Solo Musician' : 'Band'}
               </span>
 
               {recipient.genres.map((g) => (
-                <span key={g} style={{ fontSize: 12, color: 'var(--text-secondary, #999)' }}>
+                <span key={g} style={{ fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
                   {g}
                 </span>
               ))}
             </div>
 
             {recipient.currentVenueName && (
-              <div style={{ fontSize: 12, color: '#03DAC6', marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: '#059669', fontWeight: 600, marginTop: 4 }}>
                 Live at {recipient.currentVenueName}
               </div>
             )}
@@ -387,7 +388,7 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
         </div>
 
         {recipient.bio && (
-          <p style={{ fontSize: 13, color: 'var(--text-secondary, #A1A1A6)', margin: '16px 0 0', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, color: 'var(--cb-text-secondary, #64748B)', margin: '16px 0 0', lineHeight: 1.5 }}>
             {recipient.bio}
           </p>
         )}
@@ -397,8 +398,8 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
       {!recipient.canAcceptTips ? (
         <div
           style={{
-            background: 'rgba(239, 68, 68, 0.08)',
-            border: '1px solid rgba(239, 68, 68, 0.25)',
+            background: 'rgba(239, 68, 68, 0.06)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
             borderRadius: 16,
             padding: 20,
             textAlign: 'center',
@@ -408,20 +409,21 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
           <strong style={{ color: '#EF4444', fontSize: 15, display: 'block', marginBottom: 4 }}>
             This performer is not currently accepting tips
           </strong>
-          <span style={{ fontSize: 12, color: 'var(--text-secondary, #999)' }}>
+          <span style={{ fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
             Status: {recipient.eligibilityReason || 'INELIGIBLE'}
           </span>
         </div>
       ) : (
         <div
           style={{
-            background: 'var(--surface-card, #131315)',
-            border: '1px solid var(--border-subtle, #28282C)',
+            background: 'var(--cb-surface-card, #FFFFFF)',
+            border: '1px solid var(--cb-border, #E2E8F0)',
             borderRadius: 24,
             padding: 24,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
           }}
         >
-          <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary, #999)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 14px' }}>
+          <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-secondary, #64748B)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 14px' }}>
             Select Tip Amount
           </h2>
 
@@ -438,9 +440,9 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
                   style={{
                     padding: '14px 0',
                     borderRadius: 14,
-                    border: active ? '2px solid var(--accent-primary, #7C3AED)' : '1px solid rgba(255, 255, 255, 0.1)',
-                    background: active ? 'rgba(124, 58, 237, 0.18)' : 'rgba(255, 255, 255, 0.04)',
-                    color: active ? '#FFFFFF' : 'var(--text-secondary, #AAA)',
+                    border: active ? '2px solid var(--accent-primary, #7C3AED)' : '1px solid var(--cb-border, #CBD5E1)',
+                    background: active ? 'rgba(124, 58, 237, 0.08)' : 'var(--cb-surface, #FFFFFF)',
+                    color: active ? 'var(--accent-primary, #7C3AED)' : 'var(--cb-text-primary, #0A0A0B)',
                     fontSize: 18,
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -476,7 +478,7 @@ export function PerformerTipClientView({ id }: PerformerTipClientViewProps) {
                 </button>
               </div>
 
-              <div style={{ fontSize: 12, color: 'var(--text-tertiary, #666)', lineHeight: 1.5, textAlign: 'center' }}>
+              <div style={{ fontSize: 12, color: 'var(--cb-text-muted, #94A3B8)', lineHeight: 1.5, textAlign: 'center' }}>
                 <div>Crowdbeats charges a 6% platform fee.</div>
                 <div>No app download or location permission needed.</div>
               </div>

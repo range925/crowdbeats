@@ -28,7 +28,7 @@ export function MobilePhotoSourceModal({
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
         backdropFilter: 'blur(12px)',
         display: 'flex',
         alignItems: 'flex-end',
@@ -42,12 +42,12 @@ export function MobilePhotoSourceModal({
         style={{
           width: '100%',
           maxWidth: 480,
-          backgroundColor: '#12141C',
+          backgroundColor: 'var(--surface-card, #FFFFFF)',
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))',
           borderBottom: 'none',
-          boxShadow: '0 -12px 36px rgba(0, 0, 0, 0.8)',
+          boxShadow: '0 -12px 36px rgba(0, 0, 0, 0.15)',
           padding: '24px 20px 36px',
           display: 'flex',
           flexDirection: 'column',
@@ -60,15 +60,15 @@ export function MobilePhotoSourceModal({
             width: 40,
             height: 4,
             borderRadius: 2,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            backgroundColor: 'rgba(0, 0, 0, 0.15)',
             margin: '0 auto 8px',
           }}
         />
 
-        <h3 id="photo-source-title" style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF', margin: '0 0 4px', textAlign: 'center' }}>
+        <h3 id="photo-source-title" style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary, #1D1D1F)', margin: '0 0 4px', textAlign: 'center' }}>
           Select Profile Photo
         </h3>
-        <p style={{ fontSize: 13, color: 'var(--cb-text-secondary, #94A3B8)', margin: '0 0 12px', textAlign: 'center' }}>
+        <p style={{ fontSize: 13, color: 'var(--cb-text-secondary, #6E6E73)', margin: '0 0 12px', textAlign: 'center' }}>
           Capture a new headshot or choose from your device photo library
         </p>
 
@@ -93,7 +93,7 @@ export function MobilePhotoSourceModal({
             fontWeight: 700,
             cursor: 'pointer',
             minHeight: 52,
-            boxShadow: '0 4px 16px -2px rgba(124, 58, 237, 0.45)',
+            boxShadow: '0 4px 16px -2px rgba(124, 58, 237, 0.35)',
           }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -116,9 +116,9 @@ export function MobilePhotoSourceModal({
             gap: 10,
             padding: '14px 20px',
             borderRadius: 14,
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            color: '#FFFFFF',
+            border: '1px solid #CBD5E1',
+            backgroundColor: '#F8FAFC',
+            color: '#1D1D1F',
             fontSize: 15,
             fontWeight: 600,
             cursor: 'pointer',
@@ -157,14 +157,14 @@ export function MobilePhotoSourceModal({
             style={{
               padding: '12px 16px',
               borderRadius: 12,
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
               fontSize: 12,
-              color: 'var(--cb-text-secondary, #94A3B8)',
+              color: 'var(--cb-text-secondary, #475569)',
               lineHeight: 1.6,
             }}
           >
-            <div style={{ fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>
+            <div style={{ fontWeight: 700, color: '#0F172A', marginBottom: 4 }}>
               How to enable camera access:
             </div>
             <div style={{ marginBottom: 6 }}>

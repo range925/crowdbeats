@@ -37,31 +37,35 @@ export default function ReceiptsPage() {
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', fontWeight: 700, fontSize: 14 }}>
             Recent Tips Data
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
-            <thead>
-              <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
-                <th style={{ padding: '12px 20px', fontWeight: 600 }}>Tip ID</th>
-                <th style={{ padding: '12px 20px', fontWeight: 600 }}>Fan UID</th>
-                <th style={{ padding: '12px 20px', fontWeight: 600 }}>Amount</th>
-                <th style={{ padding: '12px 20px', fontWeight: 600 }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tips.slice(0, 5).map(tip => (
-                <tr key={tip.tipId} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                  <td style={{ padding: '12px 20px' }}>{tip.tipId}</td>
-                  <td style={{ padding: '12px 20px' }}>{tip.fanUid}</td>
-                  <td style={{ padding: '12px 20px' }}>{centsToDollars(tip.amountCents)}</td>
-                  <td style={{ padding: '12px 20px' }}>{tip.status}</td>
+          <div className="cb-table-wrap" style={{ border: 'none', borderRadius: 0, boxShadow: 'none' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13, minWidth: 480 }}>
+              <thead>
+                <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                  <th style={{ padding: '12px 20px', fontWeight: 600 }}>Tip ID</th>
+                  <th style={{ padding: '12px 20px', fontWeight: 600 }}>Fan UID</th>
+                  <th style={{ padding: '12px 20px', fontWeight: 600 }}>Amount</th>
+                  <th style={{ padding: '12px 20px', fontWeight: 600 }}>Status</th>
                 </tr>
-              ))}
-              {tips.length === 0 && (
-                <tr>
-                  <td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-tertiary)' }}>No tips found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tips.slice(0, 5).map(tip => (
+                  <tr key={tip.tipId} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                    <td style={{ padding: '12px 20px' }}>{tip.tipId}</td>
+                    <td style={{ padding: '12px 20px' }}>{tip.fanUid}</td>
+                    <td className="cb-tabular-nums" style={{ padding: '12px 20px', fontWeight: 600 }}>{centsToDollars(tip.amountCents)}</td>
+                    <td style={{ padding: '12px 20px' }}>
+                      <span className="cb-badge-emerald">{tip.status}</span>
+                    </td>
+                  </tr>
+                ))}
+                {tips.length === 0 && (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-tertiary)' }}>No tips found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

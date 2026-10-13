@@ -95,7 +95,7 @@ export default function SponsorDiscoveryPage() {
   });
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: 'clamp(16px, 3vw, 32px) clamp(16px, 4vw, 40px)', maxWidth: 1200, margin: '0 auto' }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 6px', color: 'var(--text-primary)' }}>
         Talent Discovery & Comparison
       </h1>
@@ -114,6 +114,7 @@ export default function SponsorDiscoveryPage() {
             flex: 1,
             minWidth: 260,
             padding: '10px 16px',
+            minHeight: '44px',
             borderRadius: 8,
             border: '1px solid var(--border-subtle)',
             background: 'var(--surface-card)',
@@ -127,6 +128,7 @@ export default function SponsorDiscoveryPage() {
           onChange={(e) => setFilterGenre(e.target.value)}
           style={{
             padding: '10px 16px',
+            minHeight: '44px',
             borderRadius: 8,
             border: '1px solid var(--border-subtle)',
             background: 'var(--surface-card)',
@@ -143,8 +145,8 @@ export default function SponsorDiscoveryPage() {
       </div>
 
       {/* Talent Table */}
-      <div style={{ background: 'var(--surface-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
+      <div className="cb-table-wrap" style={{ background: 'var(--surface-card)', borderRadius: 14, border: '1px solid var(--border-subtle)' }}>
+        <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
           <thead>
             <tr style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
               <th style={{ padding: '14px 20px', fontWeight: 600 }}>Performer</th>

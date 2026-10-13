@@ -56,11 +56,11 @@ export function RoleCard({
         textAlign: 'left',
         padding: '20px 22px',
         borderRadius: 20,
-        backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.08)' : '#1B1E28',
-        border: `2px solid ${isSelected ? accentColor : '#2B2D44'}`,
+        backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.06)' : 'var(--cb-surface-card, #FFFFFF)',
+        border: `2px solid ${isSelected ? accentColor : 'var(--cb-border, #E2E8F0)'}`,
         boxShadow: isSelected
-          ? `0 12px 28px -6px ${accentColor}33, 0 0 0 1px ${accentColor}`
-          : '0 4px 16px rgba(0,0,0,0.3)',
+          ? `0 8px 24px -4px ${accentColor}26, 0 0 0 1px ${accentColor}`
+          : '0 2px 8px rgba(0,0,0,0.04)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -90,7 +90,7 @@ export function RoleCard({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#FFFFFF' }}>{title}</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>{title}</h3>
               {badge && (
                 <span
                   style={{
@@ -100,16 +100,16 @@ export function RoleCard({
                     letterSpacing: '0.05em',
                     padding: '2px 8px',
                     borderRadius: 999,
-                    backgroundColor: `${accentColor}26`,
+                    backgroundColor: `${accentColor}1A`,
                     color: accentColor,
-                    border: `1px solid ${accentColor}66`,
+                    border: `1px solid ${accentColor}4D`,
                   }}
                 >
                   {badge}
                 </span>
               )}
             </div>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#94A3B8', lineHeight: 1.4 }}>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--cb-text-secondary, #64748B)', lineHeight: 1.4 }}>
               {description}
             </p>
           </div>
@@ -119,7 +119,7 @@ export function RoleCard({
             width: 22,
             height: 22,
             borderRadius: '50%',
-            border: `2px solid ${isSelected ? accentColor : '#52525B'}`,
+            border: `2px solid ${isSelected ? accentColor : 'var(--cb-border-medium, #CBD5E1)'}`,
             backgroundColor: isSelected ? accentColor : 'transparent',
             display: 'flex',
             alignItems: 'center',
@@ -141,14 +141,14 @@ export function RoleCard({
           style={{
             marginTop: 6,
             paddingTop: 12,
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid var(--cb-border, #E2E8F0)',
             display: 'flex',
             flexDirection: 'column',
             gap: 6,
           }}
         >
           {benefits.map((b, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#CBD5E1' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
               <span style={{ color: accentColor, fontSize: 14 }}>✦</span>
               <span>{b}</span>
             </div>
@@ -189,9 +189,9 @@ export function GenreChip({
         borderRadius: 999,
         fontSize: 13,
         fontWeight: 600,
-        backgroundColor: isSelected ? accentColor : '#1E2032',
-        color: isSelected ? '#FFFFFF' : '#CBD5E1',
-        border: `1.5px solid ${isSelected ? accentColor : '#2B2D44'}`,
+        backgroundColor: isSelected ? accentColor : 'var(--cb-surface, #FFFFFF)',
+        color: isSelected ? '#FFFFFF' : 'var(--cb-text-primary, #0A0A0B)',
+        border: `1.5px solid ${isSelected ? accentColor : 'var(--cb-border, #CBD5E1)'}`,
         boxShadow: isSelected ? `0 4px 14px ${accentColor}4D` : 'none',
         cursor: 'pointer',
         transition: 'all 0.15s ease',
@@ -229,8 +229,9 @@ export function LocationCard({
       style={{
         padding: 20,
         borderRadius: 20,
-        backgroundColor: '#1B1E28',
-        border: '1px solid #2B2D44',
+        backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+        border: '1px solid var(--cb-border, #E2E8F0)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
@@ -242,7 +243,7 @@ export function LocationCard({
             width: 40,
             height: 40,
             borderRadius: 12,
-            backgroundColor: 'rgba(8, 145, 178, 0.15)',
+            backgroundColor: 'rgba(8, 145, 178, 0.12)',
             border: '1px solid rgba(8, 145, 178, 0.3)',
             display: 'flex',
             alignItems: 'center',
@@ -254,8 +255,8 @@ export function LocationCard({
           📍
         </div>
         <div>
-          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>Find live music near you</h4>
-          <p style={{ margin: '2px 0 0', fontSize: 12, color: '#94A3B8' }}>
+          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>Find live music near you</h4>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
             {currentCity ? `Current anchor: ${currentCity}` : 'Select your coarse location to surface nearby stages.'}
           </p>
         </div>
@@ -271,7 +272,7 @@ export function LocationCard({
             borderRadius: 12,
             backgroundColor: 'rgba(8, 145, 178, 0.12)',
             border: '1.5px solid #0891B2',
-            color: '#FFFFFF',
+            color: '#0891B2',
             fontSize: 13,
             fontWeight: 600,
             display: 'flex',
@@ -291,9 +292,9 @@ export function LocationCard({
           style={{
             padding: '12px 14px',
             borderRadius: 12,
-            backgroundColor: '#151722',
-            border: '1px solid #2B2D44',
-            color: '#CBD5E1',
+            backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+            border: '1px solid var(--cb-border, #CBD5E1)',
+            color: 'var(--cb-text-primary, #0A0A0B)',
             fontSize: 13,
             fontWeight: 600,
             display: 'flex',
@@ -309,7 +310,7 @@ export function LocationCard({
       </div>
 
       {locationError && (
-        <div style={{ fontSize: 12, color: '#F87171', padding: '6px 10px', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 8 }}>
+        <div style={{ fontSize: 12, color: '#DC2626', padding: '6px 10px', backgroundColor: 'rgba(239, 68, 68, 0.08)', borderRadius: 8 }}>
           {locationError}
         </div>
       )}
@@ -350,8 +351,8 @@ export function ProgressHeader({
             aria-label="Go back to previous step"
             style={{
               background: 'none',
-              border: 'none',
-              color: '#94A3B8',
+              border: '1px solid var(--cb-border, #E2E8F0)',
+              color: 'var(--cb-text-secondary, #64748B)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -360,7 +361,7 @@ export function ProgressHeader({
               fontWeight: 500,
               padding: '6px 10px',
               borderRadius: 8,
-              backgroundColor: '#1E2032',
+              backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
             }}
           >
             ← Back
@@ -371,7 +372,7 @@ export function ProgressHeader({
           <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', color: accentColor, textTransform: 'uppercase' }}>
             {stepName || `Step ${currentStep} of ${totalSteps}`}
           </span>
-          <span style={{ fontSize: 11, color: '#64748B' }}>({pct}%)</span>
+          <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #94A3B8)' }}>({pct}%)</span>
         </div>
       </div>
 
@@ -384,7 +385,7 @@ export function ProgressHeader({
         style={{
           width: '100%',
           height: 6,
-          backgroundColor: '#27272A',
+          backgroundColor: 'var(--cb-surface-3, #E2E8F0)',
           borderRadius: 999,
           overflow: 'hidden',
           marginBottom: 20,
@@ -397,16 +398,16 @@ export function ProgressHeader({
             backgroundColor: accentColor,
             borderRadius: 999,
             transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-            boxShadow: `0 0 8px ${accentColor}80`,
+            boxShadow: `0 0 8px ${accentColor}40`,
           }}
         />
       </div>
 
-      <h1 style={{ margin: '0 0 6px', fontSize: 24, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 6px', fontSize: 24, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)', letterSpacing: '-0.02em' }}>
         {title}
       </h1>
       {subtitle && (
-        <p style={{ margin: 0, fontSize: 14, color: '#94A3B8', lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: 14, color: 'var(--cb-text-secondary, #64748B)', lineHeight: 1.5 }}>
           {subtitle}
         </p>
       )}
@@ -451,18 +452,18 @@ export function ProfilePhotoPicker({
             height: 80,
             borderRadius: '50%',
             overflow: 'hidden',
-            backgroundColor: '#1E2032',
+            backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
             border: `2px solid ${accentColor}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 4px 20px ${accentColor}33`,
+            boxShadow: `0 4px 16px ${accentColor}26`,
           }}
         >
           {photoUrl ? (
             <img src={photoUrl} alt={name || 'Profile photo'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
-            <span style={{ fontSize: 28, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: 28, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', letterSpacing: '-0.02em' }}>
               {getInitials(name)}
             </span>
           )}
@@ -482,13 +483,13 @@ export function ProfilePhotoPicker({
             borderRadius: '50%',
             backgroundColor: accentColor,
             color: '#FFFFFF',
-            border: '2px solid #101218',
+            border: '2px solid #FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 13,
             cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
           }}
         >
           📷
@@ -507,8 +508,8 @@ export function ProfilePhotoPicker({
       </div>
 
       <div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF', marginBottom: 2 }}>Profile Photo</div>
-        <p style={{ margin: 0, fontSize: 12, color: '#94A3B8', marginBottom: 8 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 2 }}>Profile Photo</div>
+        <p style={{ margin: 0, fontSize: 12, color: 'var(--cb-text-secondary, #64748B)', marginBottom: 8 }}>
           Optional. Shows on your public tips & follows.
         </p>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -538,7 +539,7 @@ export function ProfilePhotoPicker({
                 padding: 0,
                 fontSize: 12,
                 fontWeight: 600,
-                color: '#EF4444',
+                color: '#DC2626',
                 cursor: 'pointer',
               }}
             >
@@ -588,8 +589,8 @@ export function SetupChecklist({ items }: { items: ChecklistItem[] }) {
             style={{
               padding: '16px 18px',
               borderRadius: 16,
-              backgroundColor: '#1B1E28',
-              border: '1px solid #2B2D44',
+              backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+              border: '1px solid var(--cb-border, #E2E8F0)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -598,7 +599,7 @@ export function SetupChecklist({ items }: { items: ChecklistItem[] }) {
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>{it.title}</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>{it.title}</span>
                 <span
                   style={{
                     fontSize: 10,
@@ -614,7 +615,7 @@ export function SetupChecklist({ items }: { items: ChecklistItem[] }) {
                   {badge.text}
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: 12, color: '#94A3B8', lineHeight: 1.4 }}>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--cb-text-secondary, #64748B)', lineHeight: 1.4 }}>
                 {it.subtitle}
               </p>
             </div>
@@ -628,8 +629,8 @@ export function SetupChecklist({ items }: { items: ChecklistItem[] }) {
                   borderRadius: 10,
                   fontSize: 12,
                   fontWeight: 600,
-                  backgroundColor: it.status === 'action_required' ? '#D97706' : '#27272A',
-                  color: '#FFFFFF',
+                  backgroundColor: it.status === 'action_required' ? '#D97706' : 'var(--cb-surface-3, #E2E8F0)',
+                  color: it.status === 'action_required' ? '#FFFFFF' : 'var(--cb-text-primary, #0A0A0B)',
                   border: 'none',
                   cursor: 'pointer',
                   flexShrink: 0,
@@ -656,11 +657,11 @@ export interface InlineValidationProps {
 export function InlineValidation({ state, message }: InlineValidationProps) {
   if (state === 'idle' || !message) return null;
 
-  const color = state === 'valid' ? '#10B981' : state === 'invalid' ? '#EF4444' : '#0891B2';
+  const color = state === 'valid' ? '#10B981' : state === 'invalid' ? '#DC2626' : '#0891B2';
   const icon = state === 'valid' ? '✓' : state === 'invalid' ? '⚠️' : '⏳';
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, color }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, fontSize: 12, color, fontWeight: 500 }}>
       <span>{icon}</span>
       <span>{message}</span>
     </div>
@@ -695,7 +696,7 @@ export function StickyActionBar({
       style={{
         marginTop: 32,
         paddingTop: 16,
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        borderTop: '1px solid var(--cb-border, #E2E8F0)',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
@@ -710,9 +711,9 @@ export function StickyActionBar({
               flex: 1,
               padding: '14px 20px',
               borderRadius: 14,
-              backgroundColor: '#1E2032',
-              border: '1px solid #2B2D44',
-              color: '#CBD5E1',
+              backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+              border: '1px solid var(--cb-border, #CBD5E1)',
+              color: 'var(--cb-text-primary, #0A0A0B)',
               fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',
@@ -731,8 +732,8 @@ export function StickyActionBar({
             flex: 2,
             padding: '14px 20px',
             borderRadius: 14,
-            backgroundColor: primaryDisabled ? '#27272A' : accentColor,
-            color: primaryDisabled ? '#71717A' : '#FFFFFF',
+            backgroundColor: primaryDisabled ? 'var(--cb-surface-3, #E2E8F0)' : accentColor,
+            color: primaryDisabled ? 'var(--cb-text-muted, #94A3B8)' : '#FFFFFF',
             border: 'none',
             fontSize: 14,
             fontWeight: 700,
@@ -754,7 +755,7 @@ export function StickyActionBar({
       </div>
 
       {disclaimer && (
-        <p style={{ margin: 0, textAlign: 'center', fontSize: 11, color: '#64748B', lineHeight: 1.4 }}>
+        <p style={{ margin: 0, textAlign: 'center', fontSize: 11, color: 'var(--cb-text-secondary, #64748B)', lineHeight: 1.4 }}>
           {disclaimer}
         </p>
       )}
@@ -790,8 +791,9 @@ export function SuccessPanel({
       style={{
         padding: '32px 24px',
         borderRadius: 24,
-        backgroundColor: '#1B1E28',
-        border: '1px solid #2B2D44',
+        backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+        border: '1px solid var(--cb-border, #E2E8F0)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -803,14 +805,14 @@ export function SuccessPanel({
           width: 72,
           height: 72,
           borderRadius: '50%',
-          backgroundColor: `${accentColor}26`,
+          backgroundColor: `${accentColor}1F`,
           border: `2px solid ${accentColor}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 36,
           marginBottom: 16,
-          boxShadow: `0 0 32px ${accentColor}4D`,
+          boxShadow: `0 0 32px ${accentColor}33`,
         }}
       >
         🎉
@@ -825,8 +827,8 @@ export function SuccessPanel({
           letterSpacing: '0.08em',
           padding: '3px 10px',
           borderRadius: 999,
-          backgroundColor: 'rgba(16, 185, 129, 0.15)',
-          color: '#10B981',
+          backgroundColor: 'rgba(16, 185, 129, 0.12)',
+          color: '#059669',
           border: '1px solid rgba(16, 185, 129, 0.3)',
           marginBottom: 10,
         }}
@@ -834,8 +836,8 @@ export function SuccessPanel({
         {badge}
       </div>
 
-      <h2 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>{title}</h2>
-      <p style={{ margin: '0 0 24px', fontSize: 14, color: '#94A3B8', maxWidth: 380, lineHeight: 1.5 }}>
+      <h2 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)' }}>{title}</h2>
+      <p style={{ margin: '0 0 24px', fontSize: 14, color: 'var(--cb-text-secondary, #64748B)', maxWidth: 380, lineHeight: 1.5 }}>
         {subtitle}
       </p>
 
@@ -845,8 +847,8 @@ export function SuccessPanel({
           width: '100%',
           padding: 16,
           borderRadius: 16,
-          backgroundColor: '#151722',
-          border: '1px solid #2B2D44',
+          backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+          border: '1px solid var(--cb-border, #E2E8F0)',
           marginBottom: 24,
           textAlign: 'left',
           display: 'flex',
@@ -854,11 +856,11 @@ export function SuccessPanel({
           gap: 10,
         }}
       >
-        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--cb-text-secondary, #64748B)' }}>
           What you accomplished:
         </div>
         {checklistItems.map((it, idx) => (
-          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#E2E8F0' }}>
+          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--cb-text-primary, #0A0A0B)' }}>
             <span style={{ color: it.done ? '#10B981' : '#D97706', fontSize: 14 }}>
               {it.done ? '✓' : '○'}
             </span>
@@ -881,7 +883,7 @@ export function SuccessPanel({
           fontWeight: 700,
           border: 'none',
           cursor: 'pointer',
-          boxShadow: `0 8px 24px ${accentColor}66`,
+          boxShadow: `0 8px 24px ${accentColor}40`,
           marginBottom: secondaryActions && secondaryActions.length > 0 ? 16 : 0,
         }}
       >
@@ -899,9 +901,9 @@ export function SuccessPanel({
               style={{
                 padding: '12px 14px',
                 borderRadius: 12,
-                backgroundColor: '#1E2032',
-                border: '1px solid #2B2D44',
-                color: '#CBD5E1',
+                backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                border: '1px solid var(--cb-border, #CBD5E1)',
+                color: 'var(--cb-text-primary, #0A0A0B)',
                 fontSize: 12,
                 fontWeight: 600,
                 display: 'flex',
@@ -949,8 +951,9 @@ export function PermissionExplainer({
       style={{
         padding: 24,
         borderRadius: 20,
-        backgroundColor: '#1B1E28',
-        border: '1px solid #2B2D44',
+        backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+        border: '1px solid var(--cb-border, #E2E8F0)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
@@ -973,14 +976,14 @@ export function PermissionExplainer({
           📍
         </div>
         <div>
-          <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#FFFFFF' }}>{title}</h4>
-          <p style={{ margin: '2px 0 0', fontSize: 13, color: '#94A3B8' }}>{description}</p>
+          <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>{title}</h4>
+          <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--cb-text-secondary, #64748B)' }}>{description}</p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px', backgroundColor: '#151722', borderRadius: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px', backgroundColor: 'var(--cb-surface-2, #F8FAFC)', borderRadius: 12 }}>
         {bulletPoints.map((pt, idx) => (
-          <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#CBD5E1' }}>
+          <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'var(--cb-text-primary, #0A0A0B)' }}>
             <span style={{ color: accentColor }}>✦</span>
             <span>{pt}</span>
           </div>
@@ -995,9 +998,9 @@ export function PermissionExplainer({
             flex: 1,
             padding: '12px 16px',
             borderRadius: 12,
-            backgroundColor: '#1E2032',
-            border: '1px solid #2B2D44',
-            color: '#94A3B8',
+            backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+            border: '1px solid var(--cb-border, #CBD5E1)',
+            color: 'var(--cb-text-secondary, #64748B)',
             fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
@@ -1019,7 +1022,7 @@ export function PermissionExplainer({
             fontSize: 13,
             fontWeight: 700,
             cursor: 'pointer',
-            boxShadow: `0 4px 14px ${accentColor}4D`,
+            boxShadow: `0 4px 14px ${accentColor}40`,
           }}
         >
           {primaryActionLabel}

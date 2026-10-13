@@ -4,10 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 
 const CARD: React.CSSProperties = {
-  backgroundColor: 'rgba(18, 20, 28, 0.75)',
-  backdropFilter: 'blur(16px)',
-  boxShadow: '0 8px 32px -4px rgba(0, 0, 0, 0.35)',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+  border: '1px solid var(--cb-border-subtle, #E5E5EA)',
   borderRadius: 16,
   marginBottom: 20,
   overflow: 'hidden',
@@ -19,7 +18,7 @@ const ROW: React.CSSProperties = {
   justifyContent: 'space-between',
   padding: '16px 20px',
   minHeight: 52,
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+  borderBottom: '1px solid var(--cb-border-subtle, #E5E5EA)',
   textDecoration: 'none',
   color: 'inherit',
 };
@@ -35,21 +34,21 @@ export function LegalSection() {
 
   return (
     <div>
-      <div style={CARD}>
+      <div className="cb-account-card" style={CARD}>
         {documents.map((doc, idx) => (
           <Link
             key={doc.title}
             href={doc.href}
             style={{
               ...ROW,
-              borderBottom: idx === documents.length - 1 ? 'none' : '1px solid rgba(43,45,68,0.4)',
+              borderBottom: idx === documents.length - 1 ? 'none' : '1px solid var(--cb-border-subtle, #E5E5EA)',
             }}
           >
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary, #FFFFFF)' }}>{doc.title}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary, #94A3B8)', marginTop: 2 }}>{doc.desc}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--cb-text-primary, #1D1D1F)' }}>{doc.title}</div>
+              <div style={{ fontSize: 12, color: 'var(--cb-text-secondary, #6E6E73)', marginTop: 2 }}>{doc.desc}</div>
             </div>
-            <span style={{ color: 'var(--accent-primary, #A78BFA)', fontSize: 14 }}>→</span>
+            <span style={{ color: 'var(--cb-brand-primary, #7C3AED)', fontSize: 14 }}>→</span>
           </Link>
         ))}
       </div>

@@ -78,7 +78,7 @@ export default function BandSplitsPage() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: 'clamp(16px, 3vw, 40px)', maxWidth: 1100, margin: '0 auto' }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 6px', color: 'var(--text-primary)' }}>
         Splits & Revenue Governance
       </h1>
@@ -92,9 +92,9 @@ export default function BandSplitsPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 24 }}>
         {/* Left: Split Editor */}
-        <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 14, border: '1px solid var(--border-subtle)' }}>
+        <div style={{ background: 'var(--surface-card)', padding: 'clamp(16px, 3vw, 24px)', borderRadius: 14, border: '1px solid var(--border-subtle)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
               Active Configuration (v{version})
@@ -109,7 +109,7 @@ export default function BandSplitsPage() {
               <div key={s.uid} style={{ background: 'var(--surface-raised)', padding: 16, borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 14 }}>{s.displayName}</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-primary)' }}>
+                  <div className="cb-tabular-nums" style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-primary)' }}>
                     {(s.splitBps / 100).toFixed(2)}%
                   </div>
                 </div>
@@ -149,12 +149,13 @@ export default function BandSplitsPage() {
               disabled={!isValidTotal}
               style={{
                 background: isValidTotal ? 'var(--accent-primary)' : 'var(--surface-raised)',
-                color: isValidTotal ? '#000' : 'var(--text-disabled)',
+                color: isValidTotal ? '#FFFFFF' : 'var(--text-disabled)',
                 border: 'none',
                 padding: '12px 20px',
                 borderRadius: 8,
                 fontWeight: 700,
                 fontSize: 14,
+                minHeight: 44,
                 cursor: isValidTotal ? 'pointer' : 'not-allowed',
                 marginTop: 8,
               }}
@@ -165,7 +166,7 @@ export default function BandSplitsPage() {
         </div>
 
         {/* Right: Odd-Cents Simulator (OD-09) */}
-        <div style={{ background: 'var(--surface-card)', padding: 24, borderRadius: 14, border: '1px solid var(--border-subtle)' }}>
+        <div style={{ background: 'var(--surface-card)', padding: 'clamp(16px, 3vw, 24px)', borderRadius: 14, border: '1px solid var(--border-subtle)' }}>
           <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
             🧮 Largest Remainder Simulator (OD-09)
           </h3>
@@ -182,7 +183,7 @@ export default function BandSplitsPage() {
               step="0.01"
               value={testAmountDollars}
               onChange={(e) => setTestAmountDollars(e.target.value)}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-raised)', color: 'var(--text-primary)', fontSize: 16, fontWeight: 700 }}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-raised)', color: 'var(--text-primary)', fontSize: 16, fontWeight: 700, minHeight: 44 }}
             />
           </div>
 
@@ -190,12 +191,12 @@ export default function BandSplitsPage() {
             {simulatedShares.map((m) => (
               <div key={m.uid} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', borderRadius: 8, background: 'var(--surface-raised)', fontSize: 13 }}>
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{m.displayName}</span>
-                <span style={{ color: 'var(--status-success)', fontWeight: 800 }}>${m.dollars} ({m.cents}¢)</span>
+                <span className="cb-tabular-nums" style={{ color: 'var(--status-success)', fontWeight: 800 }}>${m.dollars} ({m.cents}¢)</span>
               </div>
             ))}
           </div>
 
-          <div style={{ marginTop: 20, padding: 14, borderRadius: 8, background: 'rgba(255,151,186,0.08)', border: '1px solid rgba(255,151,186,0.2)', fontSize: 12, color: 'var(--text-secondary)' }}>
+          <div style={{ marginTop: 20, padding: 14, borderRadius: 8, background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.18)', fontSize: 12, color: 'var(--text-secondary)' }}>
             🔒 <strong>Immutable Version Invariant:</strong> Past tip distributions store the split version active when the tip was received. Updating splits will only apply to future tips.
           </div>
         </div>

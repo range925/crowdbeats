@@ -157,8 +157,8 @@ export default function ArtistOnboardingPage() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#101218',
-        color: '#FFFFFF',
+        backgroundColor: 'var(--cb-bg-app, #FBFBFD)',
+        color: 'var(--cb-text-primary, #0A0A0B)',
         display: 'flex',
         justifyContent: 'center',
         padding: '36px 16px 80px',
@@ -179,11 +179,11 @@ export default function ArtistOnboardingPage() {
             {/* Form Column */}
             <div
               style={{
-                backgroundColor: '#1B1E28',
+                backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
                 borderRadius: 24,
-                border: '1px solid #2B2D44',
+                border: '1px solid var(--cb-border, #E2E8F0)',
                 padding: '28px 26px',
-                boxShadow: '0 16px 40px rgba(0, 0, 0, 0.4)',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
               }}
             >
               {/* STEP 1: Public Performer Profile */}
@@ -200,7 +200,7 @@ export default function ArtistOnboardingPage() {
                   />
 
                   {errorMessage && (
-                    <div style={{ padding: '10px 14px', borderRadius: 10, backgroundColor: 'rgba(239, 68, 68, 0.15)', border: '1px solid #EF4444', color: '#F87171', fontSize: 13, marginBottom: 18 }}>
+                    <div style={{ padding: '10px 14px', borderRadius: 10, backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid var(--cb-error-red, #DC2626)', color: 'var(--cb-error-red, #DC2626)', fontSize: 13, marginBottom: 18 }}>
                       {errorMessage}
                     </div>
                   )}
@@ -218,7 +218,7 @@ export default function ArtistOnboardingPage() {
 
                   {/* Stage Name */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
                       Stage / Performer Name <span style={{ color: '#D97706' }}>*</span>
                     </label>
                     <input
@@ -228,24 +228,26 @@ export default function ArtistOnboardingPage() {
                       onChange={(e) => setStageName(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '13px 16px',
+                        minHeight: 48,
+                        padding: '12px 16px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 14,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
 
                   {/* Handle */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
                       Artist Handle & Profile Slug <span style={{ color: '#D97706' }}>*</span>
                     </label>
                     <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 16, top: 13, color: '#64748B', fontSize: 14, fontWeight: 600 }}>
+                      <span style={{ position: 'absolute', left: 16, top: 14, color: 'var(--cb-text-secondary, #64748B)', fontSize: 15, fontWeight: 600 }}>
                         @
                       </span>
                       <input
@@ -255,25 +257,27 @@ export default function ArtistOnboardingPage() {
                         onChange={(e) => handleHandleChange(e.target.value)}
                         style={{
                           width: '100%',
-                          padding: '13px 16px 13px 34px',
+                          minHeight: 48,
+                          padding: '12px 16px 12px 34px',
                           borderRadius: 14,
-                          backgroundColor: '#151722',
-                          border: `1px solid ${handleState === 'invalid' ? '#EF4444' : handleState === 'valid' ? '#10B981' : '#2B2D44'}`,
-                          color: '#FFFFFF',
-                          fontSize: 14,
+                          backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                          border: `1px solid ${handleState === 'invalid' ? 'var(--cb-error-red, #DC2626)' : handleState === 'valid' ? 'var(--cb-live-green, #059669)' : 'var(--cb-border, #CBD5E1)'}`,
+                          color: 'var(--cb-text-primary, #0A0A0B)',
+                          fontSize: 16,
                           outline: 'none',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </div>
                     <InlineValidation state={handleState} message={handleMessage} />
-                    <p style={{ margin: '4px 0 0', fontSize: 11, color: '#64748B' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>
                       Your public profile will be at crowdbeats.com/artist/{handle || 'your-handle'}
                     </p>
                   </div>
 
                   {/* Genres (pick 1 to 3) */}
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 8 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 8 }}>
                       Primary Genres <span style={{ color: '#D97706' }}>* (Pick 1 to 3)</span>
                     </label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -291,8 +295,8 @@ export default function ArtistOnboardingPage() {
 
                   {/* Public City / Region */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
-                      Public Home Base / Region <span style={{ fontSize: 11, color: '#64748B' }}>(Optional)</span>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
+                      Public Home Base / Region <span style={{ fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>(Optional)</span>
                     </label>
                     <input
                       type="text"
@@ -301,21 +305,23 @@ export default function ArtistOnboardingPage() {
                       onChange={(e) => setCity(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '13px 16px',
+                        minHeight: 48,
+                        padding: '12px 16px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 14,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
 
                   {/* Short Bio */}
                   <div style={{ marginBottom: 18 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
-                      Short Bio <span style={{ fontSize: 11, color: '#64748B' }}>(Optional, max 160 characters)</span>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 6 }}>
+                      Short Bio <span style={{ fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>(Optional, max 160 characters)</span>
                     </label>
                     <textarea
                       rows={2}
@@ -327,23 +333,24 @@ export default function ArtistOnboardingPage() {
                         width: '100%',
                         padding: '12px 14px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 13,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
                         resize: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
-                    <div style={{ textAlign: 'right', fontSize: 11, color: '#64748B', marginTop: 2 }}>
+                    <div style={{ textAlign: 'right', fontSize: 11, color: 'var(--cb-text-secondary, #64748B)', marginTop: 2 }}>
                       {bio.length}/160
                     </div>
                   </div>
 
                   {/* Social Link */}
                   <div style={{ marginBottom: 20 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 4 }}>
-                      Social or Website Link <span style={{ fontSize: 11, color: '#64748B' }}>(Optional)</span>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', marginBottom: 4 }}>
+                      Social or Website Link <span style={{ fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>(Optional)</span>
                     </label>
                     <input
                       type="url"
@@ -352,16 +359,18 @@ export default function ArtistOnboardingPage() {
                       onChange={(e) => setSocialLink(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '13px 16px',
+                        minHeight: 48,
+                        padding: '12px 16px',
                         borderRadius: 14,
-                        backgroundColor: '#151722',
-                        border: '1px solid #2B2D44',
-                        color: '#FFFFFF',
-                        fontSize: 14,
+                        backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                        border: '1px solid var(--cb-border, #CBD5E1)',
+                        color: 'var(--cb-text-primary, #0A0A0B)',
+                        fontSize: 16,
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
-                    <p style={{ margin: '4px 0 0', fontSize: 11, color: '#64748B' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--cb-text-secondary, #64748B)' }}>
                       Displayed as a public external link. Crowdbeats does not access your social account.
                     </p>
                   </div>
@@ -390,7 +399,7 @@ export default function ArtistOnboardingPage() {
 
                   {/* Checklist */}
                   <div style={{ marginBottom: 24 }}>
-                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#CBD5E1', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
                       Your Account Capabilities
                     </span>
 
@@ -430,27 +439,27 @@ export default function ArtistOnboardingPage() {
                     style={{
                       padding: '16px 18px',
                       borderRadius: 16,
-                      backgroundColor: '#151722',
-                      border: '1px solid #2B2D44',
+                      backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                      border: '1px solid var(--cb-border, #E2E8F0)',
                       marginBottom: 24,
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                       <span style={{ fontSize: 20 }}>📡</span>
-                      <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
+                      <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>
                         How "Go Live" Works on Crowdbeats
                       </h4>
                     </div>
-                    <p style={{ margin: '0 0 10px', fontSize: 12, color: '#94A3B8', lineHeight: 1.45 }}>
+                    <p style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--cb-text-secondary, #64748B)', lineHeight: 1.45 }}>
                       When you tap <strong>Go Live</strong>, your stage pin appears on the Crowdbeats discovery map for nearby fans.
                     </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: '#CBD5E1' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: 'var(--cb-text-primary, #0A0A0B)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ color: '#10B981' }}>✦</span>
+                        <span style={{ color: 'var(--cb-live-green, #059669)' }}>✦</span>
                         <span>Performance sessions last while you play; stop broadcasting at any time with 1 tap.</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ color: '#10B981' }}>✦</span>
+                        <span style={{ color: 'var(--cb-live-green, #059669)' }}>✦</span>
                         <span>Low-power location: No continuous background battery drain or passive tracking.</span>
                       </div>
                     </div>
@@ -461,18 +470,18 @@ export default function ArtistOnboardingPage() {
                     style={{
                       padding: '14px 16px',
                       borderRadius: 14,
-                      backgroundColor: 'rgba(217, 119, 6, 0.1)',
-                      border: '1px solid rgba(217, 119, 6, 0.3)',
+                      backgroundColor: '#FEF3C7',
+                      border: '1px solid #FDE68A',
                       marginBottom: 20,
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                       <span style={{ fontSize: 16 }}>💰</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#92400E' }}>
                         Transparent Creator Earnings
                       </span>
                     </div>
-                    <p style={{ margin: 0, fontSize: 12, color: '#CBD5E1', lineHeight: 1.4 }}>
+                    <p style={{ margin: 0, fontSize: 12, color: '#78350F', lineHeight: 1.4 }}>
                       100% free to join. Crowdbeats charges a transparent <strong>6% platform fee</strong> plus standard Stripe processing (2.9% + 30¢) per tip. On a $10 tip, you keep approximately <strong>$8.81 net</strong>.
                     </p>
                   </div>
@@ -492,11 +501,11 @@ export default function ArtistOnboardingPage() {
               {/* Fan-Facing Card Preview */}
               <div
                 style={{
-                  backgroundColor: '#1B1E28',
+                  backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
                   borderRadius: 24,
-                  border: '1px solid #2B2D44',
+                  border: '1px solid var(--cb-border, #E2E8F0)',
                   overflow: 'hidden',
-                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
                 }}
               >
                 <div style={{ height: 160, position: 'relative' }}>
@@ -509,11 +518,11 @@ export default function ArtistOnboardingPage() {
                     style={{
                       position: 'absolute',
                       inset: 0,
-                      background: 'linear-gradient(to bottom, rgba(16,18,24,0.1), #1B1E28)',
+                      background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), var(--cb-surface-card, #FFFFFF))',
                     }}
                   />
                   <div style={{ position: 'absolute', top: 12, right: 12 }}>
-                    <span style={{ fontSize: 10, fontWeight: 900, backgroundColor: '#059669', color: '#FFFFFF', padding: '3px 8px', borderRadius: 999 }}>
+                    <span style={{ fontSize: 10, fontWeight: 900, backgroundColor: 'var(--cb-live-green, #059669)', color: '#FFFFFF', padding: '3px 8px', borderRadius: 999 }}>
                       LIVE NOW
                     </span>
                   </div>
@@ -521,18 +530,18 @@ export default function ArtistOnboardingPage() {
 
                 <div style={{ padding: '16px 20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#FFFFFF' }}>
+                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--cb-text-primary, #0A0A0B)' }}>
                       {stageName || 'Performer Name'}
                     </h3>
                     <span style={{ fontSize: 13, color: '#D97706', fontWeight: 700 }}>
                       @{handle || 'handle'}
                     </span>
                   </div>
-                  <p style={{ margin: '0 0 12px', fontSize: 12, color: '#94A3B8' }}>
+                  <p style={{ margin: '0 0 12px', fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
                     {genres.length > 0 ? genres.join(' · ') : 'Live Music'} · {city || 'Public Stage'}
                   </p>
                   {bio && (
-                    <p style={{ margin: '0 0 16px', fontSize: 12, color: '#CBD5E1', fontStyle: 'italic', lineHeight: 1.4 }}>
+                    <p style={{ margin: '0 0 16px', fontSize: 12, color: 'var(--cb-text-primary, #0A0A0B)', fontStyle: 'italic', lineHeight: 1.4 }}>
                       "{bio}"
                     </p>
                   )}
@@ -547,9 +556,9 @@ export default function ArtistOnboardingPage() {
                           padding: '8px 0',
                           textAlign: 'center',
                           borderRadius: 10,
-                          backgroundColor: '#151722',
-                          border: '1px solid #2B2D44',
-                          color: '#FFFFFF',
+                          backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                          border: '1px solid var(--cb-border, #CBD5E1)',
+                          color: 'var(--cb-text-primary, #0A0A0B)',
                           fontSize: 13,
                           fontWeight: 700,
                         }}
@@ -564,9 +573,9 @@ export default function ArtistOnboardingPage() {
               {/* Performer QR Code Preview */}
               <div
                 style={{
-                  backgroundColor: '#151722',
+                  backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
                   borderRadius: 18,
-                  border: '1px solid #2B2D44',
+                  border: '1px solid var(--cb-border, #E2E8F0)',
                   padding: '16px 18px',
                   display: 'flex',
                   alignItems: 'center',
@@ -579,6 +588,7 @@ export default function ArtistOnboardingPage() {
                     height: 56,
                     borderRadius: 12,
                     backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--cb-border, #CBD5E1)',
                     padding: 4,
                     display: 'flex',
                     alignItems: 'center',
@@ -588,10 +598,10 @@ export default function ArtistOnboardingPage() {
                   <span style={{ fontSize: 32 }}>🏁</span>
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)' }}>
                     Personal Stage QR
                   </div>
-                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#94A3B8' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--cb-text-secondary, #64748B)' }}>
                     Fans scan to jump directly to your tipping flow without searching.
                   </p>
                 </div>

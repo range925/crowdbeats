@@ -609,7 +609,8 @@ export function ProfileSocialHeaderActions({
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -619,17 +620,17 @@ export function ProfileSocialHeaderActions({
         >
           <div
             style={{
-              backgroundColor: '#1E2032',
+              backgroundColor: 'var(--surface-card, #FFFFFF)',
               borderRadius: 20,
               maxWidth: 460,
               width: '100%',
               padding: 24,
-              border: '1px solid #2B2D44',
-              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7)',
+              border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))',
+              boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#FFFFFF' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--text-primary, #1D1D1F)' }}>
                 Report {targetName}
               </h2>
               <button
@@ -638,7 +639,7 @@ export function ProfileSocialHeaderActions({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#94A3B8',
+                  color: '#64748B',
                   fontSize: 20,
                   cursor: 'pointer',
                 }}
@@ -647,13 +648,13 @@ export function ProfileSocialHeaderActions({
               </button>
             </div>
 
-            <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 18 }}>
+            <p style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: 13, marginBottom: 18 }}>
               Reports are submitted securely to Crowdbeats Admin Support. Please provide accurate details.
             </p>
 
             <form onSubmit={handleSubmitReport} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
                   Reason for Report
                 </label>
                 <select
@@ -663,9 +664,9 @@ export function ProfileSocialHeaderActions({
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: 10,
-                    backgroundColor: '#0F111A',
-                    border: '1px solid #2B2D44',
-                    color: '#FFFFFF',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #CBD5E1',
+                    color: '#1D1D1F',
                     fontSize: 14,
                   }}
                 >
@@ -679,7 +680,7 @@ export function ProfileSocialHeaderActions({
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#CBD5E1', marginBottom: 6 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
                   Details & Context
                 </label>
                 <textarea
@@ -692,9 +693,9 @@ export function ProfileSocialHeaderActions({
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: 10,
-                    backgroundColor: '#0F111A',
-                    border: '1px solid #2B2D44',
-                    color: '#FFFFFF',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #CBD5E1',
+                    color: '#1D1D1F',
                     fontSize: 14,
                     resize: 'none',
                   }}
@@ -708,9 +709,9 @@ export function ProfileSocialHeaderActions({
                   style={{
                     padding: '10px 18px',
                     borderRadius: 9999,
-                    backgroundColor: 'transparent',
-                    border: '1px solid #2B2D44',
-                    color: '#CBD5E1',
+                    backgroundColor: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    color: '#1D1D1F',
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -724,13 +725,14 @@ export function ProfileSocialHeaderActions({
                   style={{
                     padding: '10px 20px',
                     borderRadius: 9999,
-                    backgroundColor: '#EF4444',
+                    backgroundColor: '#DC2626',
                     border: 'none',
                     color: '#FFFFFF',
                     fontSize: 13,
                     fontWeight: 700,
                     cursor: reportSubmitting ? 'not-allowed' : 'pointer',
                     opacity: reportSubmitting || !reportDescription.trim() ? 0.6 : 1,
+                    boxShadow: '0 4px 14px rgba(220, 38, 38, 0.35)',
                   }}
                 >
                   {reportSubmitting ? 'Submitting…' : 'Submit Report'}

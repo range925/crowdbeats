@@ -70,7 +70,7 @@ export const NAV_GROUPS_CONFIG: NavGroupConfig[] = [
     items: [
       { id: 'notifications', label: 'Notifications', icon: BellIcon, color: '#EC4899', badgeBg: 'rgba(236,72,153,0.12)', subtext: 'Live alerts, tip chimes' },
       { id: 'location', label: 'Location & Radar', icon: MapPinIcon, color: '#38BDF8', badgeBg: 'rgba(56,189,248,0.12)', subtext: 'Background busker detection' },
-      { id: 'appearance', label: 'Appearance & Themes', icon: PaletteIcon, color: '#A855F7', badgeBg: 'rgba(168,85,247,0.12)', subtext: 'Dark, Light, High Contrast' },
+      { id: 'appearance', label: 'Appearance & Themes', icon: PaletteIcon, color: '#A855F7', badgeBg: 'rgba(168,85,247,0.12)', subtext: 'Light Mode Standard' },
       { id: 'accessibility', label: 'Accessibility', icon: AccessibilityIcon, color: '#6366F1', badgeBg: 'rgba(99,102,241,0.12)', subtext: 'Reduce motion, font scale' },
       { id: 'language', label: 'Language & Region', icon: GlobeIcon, color: '#94A3B8', badgeBg: 'rgba(148,163,184,0.12)', subtext: 'Timezone, display currency' },
       { id: 'content', label: 'Content Preferences', icon: MusicIcon, color: '#14B8A6', badgeBg: 'rgba(20,184,166,0.12)', subtext: 'Favorite genres & maturity' },
@@ -146,8 +146,8 @@ export function AccountCenterNav({
             <div
               style={{
                 borderRadius: 14,
-                backgroundColor: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
+                border: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.08))',
                 overflow: 'hidden',
               }}
             >
@@ -168,9 +168,9 @@ export function AccountCenterNav({
                       width: '100%',
                       padding: '10px 12px',
                       minHeight: 52,
-                      backgroundColor: isActive ? 'rgba(124,58,237,0.14)' : 'transparent',
+                      backgroundColor: isActive ? 'rgba(124,58,237,0.08)' : 'transparent',
                       border: 'none',
-                      borderBottom: idx < visibleItems.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      borderBottom: idx < visibleItems.length - 1 ? '1px solid var(--cb-border-subtle, rgba(0,0,0,0.05))' : 'none',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
@@ -187,7 +187,7 @@ export function AccountCenterNav({
                           bottom: 8,
                           width: 3,
                           borderRadius: '0 2px 2px 0',
-                          backgroundColor: 'var(--cb-purple-light, #A855F7)',
+                          backgroundColor: 'var(--cb-brand-primary, #7C3AED)',
                         }}
                       />
                     )}
@@ -215,7 +215,7 @@ export function AccountCenterNav({
                         style={{
                           fontSize: 13,
                           fontWeight: isActive ? 700 : 600,
-                          color: item.warning ? '#EF4444' : isActive ? '#FFFFFF' : 'var(--cb-text-primary, #F8FAFC)',
+                          color: item.warning ? '#DC2626' : isActive ? 'var(--cb-brand-primary, #7C3AED)' : 'var(--cb-text-primary, #1D1D1F)',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -227,7 +227,7 @@ export function AccountCenterNav({
                         <div
                           style={{
                             fontSize: 11,
-                            color: 'var(--cb-text-muted, #64748B)',
+                            color: 'var(--cb-text-muted, #636366)',
                             marginTop: 1,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -242,7 +242,7 @@ export function AccountCenterNav({
                     {/* Right Chevron */}
                     <div
                       style={{
-                        color: isActive ? 'var(--cb-purple-light, #A855F7)' : 'rgba(255,255,255,0.2)',
+                        color: isActive ? 'var(--cb-brand-primary, #7C3AED)' : 'rgba(0,0,0,0.25)',
                         transition: 'transform 0.15s ease',
                         flexShrink: 0,
                       }}

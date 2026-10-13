@@ -118,7 +118,7 @@ export function ImageCropModal({
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.82)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
         backdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
@@ -130,10 +130,10 @@ export function ImageCropModal({
         style={{
           width: '100%',
           maxWidth: 420,
-          backgroundColor: '#12141C',
+          backgroundColor: 'var(--surface-card, #FFFFFF)',
           borderRadius: 20,
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.8)',
+          border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))',
+          boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
@@ -143,13 +143,13 @@ export function ImageCropModal({
         <div
           style={{
             padding: '16px 20px',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            borderBottom: '1px solid #E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
-          <h3 id="crop-modal-title" style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+          <h3 id="crop-modal-title" style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary, #1D1D1F)', margin: 0 }}>
             Crop & Position Photo
           </h3>
           <button
@@ -224,10 +224,10 @@ export function ImageCropModal({
         </div>
 
         {/* Controls: Zoom Slider */}
-        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <div style={{ padding: '16px 20px', borderTop: '1px solid #E2E8F0' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--cb-text-secondary, #94A3B8)' }}>Zoom</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF' }}>{Math.round(zoom * 100)}%</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--cb-text-secondary, #475569)' }}>Zoom</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#1D1D1F' }}>{Math.round(zoom * 100)}%</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 12, color: 'var(--cb-text-muted, #64748B)' }}>-</span>
@@ -256,8 +256,8 @@ export function ImageCropModal({
         <div
           style={{
             padding: '14px 20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.02)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            backgroundColor: '#F8FAFC',
+            borderTop: '1px solid #E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
@@ -271,9 +271,9 @@ export function ImageCropModal({
             style={{
               padding: '10px 16px',
               borderRadius: 10,
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              backgroundColor: 'transparent',
-              color: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              backgroundColor: '#FFFFFF',
+              color: '#1D1D1F',
               fontSize: 13,
               fontWeight: 600,
               cursor: 'pointer',
@@ -297,7 +297,7 @@ export function ImageCropModal({
               cursor: processing ? 'wait' : 'pointer',
               opacity: processing ? 0.7 : 1,
               minHeight: 44,
-              boxShadow: '0 4px 16px -2px rgba(124, 58, 237, 0.45)',
+              boxShadow: '0 4px 16px -2px rgba(124, 58, 237, 0.35)',
             }}
           >
             {processing ? 'Processing Variants...' : 'Apply Crop & Preview'}

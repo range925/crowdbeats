@@ -34,7 +34,7 @@ const SEARCH_INDEX: SearchEntry[] = [
   { label: 'Tip Receipt Chimes', description: 'Audible and push notifications when fans tip', section: 'notifications', keywords: ['tips received', 'tip', 'notification', 'chime'] },
 
   // Appearance & Accessibility
-  { label: 'Theme & Dark Mode', description: 'Switch between Obsidian Dark, Light, or System', section: 'appearance', keywords: ['theme', 'dark mode', 'light mode', 'appearance', 'color scheme'] },
+  { label: 'Appearance & Display', description: 'Standardized light mode and visual contrast settings', section: 'appearance', keywords: ['theme', 'appearance', 'contrast', 'color scheme', 'display', 'light mode'] },
   { label: 'Reduce Motion', description: 'Disable spring physics animations', section: 'accessibility', keywords: ['reduce motion', 'animation', 'accessibility', 'motion'] },
   { label: 'High Contrast Mode', description: 'Maximize visual contrast for high-glare stages', section: 'accessibility', keywords: ['high contrast', 'contrast', 'accessibility', 'vision'] },
 
@@ -108,22 +108,23 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
   }, []);
 
   return (
-    <div ref={containerRef} style={{ padding: '12px 16px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
+    <div ref={containerRef} style={{ padding: '12px 16px 14px', borderBottom: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.08))', position: 'relative' }}>
       {/* Search Field */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          backgroundColor: 'rgba(255,255,255,0.04)',
-          border: `1px solid ${isOpen && results.length > 0 ? 'var(--cb-purple-light, #A855F7)' : 'rgba(255,255,255,0.08)'}`,
+          backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
+          border: `1.5px solid ${isOpen && results.length > 0 ? 'var(--cb-brand-primary, #7C3AED)' : 'var(--cb-border-medium, rgba(0,0,0,0.14))'}`,
           borderRadius: 12,
           padding: '8px 12px',
+          minHeight: 44,
           transition: 'all 0.15s ease',
-          boxShadow: isOpen && results.length > 0 ? '0 0 0 2px rgba(168,85,247,0.2)' : 'none',
+          boxShadow: isOpen && results.length > 0 ? '0 0 0 3px rgba(124,58,237,0.14)' : 'none',
         }}
       >
-        <SearchIcon size={16} color="var(--cb-text-secondary, #94A3B8)" />
+        <SearchIcon size={16} color="var(--cb-text-secondary, #6E6E73)" />
         <input
           ref={inputRef}
           type="search"
@@ -141,8 +142,8 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
             background: 'transparent',
             border: 'none',
             outline: 'none',
-            fontSize: 13,
-            color: '#FFFFFF',
+            fontSize: 14,
+            color: 'var(--cb-text-primary, #1D1D1F)',
             fontFamily: 'inherit',
           }}
           aria-label="Search settings"
@@ -153,7 +154,7 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
           <button
             type="button"
             onClick={() => { setQuery(''); setIsOpen(false); inputRef.current?.focus(); }}
-            style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: 0, fontSize: 13 }}
+            style={{ background: 'none', border: 'none', color: 'var(--cb-text-secondary, #6E6E73)', cursor: 'pointer', padding: 6, fontSize: 14, minWidth: 28, minHeight: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
             aria-label="Clear"
           >
             ✕
@@ -165,8 +166,9 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
               fontWeight: 700,
               padding: '2px 5px',
               borderRadius: 4,
-              backgroundColor: 'rgba(255,255,255,0.08)',
-              color: 'var(--cb-text-muted, #64748B)',
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              border: '1px solid rgba(0,0,0,0.08)',
+              color: 'var(--cb-text-muted, #636366)',
               fontFamily: 'monospace',
             }}
           >
@@ -186,11 +188,12 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
               style={{
                 fontSize: 11,
                 fontWeight: 600,
-                color: 'var(--cb-text-secondary, #94A3B8)',
-                backgroundColor: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                color: 'var(--cb-text-secondary, #6E6E73)',
+                backgroundColor: 'var(--cb-surface-2, #F4F4F6)',
+                border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: 14,
-                padding: '3px 8px',
+                padding: '4px 10px',
+                minHeight: 28,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'all 0.15s ease',
@@ -211,13 +214,12 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
             top: 'calc(100% + 4px)',
             left: 16,
             right: 16,
-            backgroundColor: '#12141C',
-            border: '1px solid rgba(255,255,255,0.12)',
+            backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
+            border: '1px solid var(--cb-border-medium, rgba(0,0,0,0.12))',
             borderRadius: 12,
-            boxShadow: '0 12px 32px -4px rgba(0,0,0,0.7)',
+            boxShadow: '0 12px 32px -4px rgba(0,0,0,0.12)',
             zIndex: 100,
             overflow: 'hidden',
-            backdropFilter: 'blur(20px)',
           }}
         >
           {results.map((entry, idx) => (
@@ -232,22 +234,23 @@ export function AccountCenterSearch({ onResultClick }: AccountCenterSearchProps)
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-                padding: '10px 14px',
-                backgroundColor: idx === focusedIndex ? 'rgba(124,58,237,0.18)' : 'transparent',
+                padding: '12px 14px',
+                minHeight: 44,
+                backgroundColor: idx === focusedIndex ? 'rgba(124,58,237,0.08)' : 'transparent',
                 border: 'none',
-                borderBottom: idx < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                borderBottom: idx < results.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 gap: 10,
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>{entry.label}</div>
-                <div style={{ fontSize: 11, color: 'var(--cb-text-secondary, #94A3B8)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #1D1D1F)' }}>{entry.label}</div>
+                <div style={{ fontSize: 11, color: 'var(--cb-text-secondary, #6E6E73)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {entry.description}
                 </div>
               </div>
-              <ChevronRightIcon size={14} color="var(--cb-text-muted, #64748B)" />
+              <ChevronRightIcon size={14} color="var(--cb-text-muted, #636366)" />
             </button>
           ))}
         </div>

@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { recordConsent } from '@/lib/firebase/firestore';
 import { CbButton } from '@/components/ui/Button';
+import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 import { getPersonaDashboard } from '@/app/auth/page';
 import { getSessionCookie } from '@/lib/session';
 
@@ -99,61 +100,33 @@ export default function ConsentPage() {
       alignItems:     'flex-start',
       justifyContent: 'center',
       padding:        '56px 16px 80px',
-      background:     '#000000',
+      background:     'var(--cb-bg-app, #FBFBFD)',
     }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                backgroundColor: '#7C3AED',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 3px 10px rgba(124, 58, 237, 0.35)',
-              }}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12" stroke="#2DD4BF" strokeWidth="2.5" strokeLinecap="round"/>
-                <circle cx="12" cy="12" r="2" fill="#2DD4BF"/>
-                <path d="M12 14V18" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span
-              style={{
-                fontFamily: 'var(--cb-font-display)',
-                fontWeight: 700,
-                fontSize: 20,
-                letterSpacing: '-0.024em',
-                color: '#F5F5F7',
-              }}
-            >
-              Crowdbeats
-            </span>
+          <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', marginBottom: 16 }} aria-label="Crowdbeats home">
+            <CrowdbeatsLogo variant="horizontal" height={32} surface="light" ariaHidden />
           </Link>
-          <h1 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 28, fontWeight: 700, color: '#F5F5F7', margin: '0 0 8px', letterSpacing: '-0.024em' }}>
+          <h1 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 28, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', margin: '0 0 8px', letterSpacing: '-0.024em' }}>
             Before you continue
           </h1>
-          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 15, color: '#86868B', margin: 0, lineHeight: 1.5, letterSpacing: '-0.012em' }}>
+          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 15, color: 'var(--cb-text-secondary, #64748B)', margin: 0, lineHeight: 1.5, letterSpacing: '-0.012em' }}>
             Please review and agree to the statutory Crowdbeats terms and privacy policies to create and configure your account.
           </p>
         </div>
 
         {/* ToS summary card */}
         <div style={{
-          background:   '#161617',
-          border:       '1px solid rgba(255, 255, 255, 0.08)',
+          background:   'var(--cb-surface-card, #FFFFFF)',
+          border:       '1px solid var(--cb-border, #E2E8F0)',
           borderRadius: 20,
           padding:      24,
           marginBottom: 16,
-          boxShadow:    '0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.06)',
+          boxShadow:    '0 4px 20px rgba(0, 0, 0, 0.04)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-            <h2 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 16, fontWeight: 600, color: '#F5F5F7', margin: 0, letterSpacing: '-0.016em' }}>
+            <h2 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 16, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', margin: 0, letterSpacing: '-0.016em' }}>
               Terms of Service — v{CONSENT_VERSION}
             </h2>
             <Link
@@ -164,22 +137,22 @@ export default function ConsentPage() {
                 fontSize: 12,
                 fontWeight: 500,
                 fontFamily: 'var(--cb-font-display)',
-                color: '#F5F5F7',
+                color: 'var(--cb-text-primary, #0A0A0B)',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 4,
                 padding: '4px 12px',
                 borderRadius: 9999,
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                border: '1px solid var(--cb-border, #CBD5E1)',
               }}
             >
               <span>View Full Terms</span>
               <span>↗</span>
             </Link>
           </div>
-          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: '#86868B', margin: '0 0 16px', lineHeight: 1.6, letterSpacing: '-0.012em' }}>
+          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: 'var(--cb-text-secondary, #64748B)', margin: '0 0 16px', lineHeight: 1.6, letterSpacing: '-0.012em' }}>
             By using Crowdbeats you agree to: tip transactions are final after 24 hours; you must be 13+ years of age; content you post must not infringe third-party copyrights or rights of publicity; Crowdbeats charges a transparent 6% platform fee on tips; standard Stripe.com processing (2.9% + 30¢) applies; accounts may be suspended for violations of our Acceptable Use Policy.
           </p>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer', userSelect: 'none' }}>
@@ -190,13 +163,13 @@ export default function ConsentPage() {
               style={{ marginTop: 2, width: 18, height: 18, accentColor: '#000000', flexShrink: 0, cursor: 'pointer' }}
               aria-label="I have read and agree to the Terms of Service"
             />
-            <span style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: '#F5F5F7', lineHeight: 1.5 }}>
+            <span style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: 'var(--cb-text-primary, #0A0A0B)', lineHeight: 1.5 }}>
               I have read and agree to the{' '}
               <Link
                 href="/legal/terms"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#FFFFFF', fontWeight: 600, textDecoration: 'underline' }}
+                style={{ color: '#000000', fontWeight: 600, textDecoration: 'underline' }}
               >
                 Terms of Service
               </Link>
@@ -206,15 +179,15 @@ export default function ConsentPage() {
 
         {/* Privacy Policy summary card */}
         <div style={{
-          background:   '#161617',
-          border:       '1px solid rgba(255, 255, 255, 0.08)',
+          background:   'var(--cb-surface-card, #FFFFFF)',
+          border:       '1px solid var(--cb-border, #E2E8F0)',
           borderRadius: 20,
           padding:      24,
           marginBottom: 24,
-          boxShadow:    '0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.06)',
+          boxShadow:    '0 4px 20px rgba(0, 0, 0, 0.04)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-            <h2 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 16, fontWeight: 600, color: '#F5F5F7', margin: 0, letterSpacing: '-0.016em' }}>
+            <h2 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 16, fontWeight: 600, color: 'var(--cb-text-primary, #0A0A0B)', margin: 0, letterSpacing: '-0.016em' }}>
               Privacy Policy & Data Rights
             </h2>
             <Link
@@ -225,22 +198,22 @@ export default function ConsentPage() {
                 fontSize: 12,
                 fontWeight: 500,
                 fontFamily: 'var(--cb-font-display)',
-                color: '#F5F5F7',
+                color: 'var(--cb-text-primary, #0A0A0B)',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 4,
                 padding: '4px 12px',
                 borderRadius: 9999,
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                backgroundColor: 'var(--cb-surface-2, #F8FAFC)',
+                border: '1px solid var(--cb-border, #CBD5E1)',
               }}
             >
               <span>View Full Privacy Policy</span>
               <span>↗</span>
             </Link>
           </div>
-          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: '#86868B', margin: '0 0 16px', lineHeight: 1.6, letterSpacing: '-0.012em' }}>
+          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: 'var(--cb-text-secondary, #64748B)', margin: '0 0 16px', lineHeight: 1.6, letterSpacing: '-0.012em' }}>
             Crowdbeats collects your email, display name, and transactional data exclusively to operate the platform and facilitate direct creator payouts. We do not sell or share your personal information. Under CCPA §1798.100 and GDPR Art. 15, you may request full data export or account deletion at any time in Account Settings.
           </p>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer', userSelect: 'none' }}>
@@ -251,13 +224,13 @@ export default function ConsentPage() {
               style={{ marginTop: 2, width: 18, height: 18, accentColor: '#000000', flexShrink: 0, cursor: 'pointer' }}
               aria-label="I have read and agree to the Privacy Policy"
             />
-            <span style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: '#F5F5F7', lineHeight: 1.5 }}>
+            <span style={{ fontFamily: 'var(--cb-font-body)', fontSize: 13, color: 'var(--cb-text-primary, #0A0A0B)', lineHeight: 1.5 }}>
               I have read and agree to the{' '}
               <Link
                 href="/legal/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#FFFFFF', fontWeight: 600, textDecoration: 'underline' }}
+                style={{ color: '#000000', fontWeight: 600, textDecoration: 'underline' }}
               >
                 Privacy Policy
               </Link>
@@ -269,9 +242,9 @@ export default function ConsentPage() {
           <div style={{
             padding: '12px 16px',
             borderRadius: '12px',
-            backgroundColor: 'rgba(255, 69, 58, 0.15)',
-            border: '1px solid rgba(255, 69, 58, 0.35)',
-            color: '#FF453A',
+            backgroundColor: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#DC2626',
             fontSize: 13,
             fontWeight: 600,
             marginBottom: 16,
@@ -289,9 +262,9 @@ export default function ConsentPage() {
             width: '100%',
             minHeight: 48,
             borderRadius: 9999,
-            backgroundColor: canProceed ? '#000000' : 'rgba(255, 255, 255, 0.08)',
-            color: canProceed ? '#FFFFFF' : '#6E6E73',
-            border: canProceed ? '1px solid #333333' : 'none',
+            backgroundColor: canProceed ? '#000000' : 'var(--cb-surface-3, #E2E8F0)',
+            color: canProceed ? '#FFFFFF' : 'var(--cb-text-muted, #94A3B8)',
+            border: canProceed ? '1px solid #000000' : 'none',
             fontSize: 15,
             fontWeight: 600,
             fontFamily: 'var(--cb-font-display)',
@@ -313,7 +286,7 @@ export default function ConsentPage() {
           {loading ? 'Please wait...' : 'I agree — continue'}
         </button>
 
-        <p style={{ fontSize: 12, color: '#86868B', textAlign: 'center', marginTop: 14, fontFamily: 'var(--cb-font-body)' }}>
+        <p style={{ fontSize: 12, color: 'var(--cb-text-secondary, #64748B)', textAlign: 'center', marginTop: 14, fontFamily: 'var(--cb-font-body)' }}>
           Consent version {CONSENT_VERSION} · Both checkboxes are required to proceed
         </p>
 
@@ -321,7 +294,7 @@ export default function ConsentPage() {
         <div style={{
           marginTop: 28,
           paddingTop: 18,
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: '1px solid var(--cb-border, #E2E8F0)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -330,27 +303,27 @@ export default function ConsentPage() {
           fontSize: 12,
           fontFamily: 'var(--cb-font-body)',
         }}>
-          <Link href="/legal/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#86868B', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')} onMouseLeave={(e) => (e.currentTarget.style.color = '#86868B')}>
+          <Link href="/legal/terms" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#0A0A0B')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--cb-text-secondary, #64748B)')}>
             Terms of Service
           </Link>
-          <span style={{ color: '#3A3A3C' }}>•</span>
-          <Link href="/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#86868B', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')} onMouseLeave={(e) => (e.currentTarget.style.color = '#86868B')}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <Link href="/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#0A0A0B')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--cb-text-secondary, #64748B)')}>
             Privacy Policy
           </Link>
-          <span style={{ color: '#3A3A3C' }}>•</span>
-          <Link href="/legal/dmca" target="_blank" rel="noopener noreferrer" style={{ color: '#86868B', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')} onMouseLeave={(e) => (e.currentTarget.style.color = '#86868B')}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <Link href="/legal/dmca" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#0A0A0B')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--cb-text-secondary, #64748B)')}>
             DMCA Policy
           </Link>
-          <span style={{ color: '#3A3A3C' }}>•</span>
-          <Link href="/legal/aup" target="_blank" rel="noopener noreferrer" style={{ color: '#86868B', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')} onMouseLeave={(e) => (e.currentTarget.style.color = '#86868B')}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <Link href="/legal/aup" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#0A0A0B')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--cb-text-secondary, #64748B)')}>
             Acceptable Use
           </Link>
-          <span style={{ color: '#3A3A3C' }}>•</span>
-          <Link href="/legal/refunds" target="_blank" rel="noopener noreferrer" style={{ color: '#86868B', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')} onMouseLeave={(e) => (e.currentTarget.style.color = '#86868B')}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <Link href="/legal/refunds" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }} onMouseEnter={(e) => (e.currentTarget.style.color = '#0A0A0B')} onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--cb-text-secondary, #64748B)')}>
             Refunds
           </Link>
-          <span style={{ color: '#3A3A3C' }}>•</span>
-          <Link href="/legal/support" target="_blank" rel="noopener noreferrer" style={{ color: '#86868B', textDecoration: 'none', fontWeight: 500 }} onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')} onMouseLeave={(e) => (e.currentTarget.style.color = '#86868B')}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <Link href="/legal/support" target="_blank" rel="noopener noreferrer" style={{ color: '#7C3AED', textDecoration: 'none', fontWeight: 600 }} onMouseEnter={(e) => (e.currentTarget.style.color = '#6D28D9')} onMouseLeave={(e) => (e.currentTarget.style.color = '#7C3AED')}>
             Help & Support ↗
           </Link>
         </div>

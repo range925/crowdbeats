@@ -32,22 +32,12 @@ function formatDate(ts: { _seconds: number } | null): string {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-function statusColor(status: string): string {
+function statusBadge(status: string): { label: string; bg: string; text: string; border: string } {
   switch (status) {
-    case 'succeeded': return 'text-green-400';
-    case 'refunded':  return 'text-blue-400';
-    case 'failed':    return 'text-red-400';
-    default:          return 'text-amber-400';
-  }
-}
-
-function statusLabel(status: string): string {
-  switch (status) {
-    case 'succeeded': return 'Confirmed';
-    case 'refunded':  return 'Refunded';
-    case 'failed':    return 'Failed';
-    case 'processing':return 'Processing';
-    default:          return 'Pending';
+    case 'succeeded': return { label: 'Confirmed', bg: 'rgba(5,150,105,0.08)', text: '#047857', border: 'rgba(5,150,105,0.2)' };
+    case 'refunded':  return { label: 'Refunded', bg: 'rgba(37,99,235,0.08)', text: '#1D4ED8', border: 'rgba(37,99,235,0.2)' };
+    case 'failed':    return { label: 'Failed', bg: 'rgba(220,38,38,0.08)', text: '#B91C1C', border: 'rgba(220,38,38,0.2)' };
+    default:          return { label: 'Pending', bg: 'rgba(217,119,6,0.08)', text: '#92400E', border: 'rgba(217,119,6,0.2)' };
   }
 }
 
@@ -101,8 +91,8 @@ export default async function ReceiptsPage() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ margin: 0 }}>Tip Receipts & Ledger</h1>
-          <p style={{ color: '#94A3B8', fontSize: 13, margin: '4px 0 0 0' }}>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ margin: 0, color: 'var(--cb-text-primary, #1D1D1F)' }}>Tip Receipts & Ledger</h1>
+          <p style={{ color: 'var(--cb-text-secondary, #6E6E73)', fontSize: 13, margin: '4px 0 0 0' }}>
             Verified live tipping receipts and California-governed payment records.
           </p>
         </div>
@@ -113,7 +103,7 @@ export default async function ReceiptsPage() {
           style={{
             padding: '8px 16px',
             borderRadius: 8,
-            backgroundColor: '#7C3AED',
+            backgroundColor: 'var(--cb-brand-primary, #7C3AED)',
             color: '#FFFFFF',
             fontSize: 13,
             fontWeight: 700,
@@ -121,7 +111,8 @@ export default async function ReceiptsPage() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.4)',
+            minHeight: 44,
+            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)',
           }}
         >
           <span>📥</span>
@@ -130,50 +121,78 @@ export default async function ReceiptsPage() {
       </div>
 
       {receipts.length === 0 ? (
-        <div className="rounded-2xl border border-white/8 bg-white/4 py-16 text-center">
-          <p className="text-4xl">🧾</p>
-          <p className="mt-3 text-white/50">No tips yet.</p>
-          <p className="mt-1 text-sm text-white/30">
+        <div style={{
+          borderRadius: 16,
+          border: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.08))',
+          backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
+          padding: '64px 24px',
+          textAlign: 'center',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        }}>
+          <p style={{ fontSize: 36, margin: 0 }}>🧾</p>
+          <p style={{ marginTop: 12, fontSize: 15, fontWeight: 600, color: 'var(--cb-text-primary, #1D1D1F)' }}>No tips yet.</p>
+          <p style={{ marginTop: 4, fontSize: 13, color: 'var(--cb-text-secondary, #6E6E73)' }}>
             Open the Crowdbeats app and scan a performer&apos;s QR code.
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {receipts.map((r) => (
-            <div
-              key={r.tipId}
-              className="flex items-center justify-between rounded-xl border border-white/8
-                         bg-white/4 px-5 py-4 transition-colors hover:bg-white/6"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">
-                  {r.recipientName ?? 'Artist'}
-                </p>
-                <div className="mt-1 flex items-center gap-3">
-                  <span
-                    className={`text-xs font-semibold uppercase tracking-wide ${statusColor(r.status)}`}
-                  >
-                    {statusLabel(r.status)}
-                  </span>
-                  <span className="text-xs text-white/40">
-                    {formatDate(r.createdAt)}
-                  </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {receipts.map((r) => {
+            const badge = statusBadge(r.status);
+            return (
+              <div
+                key={r.tipId}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderRadius: 12,
+                  border: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.08))',
+                  backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
+                  padding: '16px 20px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--cb-text-primary, #1D1D1F)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {r.recipientName ?? 'Artist'}
+                  </p>
+                  <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        padding: '2px 8px',
+                        borderRadius: 9999,
+                        backgroundColor: badge.bg,
+                        color: badge.text,
+                        border: `1px solid ${badge.border}`,
+                      }}
+                    >
+                      {badge.label}
+                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--cb-text-muted, #636366)' }}>
+                      {formatDate(r.createdAt)}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ marginLeft: 16, flexShrink: 0, textAlign: 'right' }}>
+                  <p className="cb-tabular-nums" style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'var(--cb-text-primary, #1D1D1F)' }}>
+                    {formatCents(r.amountCents)}
+                  </p>
+                  <p className="cb-tabular-nums" style={{ margin: '4px 0 0 0', fontSize: 12, color: 'var(--cb-text-secondary, #6E6E73)' }}>
+                    Creator got {formatCents(r.netAmountCents)}
+                  </p>
                 </div>
               </div>
-              <div className="ml-4 shrink-0 text-right">
-                <p className="text-lg font-bold">
-                  {formatCents(r.amountCents)}
-                </p>
-                <p className="text-xs text-white/40">
-                  Creator got {formatCents(r.netAmountCents)}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      <p className="mt-6 text-center text-xs text-white/30">
+      <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: 'var(--cb-text-muted, #636366)' }}>
         Showing up to 50 most recent receipts.
         Full history available in the Crowdbeats app.
       </p>

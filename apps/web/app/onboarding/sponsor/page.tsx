@@ -109,7 +109,7 @@ export default function SponsorOnboardingPage() {
               border:       '1px solid var(--border-default)',
               borderRadius: 'var(--radius-xs)',
               color:        industry ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              fontSize:     15,
+              fontSize:     16,
               padding:      '0 12px',
             }}
             aria-label="Select your industry"

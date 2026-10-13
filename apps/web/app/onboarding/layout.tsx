@@ -44,7 +44,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         background: 'var(--surface-raised)',
       }}>
         <Link href="/" aria-label="Crowdbeats home">
-          <CrowdbeatsLogo variant="horizontal" height={28} surface={theme === 'light' ? 'light' : 'dark'} ariaHidden />
+          <CrowdbeatsLogo variant="horizontal" height={28} surface="light" ariaHidden />
         </Link>
       </div>
       {/* Progress bar */}
@@ -107,28 +107,28 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         textAlign: 'center',
         padding: '20px 16px',
         fontSize: 12,
-        color: 'var(--text-tertiary, #64748B)',
-        borderTop: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.06))',
-        background: 'var(--surface-raised, rgba(18, 20, 31, 0.6))',
+        color: 'var(--cb-text-secondary, #64748B)',
+        borderTop: '1px solid var(--cb-border, #E2E8F0)',
+        background: 'var(--cb-surface-card, #FFFFFF)',
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
         alignItems: 'center'
       }}>
         <div style={{ display: 'flex', gap: '8px 16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <a href="/legal/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+          <a href="/legal/terms" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }}>
             Terms of Service
           </a>
-          <span style={{ color: '#475569' }}>•</span>
-          <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }}>
             Privacy Policy
           </a>
-          <span style={{ color: '#475569' }}>•</span>
-          <a href="/legal/dmca" target="_blank" rel="noopener noreferrer" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <a href="/legal/dmca" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cb-text-secondary, #64748B)', textDecoration: 'none' }}>
             DMCA Policy
           </a>
-          <span style={{ color: '#475569' }}>•</span>
-          <a href="/legal/support" target="_blank" rel="noopener noreferrer" style={{ color: '#38BDF8', textDecoration: 'none' }}>
+          <span style={{ color: 'var(--cb-border-medium, #CBD5E1)' }}>•</span>
+          <a href="/legal/support" target="_blank" rel="noopener noreferrer" style={{ color: '#7C3AED', textDecoration: 'none', fontWeight: 600 }}>
             Help & Support
           </a>
         </div>

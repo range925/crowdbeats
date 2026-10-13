@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { getFirebaseAuth } from '@/lib/firebase/auth';
@@ -99,7 +99,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
         backdropFilter: 'blur(12px)',
         zIndex: 9999,
         display: 'flex',
@@ -115,11 +115,11 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
         style={{
           width: '100%',
           maxWidth: 460,
-          backgroundColor: '#12141C',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: 'var(--surface-card, #FFFFFF)',
+          border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))',
           borderRadius: 18,
           padding: 24,
-          boxShadow: '0 24px 64px -12px rgba(0, 0, 0, 0.8)',
+          boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
@@ -128,11 +128,11 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
               width: 40,
               height: 40,
               borderRadius: 10,
-              backgroundColor: 'rgba(168, 85, 247, 0.15)',
+              backgroundColor: 'rgba(124, 58, 237, 0.10)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#C084FC',
+              color: '#7C3AED',
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -141,8 +141,8 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
             </svg>
           </div>
           <div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>Change Password</h3>
-            <p style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.55)', margin: 0 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary, #1D1D1F)', margin: 0 }}>Change Password</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-secondary, #6E6E73)', margin: 0 }}>
               Update your account login credentials
             </p>
           </div>
@@ -153,9 +153,9 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
             style={{
               padding: '10px 14px',
               borderRadius: 8,
-              backgroundColor: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#F87171',
+              backgroundColor: 'rgba(239, 68, 68, 0.10)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              color: '#DC2626',
               fontSize: 13,
               marginBottom: 16,
             }}
@@ -166,7 +166,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#FFFFFF', marginBottom: 6 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
               Current Password
             </label>
             <input
@@ -176,11 +176,11 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
               placeholder="Enter current password"
               style={{
                 width: '100%',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #CBD5E1',
                 borderRadius: 10,
                 padding: '10px 14px',
-                color: '#FFFFFF',
+                color: '#1D1D1F',
                 fontSize: 14,
                 minHeight: 44,
                 outline: 'none',
@@ -191,7 +191,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
           </div>
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#FFFFFF', marginBottom: 6 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
               New Password
             </label>
             <input
@@ -201,11 +201,11 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
               placeholder="At least 8 characters"
               style={{
                 width: '100%',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #CBD5E1',
                 borderRadius: 10,
                 padding: '10px 14px',
-                color: '#FFFFFF',
+                color: '#1D1D1F',
                 fontSize: 14,
                 minHeight: 44,
                 outline: 'none',
@@ -215,7 +215,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
             />
             {newPassword && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-                <div style={{ flex: 1, height: 4, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ flex: 1, height: 4, backgroundColor: '#E2E8F0', borderRadius: 2, overflow: 'hidden' }}>
                   <div
                     style={{
                       height: '100%',
@@ -233,7 +233,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#FFFFFF', marginBottom: 6 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
               Confirm New Password
             </label>
             <input
@@ -243,11 +243,11 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
               placeholder="Re-type new password"
               style={{
                 width: '100%',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #CBD5E1',
                 borderRadius: 10,
                 padding: '10px 14px',
-                color: '#FFFFFF',
+                color: '#1D1D1F',
                 fontSize: 14,
                 minHeight: 44,
                 outline: 'none',
@@ -267,9 +267,9 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 600,
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                color: '#FFFFFF',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#F1F5F9',
+                color: '#1D1D1F',
+                border: '1px solid #CBD5E1',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 minHeight: 44,
               }}
@@ -284,12 +284,12 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 700,
-                backgroundColor: '#A855F7',
+                backgroundColor: '#7C3AED',
                 color: '#FFFFFF',
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 minHeight: 44,
-                boxShadow: '0 4px 16px rgba(168, 85, 247, 0.4)',
+                boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)',
               }}
             >
               {loading ? 'Saving...' : 'Update Password'}

@@ -83,105 +83,6 @@ export function getSafeReturnUrl(
   return getPersonaDashboard(personaType);
 }
 
-// ── Appearance Selector (Light, Dark, System) ──────────────────────────────────
-
-function AppearanceSelector({
-  preference,
-  resolvedTheme,
-  onChange,
-}: {
-  preference: ThemePreference;
-  resolvedTheme: ResolvedTheme;
-  onChange: (pref: ThemePreference) => void;
-}) {
-  const isDark = resolvedTheme === 'dark';
-
-  return (
-    <div
-      role="group"
-      aria-label="Appearance options"
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        padding: '3px',
-        borderRadius: 9999,
-        background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)'}`,
-        gap: 2,
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => onChange('light')}
-        aria-pressed={preference === 'light'}
-        title="Light theme"
-        aria-label="Light theme"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 28,
-          height: 28,
-          borderRadius: 9999,
-          border: 'none',
-          cursor: 'pointer',
-          background: preference === 'light' ? (isDark ? '#FFFFFF' : '#000000') : 'transparent',
-          color: preference === 'light' ? (isDark ? '#000000' : '#FFFFFF') : 'var(--cb-text-secondary)',
-          transition: 'all 0.15s ease',
-        }}
-      >
-        <SunIcon />
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange('dark')}
-        aria-pressed={preference === 'dark'}
-        title="Dark theme"
-        aria-label="Dark theme"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 28,
-          height: 28,
-          borderRadius: 9999,
-          border: 'none',
-          cursor: 'pointer',
-          background: preference === 'dark' ? (isDark ? '#FFFFFF' : '#000000') : 'transparent',
-          color: preference === 'dark' ? (isDark ? '#000000' : '#FFFFFF') : 'var(--cb-text-secondary)',
-          transition: 'all 0.15s ease',
-        }}
-      >
-        <MoonIcon />
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange('system')}
-        aria-pressed={preference === 'system'}
-        title="System default"
-        aria-label="System default"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 8px',
-          height: 28,
-          borderRadius: 9999,
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: 11,
-          fontWeight: 600,
-          fontFamily: 'var(--cb-font-display)',
-          background: preference === 'system' ? (isDark ? '#FFFFFF' : '#000000') : 'transparent',
-          color: preference === 'system' ? (isDark ? '#000000' : '#FFFFFF') : 'var(--cb-text-secondary)',
-          transition: 'all 0.15s ease',
-        }}
-      >
-        Auto
-      </button>
-    </div>
-  );
-}
 
 // ── Sub-forms ──────────────────────────────────────────────────────────────────
 
@@ -744,16 +645,11 @@ function AuthPageContent() {
           position:     'relative',
         }}
       >
-        {/* Top Bar: Logo & Appearance Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        {/* Top Bar: Brand Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
           <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }} aria-label="Crowdbeats home">
-            <CrowdbeatsLogo variant="horizontal" height={34} surface="auto" ariaHidden />
+            <CrowdbeatsLogo variant="horizontal" height={34} surface="light" ariaHidden />
           </Link>
-          <AppearanceSelector
-            preference={themePreference}
-            resolvedTheme={resolvedTheme}
-            onChange={setThemePreference}
-          />
         </div>
 
         {/* Brand Header */}

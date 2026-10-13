@@ -11,10 +11,12 @@
  * - Seamless integration with the canonical CbFooter
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/theme/ThemeProvider';
+import { useMobileDrawer } from '@/lib/hooks/useMobileDrawer';
+import { ResponsiveMobileDrawer } from '@/components/navigation/ResponsiveMobileDrawer';
 import { CbFooter } from '@/components/ui/CbFooter';
 import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 
@@ -26,12 +28,13 @@ export const LegalPageShell: React.FC<LegalPageShellProps> = ({ children }) => {
   const { resolvedTheme } = useTheme();
   const isLight = resolvedTheme === 'light';
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+  const {
+    isOpen: mobileMenuOpen,
+    close: closeMobileMenu,
+    triggerProps,
+    drawerRef,
+    closeButtonRef,
+  } = useMobileDrawer({ drawerId: 'cb-legal-mobile-drawer' });
 
   // Theme tokens matching Apple design system
   const canvasBg = isLight ? '#F5F5F7' : '#000000';
@@ -97,7 +100,7 @@ export const LegalPageShell: React.FC<LegalPageShellProps> = ({ children }) => {
               }}
               aria-label="Crowdbeats home"
             >
-              <CrowdbeatsLogo variant="horizontal" height={26} surface={isLight ? 'light' : 'dark'} ariaHidden />
+              <CrowdbeatsLogo variant="horizontal" height={26} surface="light" ariaHidden />
             </Link>
 
             <span style={{ color: borderColor, fontSize: 16 }}>/</span>
@@ -192,8 +195,7 @@ export const LegalPageShell: React.FC<LegalPageShellProps> = ({ children }) => {
             {/* Mobile Hamburger Button */}
             <button
               type="button"
-              aria-label="Toggle navigation menu"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              {...triggerProps}
               className="cb-legal-mobile-toggle"
               style={{
                 background: 'none',
@@ -215,27 +217,28 @@ export const LegalPageShell: React.FC<LegalPageShellProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div
-            style={{
-              backgroundColor: isLight ? '#FFFFFF' : '#141416',
-              borderBottom: `1px solid ${borderColor}`,
-              padding: '16px 24px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
-            }}
-          >
+        {/* Accessible Responsive Mobile Navigation Drawer */}
+        <ResponsiveMobileDrawer
+          isOpen={mobileMenuOpen}
+          onClose={closeMobileMenu}
+          drawerRef={drawerRef}
+          closeButtonRef={closeButtonRef}
+          drawerId="cb-legal-mobile-drawer"
+          title="Legal & Compliance Navigation"
+          personaLabel="Legal & Support"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Link
               href="/legal"
+              onClick={() => closeMobileMenu(false)}
               style={{
                 color: textPrimary,
                 textDecoration: 'none',
-                fontWeight: 600,
+                fontWeight: 700,
                 fontSize: 14,
-                padding: '8px 0',
+                padding: '8px 10px',
+                borderRadius: 8,
+                backgroundColor: 'rgba(0,0,0,0.04)',
               }}
             >
               Legal & Compliance Portal
@@ -244,18 +247,22 @@ export const LegalPageShell: React.FC<LegalPageShellProps> = ({ children }) => {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => closeMobileMenu(false)}
                 style={{
                   color: textSecondary,
                   textDecoration: 'none',
                   fontSize: 14,
-                  padding: '6px 0',
+                  fontWeight: 500,
+                  padding: '8px 10px',
+                  borderRadius: 8,
+                  transition: 'background-color 0.15s ease',
                 }}
               >
                 {item.label}
               </Link>
             ))}
           </div>
-        )}
+        </ResponsiveMobileDrawer>
       </header>
 
       {/* ── RESPONSIVE CSS HELPER FOR MOBILE NAV TOGGLE ─────────────────────── */}

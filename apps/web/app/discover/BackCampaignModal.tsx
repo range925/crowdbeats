@@ -334,14 +334,16 @@ export function BackCampaignModal({ campaign, onClose }: BackCampaignModalProps)
                     onChange={(e) => setCustomAmount(e.target.value)}
                     style={{
                       width: 120,
+                      minHeight: 48,
                       padding: '8px 12px',
                       borderRadius: 10,
                       border: '1px solid var(--cb-border-medium, rgba(0, 0, 0, 0.15))',
                       backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                       color: 'var(--cb-text-primary, #1D1D1F)',
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: 600,
                       outline: 'none',
+                      boxSizing: 'border-box',
                     }}
                   />
                 </div>
@@ -404,7 +406,7 @@ export function BackCampaignModal({ campaign, onClose }: BackCampaignModalProps)
                     border: '1px solid var(--cb-border-medium, rgba(0, 0, 0, 0.12))',
                     backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
                     color: 'var(--cb-text-primary, #1D1D1F)',
-                    fontSize: 13,
+                    fontSize: 16,
                     fontFamily: 'inherit',
                     outline: 'none',
                     resize: 'none',
@@ -420,6 +422,7 @@ export function BackCampaignModal({ campaign, onClose }: BackCampaignModalProps)
                   disabled={isSubmitting || activeDollars <= 0}
                   style={{
                     flex: 1,
+                    minHeight: 48,
                     padding: '14px 20px',
                     borderRadius: 9999,
                     border: 'none',
@@ -439,6 +442,7 @@ export function BackCampaignModal({ campaign, onClose }: BackCampaignModalProps)
                   type="button"
                   onClick={onClose}
                   style={{
+                    minHeight: 48,
                     padding: '14px 20px',
                     borderRadius: 9999,
                     border: '1px solid var(--cb-border-medium, rgba(0, 0, 0, 0.12))',

@@ -78,7 +78,7 @@ export default async function BandProfilePage({ params }: PageProps) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0B0C10', color: '#FFFFFF' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--cb-surface-canvas, #FBFBFD)', color: 'var(--cb-text-primary, #1D1D1F)' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

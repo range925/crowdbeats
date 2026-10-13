@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { DataExportModal } from '@/components/compliance/DataExportModal';
@@ -27,8 +27,8 @@ export function DataExportCard({
           justifyContent: 'space-between',
           gap: 16,
           padding: '16px 18px',
-          backgroundColor: 'var(--cb-surface-1, #0F1017)',
-          border: '1px solid var(--cb-border-subtle, rgba(255,255,255,0.08))',
+          backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
+          border: '1px solid var(--cb-border-subtle, rgba(0, 0, 0, 0.08))',
           borderRadius: 12,
         }}
       >
@@ -47,7 +47,7 @@ export function DataExportCard({
                 fontSize: 14,
                 fontWeight: 700,
                 margin: 0,
-                color: 'var(--cb-text-primary, #FFFFFF)',
+                color: 'var(--cb-text-primary, #1D1D1F)',
                 fontFamily: 'Montserrat, sans-serif',
               }}
             >
@@ -57,7 +57,7 @@ export function DataExportCard({
           <p
             style={{
               fontSize: 12,
-              color: 'var(--cb-text-secondary, #94A3B8)',
+              color: 'var(--cb-text-secondary, #6E6E73)',
               margin: 0,
               lineHeight: 1.5,
             }}
@@ -74,9 +74,9 @@ export function DataExportCard({
             fontWeight: 600,
             padding: '8px 16px',
             borderRadius: 8,
-            backgroundColor: 'var(--cb-purple-dim, rgba(124,58,237,0.16))',
-            color: 'var(--cb-purple-light, #A855F7)',
-            border: '1px solid rgba(124, 58, 237, 0.3)',
+            backgroundColor: 'var(--cb-purple-dim, rgba(124, 58, 237, 0.08))',
+            color: 'var(--cb-purple-main, #7C3AED)',
+            border: '1px solid rgba(124, 58, 237, 0.25)',
             cursor: 'pointer',
             flexShrink: 0,
             whiteSpace: 'nowrap',
@@ -84,10 +84,10 @@ export function DataExportCard({
             transition: 'background-color 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(124, 58, 237, 0.24)';
+            (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(124, 58, 237, 0.16)';
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--cb-purple-dim, rgba(124,58,237,0.16))';
+            (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--cb-purple-dim, rgba(124, 58, 237, 0.08))';
           }}
         >
           Download My Data

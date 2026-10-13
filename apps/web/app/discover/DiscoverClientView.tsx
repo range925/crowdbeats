@@ -653,14 +653,15 @@ export function DiscoverClientView() {
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: 'var(--cb-surface-1, #FFFFFF)',
-                border: '1px solid var(--cb-border-medium, rgba(0, 0, 0, 0.12))',
+                border: '1.5px solid var(--cb-border-medium, rgba(0, 0, 0, 0.12))',
                 borderRadius: 9999,
-                padding: '8px 16px',
+                padding: '6px 16px',
+                minHeight: 44,
                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)',
                 transition: 'all 0.15s ease',
               }}
             >
-              <span style={{ fontSize: 16, color: 'var(--cb-text-muted, #86868B)', marginRight: 10 }}>
+              <span style={{ fontSize: 16, color: 'var(--cb-text-muted, #636366)', marginRight: 10 }}>
                 🔍
               </span>
               <input
@@ -693,10 +694,15 @@ export function DiscoverClientView() {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: 'var(--cb-text-muted, #86868B)',
+                    color: 'var(--cb-text-muted, #636366)',
                     cursor: 'pointer',
                     fontSize: 14,
-                    padding: '2px 6px',
+                    padding: '4px 8px',
+                    minWidth: 32,
+                    minHeight: 32,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                   aria-label="Clear search"
                 >
@@ -814,7 +820,7 @@ export function DiscoverClientView() {
           </div>
 
           {/* Location Actions: Explored Badge + Return to my location button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', maxWidth: '100%' }}>
             {/* Visible Explored Area Badge */}
             <div
               style={{
@@ -828,7 +834,8 @@ export function DiscoverClientView() {
                 color: '#7C3AED',
                 fontSize: 13,
                 fontWeight: 700,
-                maxWidth: 360,
+                maxWidth: 'min(360px, 100%)',
+                boxSizing: 'border-box',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -858,6 +865,8 @@ export function DiscoverClientView() {
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
               }}
               title="Locate live music playing near you"
             >
@@ -1117,8 +1126,8 @@ export function DiscoverClientView() {
                                 gap: 4,
                                 padding: '2px 6px',
                                 borderRadius: 9999,
-                                backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                                color: '#10B981',
+                                backgroundColor: 'rgba(5, 150, 105, 0.12)',
+                                color: 'var(--cb-live-green, #059669)',
                                 fontSize: 10,
                                 fontWeight: 800,
                                 textTransform: 'uppercase',

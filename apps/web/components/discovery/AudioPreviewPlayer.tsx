@@ -53,7 +53,9 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
 
     return () => {
       if (audioRef.current) {
-        audioRef.current.pause();
+        try {
+          audioRef.current.pause();
+        } catch {}
         audioRef.current = null;
       }
       if (progressIntervalRef.current) {
@@ -65,7 +67,9 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
   const togglePlayback = () => {
     if (isPlaying) {
       if (audioRef.current) {
-        audioRef.current.pause();
+        try {
+          audioRef.current.pause();
+        } catch {}
       }
       if (progressIntervalRef.current) {
         window.clearInterval(progressIntervalRef.current);
@@ -99,11 +103,11 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
     <div
       className={className}
       style={{
-        background: 'linear-gradient(135deg, rgba(30, 32, 50, 0.85) 0%, rgba(15, 17, 26, 0.95) 100%)',
-        border: '1px solid rgba(124, 58, 237, 0.35)',
+        background: 'var(--cb-surface-card, #FFFFFF)',
+        border: '1px solid var(--cb-border-subtle, #E5E5EA)',
         borderRadius: 16,
         padding: '16px 20px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -117,7 +121,7 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
           width: 100,
           height: 100,
           borderRadius: '50%',
-          background: isPlaying ? 'radial-gradient(circle, rgba(0, 240, 118, 0.15) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%)',
+          background: isPlaying ? 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%)',
           pointerEvents: 'none',
           transition: 'all 0.5s ease',
         }}
@@ -135,10 +139,10 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
               height: 44,
               borderRadius: '50%',
               background: isPlaying
-                ? 'linear-gradient(135deg, #00F076 0%, #10B981 100%)'
-                : 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+                ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
               border: 'none',
-              color: isPlaying ? '#0B0C10' : '#FFFFFF',
+              color: '#FFFFFF',
               fontSize: 18,
               fontWeight: 800,
               display: 'flex',
@@ -147,8 +151,8 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
               cursor: 'pointer',
               flexShrink: 0,
               boxShadow: isPlaying
-                ? '0 0 16px rgba(0, 240, 118, 0.4)'
-                : '0 4px 12px rgba(124, 58, 237, 0.4)',
+                ? '0 0 16px rgba(16, 185, 129, 0.3)'
+                : '0 4px 12px rgba(124, 58, 237, 0.25)',
               transition: 'all 0.25s ease',
             }}
           >
@@ -163,12 +167,12 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  color: isPlaying ? '#00F076' : '#A855F7',
+                  color: isPlaying ? '#059669' : '#7C3AED',
                 }}
               >
                 {isPlaying ? 'Now Sampling' : 'Featured Track'}
               </span>
-              <span style={{ fontSize: 11, color: 'var(--cb-text-secondary, #94A3B8)' }}>
+              <span style={{ fontSize: 11, color: 'var(--cb-text-secondary, #636366)' }}>
                 • {durationText}
               </span>
             </div>
@@ -176,7 +180,7 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                color: '#FFFFFF',
+                color: 'var(--cb-text-primary, #1D1D1F)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -206,7 +210,7 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
                 width: 3,
                 height: isPlaying ? `${baseHeight}px` : '4px',
                 borderRadius: 2,
-                background: isPlaying ? '#00F076' : 'rgba(255, 255, 255, 0.2)',
+                background: isPlaying ? '#10B981' : '#D1D5DB',
                 transition: 'height 0.2s ease, background 0.3s ease',
               }}
             />
@@ -220,7 +224,7 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
           width: '100%',
           height: 4,
           borderRadius: 2,
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backgroundColor: '#F2F2F7',
           overflow: 'hidden',
           position: 'relative',
         }}
@@ -230,7 +234,7 @@ export const AudioPreviewPlayer: React.FC<AudioPreviewPlayerProps> = ({
             width: `${progress}%`,
             height: '100%',
             background: isPlaying
-              ? 'linear-gradient(90deg, #7C3AED 0%, #00F076 100%)'
+              ? 'linear-gradient(90deg, #7C3AED 0%, #10B981 100%)'
               : '#7C3AED',
             borderRadius: 2,
             transition: 'width 0.5s linear',

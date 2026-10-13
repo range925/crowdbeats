@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { getFirebaseAuth } from '@/lib/firebase/auth';
@@ -68,7 +68,7 @@ export function RecentAuthModal({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
         backdropFilter: 'blur(12px)',
         zIndex: 9999,
         display: 'flex',
@@ -84,11 +84,11 @@ export function RecentAuthModal({
         style={{
           width: '100%',
           maxWidth: 440,
-          backgroundColor: '#12141C',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: 'var(--surface-card, #FFFFFF)',
+          border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))',
           borderRadius: 18,
           padding: 24,
-          boxShadow: '0 24px 64px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(168, 85, 247, 0.2)',
+          boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)',
           position: 'relative',
         }}
       >
@@ -99,12 +99,12 @@ export function RecentAuthModal({
               width: 42,
               height: 42,
               borderRadius: 12,
-              backgroundColor: 'rgba(168, 85, 247, 0.15)',
-              border: '1px solid rgba(168, 85, 247, 0.3)',
+              backgroundColor: 'rgba(124, 58, 237, 0.10)',
+              border: '1px solid rgba(124, 58, 237, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#C084FC',
+              color: '#7C3AED',
               flexShrink: 0,
             }}
           >
@@ -113,16 +113,16 @@ export function RecentAuthModal({
             </svg>
           </div>
           <div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary, #1D1D1F)', margin: 0 }}>
               {actionTitle}
             </h3>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#A855F7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Identity Re-Verification Required
             </span>
           </div>
         </div>
 
-        <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.65)', lineHeight: 1.5, margin: '0 0 18px' }}>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary, #6E6E73)', lineHeight: 1.5, margin: '0 0 18px' }}>
           {actionDescription}
         </p>
 
@@ -131,9 +131,9 @@ export function RecentAuthModal({
             style={{
               padding: '10px 14px',
               borderRadius: 8,
-              backgroundColor: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#F87171',
+              backgroundColor: 'rgba(239, 68, 68, 0.10)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              color: '#DC2626',
               fontSize: 13,
               marginBottom: 16,
             }}
@@ -144,7 +144,7 @@ export function RecentAuthModal({
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#FFFFFF', marginBottom: 6 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
               Current Password
             </label>
             <div style={{ position: 'relative' }}>
@@ -157,11 +157,11 @@ export function RecentAuthModal({
                 disabled={loading}
                 style={{
                   width: '100%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #CBD5E1',
                   borderRadius: 10,
                   padding: '12px 42px 12px 14px',
-                  color: '#FFFFFF',
+                  color: '#1D1D1F',
                   fontSize: 14,
                   minHeight: 44,
                   outline: 'none',
@@ -178,7 +178,7 @@ export function RecentAuthModal({
                   transform: 'translateY(-50%)',
                   background: 'none',
                   border: 'none',
-                  color: 'rgba(255, 255, 255, 0.5)',
+                  color: '#64748B',
                   cursor: 'pointer',
                   padding: 4,
                   fontSize: 12,
@@ -199,9 +199,9 @@ export function RecentAuthModal({
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 600,
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                color: '#FFFFFF',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#F1F5F9',
+                color: '#1D1D1F',
+                border: '1px solid #CBD5E1',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 minHeight: 44,
               }}
@@ -216,13 +216,13 @@ export function RecentAuthModal({
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 700,
-                backgroundColor: '#A855F7',
+                backgroundColor: '#7C3AED',
                 color: '#FFFFFF',
                 border: 'none',
                 cursor: loading || !password ? 'not-allowed' : 'pointer',
                 opacity: loading || !password ? 0.6 : 1,
                 minHeight: 44,
-                boxShadow: '0 4px 16px rgba(168, 85, 247, 0.4)',
+                boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)',
               }}
             >
               {loading ? 'Verifying...' : 'Verify & Continue'}

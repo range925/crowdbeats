@@ -221,11 +221,11 @@ describe('Theme Switching Without Form Reset', () => {
     expect(emailInput.value).toBe('musician@crowdbeats.ai');
     expect(passwordInput.value).toBe('SecretKey2026!');
 
-    // Switch to Dark theme
+    // Attempt switch to Dark theme — web light mode policy locks resolved theme to light
     act(() => {
       darkBtn.click();
     });
-    expect(themeEl.textContent).toBe('dark');
+    expect(themeEl.textContent).toBe('light');
     expect(emailInput.value).toBe('musician@crowdbeats.ai');
     expect(passwordInput.value).toBe('SecretKey2026!');
 

@@ -8,10 +8,9 @@ import { DataExportCard } from '@/components/settings/DataExportCard';
 import { SettingsToggle } from '@/components/settings/SettingsToggle';
 
 const CARD: React.CSSProperties = {
-  backgroundColor: 'rgba(18, 20, 28, 0.75)',
-  backdropFilter: 'blur(16px)',
-  boxShadow: '0 8px 32px -4px rgba(0, 0, 0, 0.35)',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  backgroundColor: 'var(--cb-surface-card, #FFFFFF)',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+  border: '1px solid var(--cb-border-subtle, #E5E5EA)',
   borderRadius: 16,
   padding: 20,
   marginBottom: 20,
@@ -45,11 +44,11 @@ export function DataPrivacySection() {
       </div>
 
       {/* Telemetry */}
-      <div style={CARD}>
+      <div className="cb-account-card" style={CARD}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Telemetry & Analytics</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary, #94A3B8)', marginTop: 2 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--cb-text-primary, #1D1D1F)' }}>Telemetry & Analytics</div>
+            <div style={{ fontSize: 12, color: 'var(--cb-text-secondary, #6E6E73)', marginTop: 2 }}>
               Share anonymized usage logs to help us prevent stream dropouts and resolve tip delivery latencies.
             </div>
           </div>
@@ -62,9 +61,9 @@ export function DataPrivacySection() {
       </div>
 
       {/* Retention Schedule */}
-      <div style={CARD}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF', margin: '0 0 6px' }}>Data Retention & Ledger Policy</h3>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary, #94A3B8)', lineHeight: 1.5, marginBottom: 14 }}>
+      <div className="cb-account-card" style={CARD}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--cb-text-primary, #1D1D1F)', margin: '0 0 6px' }}>Data Retention & Ledger Policy</h3>
+        <p style={{ fontSize: 13, color: 'var(--cb-text-secondary, #6E6E73)', lineHeight: 1.5, marginBottom: 14 }}>
           In accordance with financial banking and IRS 1099 regulations, immutable cryptographic transaction logs (tips, escrow releases, refunds) are maintained for 7 years. All other telemetry, GPS radar beacons, and temporary listening caches can be erased upon request.
         </p>
         <Link

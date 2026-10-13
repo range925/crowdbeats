@@ -10,10 +10,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getSessionCookie } from '@/lib/session';
 import { ROLE_TO_PERSONA, SIGNUP_INTENT_KEY, isSignupRole } from '@/components/landing/v3/signupIntent';
-
+import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 import { RoleCard } from '@/components/onboarding/OnboardingSharedComponents';
 
 const PERSONAS = [
@@ -116,46 +117,18 @@ export default function PersonaPickerPage() {
       alignItems:     'flex-start',
       justifyContent: 'center',
       padding:        '56px 16px 80px',
-      background:     '#000000',
+      background:     'var(--cb-bg-app, #FBFBFD)',
     }}>
       <div style={{ width: '100%', maxWidth: 580 }}>
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                backgroundColor: '#7C3AED',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 3px 10px rgba(124, 58, 237, 0.35)',
-              }}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12" stroke="#2DD4BF" strokeWidth="2.5" strokeLinecap="round"/>
-                <circle cx="12" cy="12" r="2" fill="#2DD4BF"/>
-                <path d="M12 14V18" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span
-              style={{
-                fontFamily: 'var(--cb-font-display)',
-                fontWeight: 700,
-                fontSize: 20,
-                letterSpacing: '-0.024em',
-                color: '#F5F5F7',
-              }}
-            >
-              Crowdbeats
-            </span>
-          </div>
-          <h1 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 28, fontWeight: 700, color: '#F5F5F7', margin: '0 0 8px', letterSpacing: '-0.024em' }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', marginBottom: 16 }} aria-label="Crowdbeats home">
+            <CrowdbeatsLogo variant="horizontal" height={32} surface="light" ariaHidden />
+          </Link>
+          <h1 style={{ fontFamily: 'var(--cb-font-display)', fontSize: 28, fontWeight: 700, color: 'var(--cb-text-primary, #0A0A0B)', margin: '0 0 8px', letterSpacing: '-0.024em' }}>
             How will you use Crowdbeats?
           </h1>
-          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 15, color: '#86868B', margin: 0, lineHeight: 1.5, letterSpacing: '-0.012em' }}>
+          <p style={{ fontFamily: 'var(--cb-font-body)', fontSize: 15, color: 'var(--cb-text-secondary, #64748B)', margin: 0, lineHeight: 1.5, letterSpacing: '-0.012em' }}>
             Choose your primary experience. You can always configure additional roles later from your settings.
           </p>
         </div>
@@ -189,9 +162,9 @@ export default function PersonaPickerPage() {
               width:        '100%',
               minHeight:    48,
               borderRadius: 9999,
-              border:       selected ? '1px solid #333333' : 'none',
-              background:   selected ? '#000000' : 'rgba(255, 255, 255, 0.08)',
-              color:        selected ? '#FFFFFF' : '#6E6E73',
+              border:       selected ? '1px solid #000000' : 'none',
+              background:   selected ? '#000000' : 'var(--cb-surface-3, #E2E8F0)',
+              color:        selected ? '#FFFFFF' : 'var(--cb-text-muted, #94A3B8)',
               fontSize:     15,
               fontWeight:   600,
               fontFamily:   'var(--cb-font-display)',

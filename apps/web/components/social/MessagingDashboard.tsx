@@ -682,55 +682,55 @@ export function MessagingDashboard({
 
       {/* Recipient Message Settings Modal */}
       {showSettingsModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: '#1A1D28', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: 16, padding: 28, width: 440, maxWidth: '90vw' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 8px', color: '#FFFFFF' }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
+          <div style={{ backgroundColor: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))', borderRadius: 16, padding: 28, width: 440, maxWidth: '90vw', boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 8px', color: 'var(--text-primary, #1D1D1F)' }}>
               Message Control Settings
             </h2>
-            <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.6)', marginBottom: 20 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #6E6E73)', marginBottom: 20 }}>
               Control who can send you message requests and pause incoming messages.
             </p>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', color: '#FFFFFF', fontSize: 14, fontWeight: 600 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', color: 'var(--text-primary, #1D1D1F)', fontSize: 14, fontWeight: 600 }}>
                 <input
                   type="checkbox"
                   checked={settings.pauseMessages}
                   onChange={(e) => setSettings({ ...settings, pauseMessages: e.target.checked })}
-                  style={{ width: 18, height: 18 }}
+                  style={{ width: 18, height: 18, accentColor: '#7C3AED' }}
                 />
                 Pause all incoming message requests
               </label>
-              <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.5)', marginTop: 4, marginLeft: 28 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary, #6E6E73)', marginTop: 4, marginLeft: 28 }}>
                 When enabled, nobody can start a new message thread with you. Existing chats remain open.
               </div>
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#FFFFFF', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 8 }}>
                 Who can send message requests?
               </label>
               <select
                 value={settings.eligibility}
                 onChange={(e) => setSettings({ ...settings, eligibility: e.target.value as any })}
-                style={{ width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '10px 14px', borderRadius: 8, fontSize: 14, outline: 'none', minHeight: 44 }}
+                style={{ width: '100%', backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1D1D1F', padding: '10px 14px', borderRadius: 8, fontSize: 14, outline: 'none', minHeight: 44 }}
               >
-                <option value="everyone_eligible" style={{ background: '#1A1D28' }}>Everyone who follows you</option>
-                <option value="following_or_followers" style={{ background: '#1A1D28' }}>People I follow or who follow me</option>
-                <option value="mutual_only" style={{ background: '#1A1D28' }}>Mutual follows only</option>
+                <option value="everyone_eligible">Everyone who follows you</option>
+                <option value="following_or_followers">People I follow or who follow me</option>
+                <option value="mutual_only">Mutual follows only</option>
               </select>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
               <button
                 onClick={() => setShowSettingsModal(false)}
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', border: 'none', color: '#FFFFFF', padding: '8px 16px', borderRadius: 8, fontSize: 13, cursor: 'pointer', minHeight: 40 }}
+                style={{ backgroundColor: '#F1F5F9', border: '1px solid #CBD5E1', color: '#1D1D1F', padding: '8px 16px', borderRadius: 8, fontSize: 13, cursor: 'pointer', minHeight: 40 }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveSettings}
-                style={{ backgroundColor: '#6366F1', border: 'none', color: '#FFFFFF', padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', minHeight: 40 }}
+                style={{ backgroundColor: '#7C3AED', border: 'none', color: '#FFFFFF', padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', minHeight: 40, boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)' }}
               >
                 Save Changes
               </button>
@@ -741,35 +741,35 @@ export function MessagingDashboard({
 
       {/* Report Modal */}
       {showReportModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: '#1A1D28', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: 16, padding: 28, width: 440, maxWidth: '90vw' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 8px', color: '#FFFFFF' }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
+          <div style={{ backgroundColor: 'var(--surface-card, #FFFFFF)', border: '1px solid var(--border-subtle, rgba(0, 0, 0, 0.10))', borderRadius: 16, padding: 28, width: 440, maxWidth: '90vw', boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 8px', color: 'var(--text-primary, #1D1D1F)' }}>
               Report to Admin Support
             </h2>
-            <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.6)', marginBottom: 20 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #6E6E73)', marginBottom: 20 }}>
               Recent messages will be securely snapshotted as evidence for the moderation team.
             </p>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#FFFFFF', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
                 Reason
               </label>
               <select
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                style={{ width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '10px 14px', borderRadius: 8, fontSize: 14, minHeight: 44 }}
+                style={{ width: '100%', backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1D1D1F', padding: '10px 14px', borderRadius: 8, fontSize: 14, minHeight: 44 }}
               >
-                <option value="harassment" style={{ background: '#1A1D28' }}>Harassment or Bullying</option>
-                <option value="spam" style={{ background: '#1A1D28' }}>Spam or Scam</option>
-                <option value="hate_speech" style={{ background: '#1A1D28' }}>Hate Speech</option>
-                <option value="violence" style={{ background: '#1A1D28' }}>Threats or Violence</option>
-                <option value="impersonation" style={{ background: '#1A1D28' }}>Impersonation</option>
-                <option value="other" style={{ background: '#1A1D28' }}>Other Violation</option>
+                <option value="harassment">Harassment or Bullying</option>
+                <option value="spam">Spam or Scam</option>
+                <option value="hate_speech">Hate Speech</option>
+                <option value="violence">Threats or Violence</option>
+                <option value="impersonation">Impersonation</option>
+                <option value="other">Other Violation</option>
               </select>
             </div>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#FFFFFF', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-primary, #1D1D1F)', marginBottom: 6 }}>
                 Description (Optional)
               </label>
               <textarea
@@ -777,20 +777,20 @@ export function MessagingDashboard({
                 onChange={(e) => setReportDescription(e.target.value)}
                 placeholder="Provide additional context for support staff..."
                 rows={3}
-                style={{ width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#FFFFFF', padding: '10px 14px', borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
+                style={{ width: '100%', backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1D1D1F', padding: '10px 14px', borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
               <button
                 onClick={() => setShowReportModal(false)}
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', border: 'none', color: '#FFFFFF', padding: '8px 16px', borderRadius: 8, fontSize: 13, cursor: 'pointer', minHeight: 40 }}
+                style={{ backgroundColor: '#F1F5F9', border: '1px solid #CBD5E1', color: '#1D1D1F', padding: '8px 16px', borderRadius: 8, fontSize: 13, cursor: 'pointer', minHeight: 40 }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleRespondToRequest('report')}
-                style={{ backgroundColor: '#EF4444', border: 'none', color: '#FFFFFF', padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', minHeight: 40 }}
+                style={{ backgroundColor: '#DC2626', border: 'none', color: '#FFFFFF', padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', minHeight: 40, boxShadow: '0 4px 14px rgba(220, 38, 38, 0.35)' }}
               >
                 Submit Report
               </button>

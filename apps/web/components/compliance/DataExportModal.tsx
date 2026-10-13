@@ -57,7 +57,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         zIndex: 9999,
@@ -73,27 +73,27 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
     >
       <div
         style={{
-          backgroundColor: isPreviewMode ? '#0F172A' : '#151722',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid var(--cb-border-subtle, rgba(0, 0, 0, 0.10))',
           borderRadius: 18,
           width: '100%',
           maxWidth: isPreviewMode ? 940 : 540,
           maxHeight: '90vh',
           overflowY: 'auto',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.75)',
-          color: '#FFFFFF',
+          boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.15)',
+          color: 'var(--cb-text-primary, #1D1D1F)',
           transition: 'all 0.2s ease',
         }}
       >
         {isPreviewMode && statementData ? (
           <div>
-            <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '12px 20px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button
                 onClick={() => setIsPreviewMode(false)}
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #CBD5E1',
+                  color: '#1D1D1F',
                   padding: '6px 12px',
                   borderRadius: 6,
                   fontSize: 12,
@@ -107,7 +107,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 onClick={onClose}
                 style={{
                   backgroundColor: 'transparent',
-                  color: '#94A3B8',
+                  color: '#64748B',
                   border: 'none',
                   fontSize: 18,
                   cursor: 'pointer',
@@ -127,11 +127,11 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <span style={{ fontSize: 22 }}>📥</span>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#1D1D1F' }}>
                     Download Data & Tax Statement
                   </h3>
                 </div>
-                <p style={{ color: '#94A3B8', fontSize: 13, margin: 0 }}>
+                <p style={{ color: '#6E6E73', fontSize: 13, margin: 0 }}>
                   Official CCPA / GDPR Data Archive, tip receipts, creator earnings, and IRS tax records.
                 </p>
               </div>
@@ -140,7 +140,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#94A3B8',
+                  color: '#64748B',
                   fontSize: 20,
                   cursor: 'pointer',
                   padding: 4,
@@ -152,7 +152,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
 
             {/* Select Tax Year */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#1D1D1F', marginBottom: 8 }}>
                 Select Tax & Reporting Year
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
@@ -164,9 +164,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                     style={{
                       padding: '12px 10px',
                       borderRadius: 10,
-                      border: selectedYear === year ? '1.5px solid #7C3AED' : '1px solid rgba(255, 255, 255, 0.12)',
-                      backgroundColor: selectedYear === year ? 'rgba(124, 58, 237, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                      color: selectedYear === year ? '#FFFFFF' : '#94A3B8',
+                      border: selectedYear === year ? '1.5px solid #7C3AED' : '1px solid rgba(0, 0, 0, 0.10)',
+                      backgroundColor: selectedYear === year ? 'rgba(124, 58, 237, 0.08)' : 'rgba(0, 0, 0, 0.03)',
+                      color: selectedYear === year ? '#7C3AED' : '#475569',
                       fontWeight: selectedYear === year ? 700 : 500,
                       fontSize: 14,
                       cursor: 'pointer',
@@ -182,17 +182,17 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             {/* Document Details Box */}
             <div
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
                 borderRadius: 12,
                 padding: '16px',
                 marginBottom: 24,
                 fontSize: 12,
                 lineHeight: 1.6,
-                color: '#94A3B8',
+                color: '#475569',
               }}
             >
-              <div style={{ fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>
+              <div style={{ fontWeight: 700, color: '#0F172A', marginBottom: 4 }}>
                 What will be generated in your statement:
               </div>
               <ul style={{ paddingLeft: 16, margin: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -218,7 +218,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                   fontSize: 14,
                   border: 'none',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(124, 58, 237, 0.4)',
+                  boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -235,9 +235,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 style={{
                   padding: '12px 20px',
                   borderRadius: 10,
-                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: '#FFFFFF',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#1D1D1F',
                   fontWeight: 600,
                   fontSize: 13,
                   cursor: 'pointer',

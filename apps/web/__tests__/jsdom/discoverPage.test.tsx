@@ -19,6 +19,7 @@ jest.mock('next/navigation', () => ({
     replace: jest.fn(),
   }),
   useSearchParams: () => mockSearchParams,
+  usePathname: () => '/discover',
 }));
 
 jest.mock('@/hooks/useLivePerformers', () => ({

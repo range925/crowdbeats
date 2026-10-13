@@ -26,7 +26,7 @@ function SectionPlaceholder({ id }: { id: string }) {
       style={{
         padding: '60px 24px',
         textAlign: 'center',
-        color: 'var(--cb-text-muted, #64748B)',
+        color: 'var(--cb-text-muted, #636366)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -39,17 +39,17 @@ function SectionPlaceholder({ id }: { id: string }) {
           width: 44,
           height: 44,
           borderRadius: 12,
-          backgroundColor: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          backgroundColor: 'var(--cb-surface-2, #F4F4F6)',
+          border: '1px solid var(--cb-border-subtle, rgba(0, 0, 0, 0.08))',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'var(--cb-purple-light, #A855F7)',
+          color: 'var(--cb-brand-primary, #7C3AED)',
         }}
       >
-        <div className="cb-spin" style={{ width: 18, height: 18, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#A855F7', borderRadius: '50%' }} />
+        <div className="cb-spin" style={{ width: 18, height: 18, border: '2px solid rgba(0, 0, 0, 0.1)', borderTopColor: '#7C3AED', borderRadius: '50%' }} />
       </div>
-      <div style={{ fontSize: 13, fontWeight: 600 }}>Loading {id} settings…</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--cb-text-primary, #1D1D1F)' }}>Loading {id} settings…</div>
     </div>
   );
 }
@@ -114,7 +114,7 @@ const SECTION_DESCRIPTIONS: Record<SectionId, { title: string; subtitle: string;
   payouts: { title: 'Payouts & Banking', subtitle: 'Stripe Connect direct deposit routing for verified creators and venues', category: 'Financials & Monetization' },
   notifications: { title: 'Notifications', subtitle: 'Live stage callouts, tip receipt delivery, and digest schedules', category: 'Preferences' },
   location: { title: 'Location & Radar', subtitle: 'Background stage proximity detection and privacy radius', category: 'Preferences' },
-  appearance: { title: 'Appearance & Themes', subtitle: 'Customize visual theme and interface preview tokens', category: 'Preferences' },
+  appearance: { title: 'Appearance & Themes', subtitle: 'Standardized light mode and interface design tokens', category: 'Preferences' },
   accessibility: { title: 'Accessibility', subtitle: 'Reduce motion, high-contrast modes, and screen reader announcements', category: 'Preferences' },
   language: { title: 'Language & Region', subtitle: 'Timezone localization, date formatting, and regional currencies', category: 'Preferences' },
   content: { title: 'Content Preferences', subtitle: 'Favorite music genres, maturity filters, and track auto-play', category: 'Preferences' },
@@ -175,8 +175,8 @@ function AccountCenterInner() {
         .cb-account-shell {
           display: flex;
           min-height: 100vh;
-          background-color: var(--cb-bg-app, #050507);
-          color: var(--cb-text-primary, #FFFFFF);
+          background-color: var(--cb-surface-canvas, #FBFBFD);
+          color: var(--cb-text-primary, #1D1D1F);
           font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
           position: relative;
         }
@@ -185,10 +185,10 @@ function AccountCenterInner() {
         .cb-account-nav-pane {
           width: 330px;
           flex-shrink: 0;
-          border-right: 1px solid rgba(255, 255, 255, 0.06);
+          border-right: 1px solid var(--cb-border-subtle, #E5E5EA);
           display: flex;
           flex-direction: column;
-          background: #090A0E;
+          background: var(--cb-surface-card, #FFFFFF);
           position: sticky;
           top: 0;
           height: 100vh;
@@ -202,12 +202,49 @@ function AccountCenterInner() {
           display: flex;
           flex-direction: column;
           align-items: center;
+          background-color: var(--cb-surface-canvas, #FBFBFD);
+          color: var(--cb-text-primary, #1D1D1F);
         }
 
         .cb-account-content-inner {
           width: 100%;
           max-width: 760px;
           padding: 40px 32px 80px;
+        }
+
+        .cb-account-shell h1,
+        .cb-account-shell h2,
+        .cb-account-shell h3,
+        .cb-account-shell h4 {
+          color: var(--cb-text-primary, #1D1D1F);
+        }
+
+        /* Standardize any legacy dark card backgrounds to crisp light mode */
+        .cb-account-content-pane [style*="18, 20, 28"],
+        .cb-account-content-pane [style*="rgb(18, 20, 28)"],
+        .cb-account-content-pane [style*="rgba(18, 20, 28"] {
+          background-color: var(--cb-surface-card, #FFFFFF) !important;
+          border-color: var(--cb-border-subtle, #E5E5EA) !important;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+          color: var(--cb-text-primary, #1D1D1F) !important;
+        }
+
+        .cb-account-content-pane [style*="color: #FFFFFF"],
+        .cb-account-content-pane [style*="color: rgb(255, 255, 255)"],
+        .cb-account-content-pane [style*="color: var(--text-primary, #FFFFFF)"] {
+          color: var(--cb-text-primary, #1D1D1F) !important;
+        }
+
+        .cb-account-content-pane [style*="color: var(--text-secondary, #94A3B8)"],
+        .cb-account-content-pane [style*="color: var(--cb-text-secondary, #94A3B8)"] {
+          color: var(--cb-text-secondary, #6E6E73) !important;
+        }
+
+        .cb-account-content-pane [style*="rgba(255, 255, 255, 0.04)"],
+        .cb-account-content-pane [style*="rgba(255, 255, 255, 0.05)"],
+        .cb-account-content-pane [style*="rgba(255, 255, 255, 0.08)"],
+        .cb-account-content-pane [style*="rgba(43,45,68,0.4)"] {
+          border-color: var(--cb-border-subtle, #E5E5EA) !important;
         }
 
         /* Mobile Viewport Adaptations */
@@ -263,21 +300,23 @@ function AccountCenterInner() {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 16px',
-              backgroundColor: 'rgba(9, 10, 14, 0.85)',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
               backdropFilter: 'blur(16px)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              WebkitBackdropFilter: 'blur(16px)',
+              borderBottom: '1px solid var(--cb-border-subtle, #E5E5EA)',
             }}
           >
             <button
               type="button"
               onClick={handleBack}
+              aria-label="Return to settings list"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
                 background: 'none',
                 border: 'none',
-                color: 'var(--cb-purple-light, #A855F7)',
+                color: 'var(--cb-brand-primary, #7C3AED)',
                 fontSize: 14,
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -288,7 +327,7 @@ function AccountCenterInner() {
               <ChevronLeftIcon size={18} />
               Settings
             </button>
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--cb-text-primary, #1D1D1F)' }}>
               {currentMeta.title}
             </span>
             <div style={{ width: 44 }} />
@@ -311,7 +350,7 @@ function AccountCenterInner() {
             >
               <span>Account Center</span>
               <span>/</span>
-              <span style={{ color: 'var(--cb-purple-light, #A855F7)' }}>{currentMeta.category}</span>
+              <span style={{ color: 'var(--cb-brand-primary, #7C3AED)' }}>{currentMeta.category}</span>
             </div>
 
             {/* Section Header Title & Subtitle */}
@@ -321,7 +360,7 @@ function AccountCenterInner() {
                   fontSize: 26,
                   fontWeight: 800,
                   letterSpacing: '-0.025em',
-                  color: '#FFFFFF',
+                  color: 'var(--cb-text-primary, #1D1D1F)',
                   margin: '0 0 6px',
                 }}
               >
@@ -330,7 +369,7 @@ function AccountCenterInner() {
               <p
                 style={{
                   fontSize: 14,
-                  color: 'var(--cb-text-secondary, #94A3B8)',
+                  color: 'var(--cb-text-secondary, #6E6E73)',
                   lineHeight: 1.5,
                   margin: 0,
                 }}
@@ -354,7 +393,7 @@ export default function AccountPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#050507', color: '#94A3B8', fontSize: 14 }}>
+        <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--cb-surface-canvas, #FBFBFD)', color: 'var(--cb-text-secondary, #6E6E73)', fontSize: 14 }}>
           Loading Crowdbeats Account Center…
         </div>
       }

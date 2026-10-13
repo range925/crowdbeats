@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import type { AuthSession } from '@crowdbeats/contracts';
@@ -65,8 +65,8 @@ export function SuspiciousActivityModal({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(16px)',
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
+        backdropFilter: 'blur(12px)',
         zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
@@ -81,11 +81,11 @@ export function SuspiciousActivityModal({
         style={{
           width: '100%',
           maxWidth: 480,
-          backgroundColor: '#12141C',
+          backgroundColor: 'var(--surface-card, #FFFFFF)',
           border: '1px solid rgba(239, 68, 68, 0.3)',
           borderRadius: 20,
           padding: 24,
-          boxShadow: '0 24px 64px -12px rgba(239, 68, 68, 0.3), 0 0 0 1px rgba(239, 68, 68, 0.2)',
+          boxShadow: '0 20px 40px -10px rgba(239, 68, 68, 0.15)',
         }}
       >
         {step === 'confirm' && (
@@ -97,12 +97,12 @@ export function SuspiciousActivityModal({
                   width: 44,
                   height: 44,
                   borderRadius: 12,
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.12)',
                   border: '1px solid rgba(239, 68, 68, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#EF4444',
+                  color: '#DC2626',
                   flexShrink: 0,
                 }}
               >
@@ -113,33 +113,33 @@ export function SuspiciousActivityModal({
                 </svg>
               </div>
               <div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary, #1D1D1F)', margin: 0 }}>
                   Did you recognize this login?
                 </h3>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Suspicious Activity Verification
                 </span>
               </div>
             </div>
 
-            <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.5, margin: '0 0 16px' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #6E6E73)', lineHeight: 1.5, margin: '0 0 16px' }}>
               If this wasn't you, we will immediately terminate this session and guide you through securing your account.
             </p>
 
             {/* Session details card */}
             <div
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FEE2E2',
                 borderRadius: 12,
                 padding: 14,
                 marginBottom: 16,
               }}
             >
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF', marginBottom: 4 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#991B1B', marginBottom: 4 }}>
                 {session.device}
               </div>
-              <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.6)', lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, color: '#4B5563', lineHeight: 1.6 }}>
                 <div><strong>Browser / App:</strong> {session.browser}</div>
                 <div><strong>Approximate Location:</strong> {session.approxLocation}</div>
                 <div><strong>Last Active:</strong> {session.lastActive}</div>
@@ -155,20 +155,20 @@ export function SuspiciousActivityModal({
                 cursor: 'pointer',
                 marginBottom: 20,
                 fontSize: 13,
-                color: 'rgba(255, 255, 255, 0.85)',
+                color: 'var(--text-primary, #1D1D1F)',
               }}
             >
               <input
                 type="checkbox"
                 checked={revokeAllOthers}
                 onChange={(e) => setRevokeAllOthers(e.target.checked)}
-                style={{ width: 16, height: 16, accentColor: '#EF4444' }}
+                style={{ width: 16, height: 16, accentColor: '#DC2626' }}
               />
               <span>Also sign out of all other devices except this one (Recommended)</span>
             </label>
 
             {error && (
-              <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#F87171', fontSize: 13, marginBottom: 16 }}>
+              <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: 'rgba(239, 68, 68, 0.10)', color: '#DC2626', fontSize: 13, marginBottom: 16 }}>
                 {error}
               </div>
             )}
@@ -182,9 +182,9 @@ export function SuspiciousActivityModal({
                   borderRadius: 10,
                   fontSize: 13,
                   fontWeight: 600,
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  color: '#FFFFFF',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#F1F5F9',
+                  color: '#1D1D1F',
+                  border: '1px solid #CBD5E1',
                   cursor: 'pointer',
                   minHeight: 44,
                 }}
@@ -199,12 +199,12 @@ export function SuspiciousActivityModal({
                   borderRadius: 10,
                   fontSize: 13,
                   fontWeight: 700,
-                  backgroundColor: '#EF4444',
+                  backgroundColor: '#DC2626',
                   color: '#FFFFFF',
                   border: 'none',
                   cursor: 'pointer',
                   minHeight: 44,
-                  boxShadow: '0 4px 16px rgba(239, 68, 68, 0.4)',
+                  boxShadow: '0 4px 14px rgba(220, 38, 38, 0.35)',
                 }}
               >
                 This Wasn't Me — Lock Down
@@ -221,15 +221,15 @@ export function SuspiciousActivityModal({
                 height: 36,
                 borderRadius: '50%',
                 border: '3px solid rgba(239, 68, 68, 0.2)',
-                borderTopColor: '#EF4444',
+                borderTopColor: '#DC2626',
                 margin: '0 auto 16px',
                 animation: 'spin 0.8s linear infinite',
               }}
             />
-            <h4 style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', margin: '0 0 6px' }}>
+            <h4 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary, #1D1D1F)', margin: '0 0 6px' }}>
               Securing Your Account...
             </h4>
-            <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.6)', margin: 0 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #6E6E73)', margin: 0 }}>
               Terminating unrecognized sessions and invalidating refresh tokens.
             </p>
           </div>
@@ -243,12 +243,12 @@ export function SuspiciousActivityModal({
                   width: 44,
                   height: 44,
                   borderRadius: 12,
-                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#10B981',
+                  color: '#059669',
                   flexShrink: 0,
                 }}
               >
@@ -257,16 +257,16 @@ export function SuspiciousActivityModal({
                 </svg>
               </div>
               <div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary, #1D1D1F)', margin: 0 }}>
                   Device Access Terminated
                 </h3>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#10B981', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Account Secured
                 </span>
               </div>
             </div>
 
-            <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.5, marginBottom: 16 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #6E6E73)', lineHeight: 1.5, marginBottom: 16 }}>
               The suspicious session has been revoked and blocked from refreshing. To protect your funds and identity, we strongly recommend completing these steps:
             </p>
 
@@ -277,14 +277,14 @@ export function SuspiciousActivityModal({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '12px 14px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
                   borderRadius: 10,
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>Reset Your Password</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.5)' }}>Ensure unauthorized users cannot re-enter</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1D1D1F' }}>Reset Your Password</div>
+                  <div style={{ fontSize: 11, color: '#64748B' }}>Ensure unauthorized users cannot re-enter</div>
                 </div>
                 <button
                   type="button"
@@ -295,8 +295,8 @@ export function SuspiciousActivityModal({
                     borderRadius: 8,
                     fontSize: 12,
                     fontWeight: 600,
-                    backgroundColor: resetEmailSent ? 'rgba(16, 185, 129, 0.2)' : '#A855F7',
-                    color: resetEmailSent ? '#10B981' : '#FFFFFF',
+                    backgroundColor: resetEmailSent ? 'rgba(16, 185, 129, 0.15)' : '#7C3AED',
+                    color: resetEmailSent ? '#059669' : '#FFFFFF',
                     border: 'none',
                     cursor: resetEmailSent ? 'default' : 'pointer',
                   }}
@@ -308,13 +308,13 @@ export function SuspiciousActivityModal({
               <div
                 style={{
                   padding: '12px 14px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
                   borderRadius: 10,
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>Security Alert Logged</div>
-                <div style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.5)', marginTop: 2 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1D1D1F' }}>Security Alert Logged</div>
+                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
                   A permanent incident audit event has been recorded in your security history.
                 </div>
               </div>
@@ -329,9 +329,9 @@ export function SuspiciousActivityModal({
                   borderRadius: 10,
                   fontSize: 13,
                   fontWeight: 700,
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: '#FFFFFF',
-                  border: 'none',
+                  backgroundColor: '#F1F5F9',
+                  color: '#1D1D1F',
+                  border: '1px solid #CBD5E1',
                   cursor: 'pointer',
                   minHeight: 44,
                 }}

@@ -118,8 +118,10 @@ export const StatementDocumentView: React.FC<StatementDocumentViewProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: '#1E293B',
-            color: '#FFFFFF',
+            backgroundColor: '#F8FAFC',
+            color: '#0F172A',
+            border: '1px solid #E2E8F0',
+            borderBottom: 'none',
             padding: '14px 20px',
             borderRadius: '12px 12px 0 0',
             marginBottom: 0,
@@ -129,13 +131,13 @@ export const StatementDocumentView: React.FC<StatementDocumentViewProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 18 }}>📄</span>
-            <span style={{ fontWeight: 700, fontSize: 14 }}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
               Official Statement & IRS Compliance Export
             </span>
             <span
               style={{
-                backgroundColor: 'rgba(56, 189, 248, 0.2)',
-                color: '#38BDF8',
+                backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                color: '#0284C7',
                 fontSize: 11,
                 fontWeight: 700,
                 padding: '2px 8px',
@@ -161,7 +163,7 @@ export const StatementDocumentView: React.FC<StatementDocumentViewProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.4)',
+                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.35)',
               }}
             >
               <span>🖨️</span>
@@ -171,9 +173,9 @@ export const StatementDocumentView: React.FC<StatementDocumentViewProps> = ({
             <button
               onClick={handleDownloadCSV}
               style={{
-                backgroundColor: '#334155',
-                color: '#E2E8F0',
-                border: '1px solid #475569',
+                backgroundColor: '#FFFFFF',
+                color: '#1E293B',
+                border: '1px solid #CBD5E1',
                 borderRadius: 8,
                 padding: '8px 12px',
                 fontSize: 13,
@@ -187,9 +189,9 @@ export const StatementDocumentView: React.FC<StatementDocumentViewProps> = ({
             <button
               onClick={handleDownloadJSON}
               style={{
-                backgroundColor: '#334155',
-                color: '#E2E8F0',
-                border: '1px solid #475569',
+                backgroundColor: '#FFFFFF',
+                color: '#1E293B',
+                border: '1px solid #CBD5E1',
                 borderRadius: 8,
                 padding: '8px 12px',
                 fontSize: 13,
@@ -205,7 +207,7 @@ export const StatementDocumentView: React.FC<StatementDocumentViewProps> = ({
                 onClick={onClose}
                 style={{
                   backgroundColor: 'transparent',
-                  color: '#94A3B8',
+                  color: '#64748B',
                   border: 'none',
                   fontSize: 18,
                   cursor: 'pointer',

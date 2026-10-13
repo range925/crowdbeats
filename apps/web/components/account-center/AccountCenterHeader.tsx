@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { CrowdbeatsLogo } from '@/components/ui/CbLogo';
 import { CheckIcon, SparklesIcon, MicIcon, BuildingIcon, MusicIcon, ShieldIcon, RadarIcon } from './AccountCenterIcons';
 
 interface AccountCenterHeaderProps {
@@ -194,10 +195,10 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
     <div
       style={{
         padding: '20px 18px 18px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.08))',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%)',
+        background: 'var(--cb-surface-1, #FFFFFF)',
       }}
     >
       {/* Ambient background glow tailored to persona */}
@@ -210,11 +211,38 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
           height: 140,
           borderRadius: '50%',
           background: config.accent,
-          opacity: 0.12,
+          opacity: 0.08,
           filter: 'blur(36px)',
           pointerEvents: 'none',
         }}
       />
+
+      {/* Brand Navigation Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, position: 'relative', zIndex: 2 }}>
+        <Link href="/" aria-label="Crowdbeats home" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>
+          <CrowdbeatsLogo variant="horizontal" height={20} surface="light" ariaHidden />
+        </Link>
+        <Link
+          href="/"
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--cb-text-secondary, #6E6E73)',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '4px 10px',
+            minHeight: 32,
+            borderRadius: 6,
+            background: 'rgba(0, 0, 0, 0.04)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
+            transition: 'background-color 0.15s ease',
+          }}
+        >
+          Exit to App ↗
+        </Link>
+      </div>
 
       {/* Profile Card Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14, position: 'relative' }}>
@@ -259,8 +287,8 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
               width: 18,
               height: 18,
               borderRadius: '50%',
-              backgroundColor: '#10B981',
-              border: '2px solid #0B0C10',
+              backgroundColor: '#059669',
+              border: '2px solid #FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -279,7 +307,7 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
               style={{
                 fontSize: 15,
                 fontWeight: 700,
-                color: '#FFFFFF',
+                color: 'var(--cb-text-primary, #1D1D1F)',
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -293,7 +321,7 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
           <div
             style={{
               fontSize: 12,
-              color: 'var(--cb-text-secondary, #94A3B8)',
+              color: 'var(--cb-text-secondary, #6E6E73)',
               marginTop: 1,
               marginBottom: 5,
               whiteSpace: 'nowrap',
@@ -328,8 +356,8 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
       <div
         style={{
           borderRadius: 10,
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--cb-surface-2, #F4F4F6)',
+          border: '1px solid var(--cb-border-subtle, rgba(0,0,0,0.06))',
           padding: '8px 12px',
           marginBottom: 12,
           display: 'flex',
@@ -339,10 +367,10 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
       >
         {config.highlights.map((h, i) => (
           <div key={h.label} style={{ flex: 1, textAlign: i === 0 ? 'left' : 'right' }}>
-            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--cb-text-muted, #64748B)', fontWeight: 700 }}>
+            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--cb-text-muted, #636366)', fontWeight: 700 }}>
               {h.label}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF', marginTop: 1 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--cb-text-primary, #1D1D1F)', marginTop: 1 }}>
               {h.value}
             </div>
           </div>
@@ -352,14 +380,14 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
       {/* Account Completeness Progress */}
       <div style={{ marginBottom: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5 }}>
-          <span style={{ color: 'var(--cb-text-secondary, #94A3B8)' }}>Profile Completeness</span>
-          <span style={{ color: '#FFFFFF', fontWeight: 700 }}>{completeness}%</span>
+          <span style={{ color: 'var(--cb-text-secondary, #6E6E73)' }}>Profile Completeness</span>
+          <span style={{ color: 'var(--cb-text-primary, #1D1D1F)', fontWeight: 700 }}>{completeness}%</span>
         </div>
         <div
           style={{
-            height: 4,
-            borderRadius: 2,
-            backgroundColor: 'rgba(255,255,255,0.06)',
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: '#E5E5EA',
             overflow: 'hidden',
           }}
         >
@@ -368,7 +396,7 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
               height: '100%',
               width: `${completeness}%`,
               background: `linear-gradient(90deg, ${config.accent} 0%, #7C3AED 100%)`,
-              borderRadius: 2,
+              borderRadius: 3,
               transition: 'width 0.4s ease',
             }}
           />
@@ -387,13 +415,14 @@ export function AccountCenterHeader({ onEditProfile }: AccountCenterHeaderProps)
             fontWeight: 700,
             color: config.accent,
             textDecoration: 'none',
-            padding: '4px 0',
+            padding: '6px 0',
+            minHeight: 28,
             transition: 'opacity 0.15s ease',
           }}
         >
           Edit Studio EPK →
         </Link>
-        <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #64748B)' }}>
+        <span style={{ fontSize: 11, color: 'var(--cb-text-muted, #636366)' }}>
           ID: {auth.uid ? `${auth.uid.slice(0, 6)}...` : 'demo'}
         </span>
       </div>

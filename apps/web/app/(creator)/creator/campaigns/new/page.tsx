@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Crowdbeats V2 — Multi-step Campaign Creator Wizard (Phase 7)
  * 'use client' wizard: Step 1 Basics -> Step 2 Reward Tiers -> Step 3 Review & Create.
  */
@@ -140,23 +140,23 @@ export default function NewCampaignPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>Campaign Title</label>
-            <input type="text" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Debut Studio LP Pressing & Vinyl Run" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 14 }} />
+            <input type="text" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Debut Studio LP Pressing & Vinyl Run" style={{ width: '100%', minHeight: 48, padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, boxSizing: 'border-box' }} />
           </div>
 
           <div>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>Description (min 50 chars)</label>
-            <textarea rows={5} maxLength={5000} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Explain your project, what the funds will be used for, and why fans should back it..." style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 14, resize: 'vertical' }} />
+            <textarea rows={5} maxLength={5000} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Explain your project, what the funds will be used for, and why fans should back it..." style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, resize: 'vertical', boxSizing: 'border-box' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>Funding Goal (USD $)</label>
-              <input type="number" min="10" max="10000" value={goalDollar} onChange={(e) => setGoalDollar(e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 14 }} />
+              <input type="number" min="10" max="10000" value={goalDollar} onChange={(e) => setGoalDollar(e.target.value)} style={{ width: '100%', minHeight: 48, padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, boxSizing: 'border-box' }} />
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>Duration (Days)</label>
-              <select value={deadlineDays} onChange={(e) => setDeadlineDays(e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 14 }}>
+              <select value={deadlineDays} onChange={(e) => setDeadlineDays(e.target.value)} style={{ width: '100%', minHeight: 48, padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, boxSizing: 'border-box' }}>
                 <option value="14">14 Days</option>
                 <option value="30">30 Days</option>
                 <option value="45">45 Days</option>
@@ -183,11 +183,11 @@ export default function NewCampaignPage() {
 
           <div style={{ background: 'var(--surface-raised)', padding: 16, borderRadius: 8, border: '1px dashed var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
             <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-secondary)' }}>+ Add Reward Tier</div>
-            <input type="text" placeholder="Tier Title (e.g. Signed Vinyl LP)" value={newTierTitle} onChange={(e) => setNewTierTitle(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 13 }} />
-            <input type="text" placeholder="Description of what backer receives" value={newTierDesc} onChange={(e) => setNewTierDesc(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 13 }} />
+            <input type="text" placeholder="Tier Title (e.g. Signed Vinyl LP)" value={newTierTitle} onChange={(e) => setNewTierTitle(e.target.value)} style={{ padding: '10px 12px', minHeight: 48, borderRadius: 6, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, boxSizing: 'border-box' }} />
+            <input type="text" placeholder="Description of what backer receives" value={newTierDesc} onChange={(e) => setNewTierDesc(e.target.value)} style={{ padding: '10px 12px', minHeight: 48, borderRadius: 6, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <input type="number" min="1" placeholder="Amount ($)" value={newTierAmount} onChange={(e) => setNewTierAmount(e.target.value)} style={{ width: 120, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 13 }} />
-              <button type="button" onClick={addTier} style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Add Tier</button>
+              <input type="number" min="1" placeholder="Amount ($)" value={newTierAmount} onChange={(e) => setNewTierAmount(e.target.value)} style={{ width: 120, minHeight: 48, padding: '10px 12px', borderRadius: 6, border: '1px solid var(--border-subtle)', background: 'var(--surface-card)', color: 'var(--text-primary)', fontSize: 16, boxSizing: 'border-box' }} />
+              <button type="button" onClick={addTier} style={{ minHeight: 48, background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Add Tier</button>
             </div>
           </div>
         </div>
