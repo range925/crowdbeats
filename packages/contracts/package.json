@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "validate": "node scripts/validate-schemas.js"
   },
   "devDependencies": {

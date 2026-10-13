@@ -5,9 +5,9 @@ name: Crowdbeats V2 — Local CI
 
 on:
   push:
-    branches: [main, 'feature/**', 'fix/**']
+    branches: [main, 'feature/**', 'fix/**', 'redesign/**', 'staging']
   pull_request:
-    branches: [main]
+    branches: [main, 'staging']
 
 env:
   NODE_VERSION: '20'
