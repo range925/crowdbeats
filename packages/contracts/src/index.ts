@@ -141,6 +141,9 @@ export * from './campaign/campaignSyncContracts';
 // ─── Security, Fraud & Compliance (Phase 17) ──────────────────────────────
 export * from './security/securityFraudContracts';
 
-export const CONTRACTS_VERSION = '0.30.0-security-fraud-compliance' as const;
+// ─── Financial Oversight & Reconciliation (Phase 18) ───────────────────────
+export * from './financial/financialOversightContracts';
+
+export const CONTRACTS_VERSION = '0.31.0-financial-oversight-reconciliation' as const;
 
 

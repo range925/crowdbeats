@@ -493,9 +493,15 @@ describe('Server-only collections — all client access denied', () => {
     );
   });
 
-  test('❌ SUPER_ADMIN cannot read paymentLedger via client', async () => {
-    const ctx = asStaff('staff-root', 'SUPER_ADMIN');
-    await assertFails(getDoc(doc(ctx.firestore(), 'paymentLedger/entry-001')));
+  test('✅ SUPER_ADMIN and FINANCE_ANALYST can read paymentLedger; fan cannot', async () => {
+    const ctxAdmin = asStaff('staff-root', 'SUPER_ADMIN');
+    await assertSucceeds(getDoc(doc(ctxAdmin.firestore(), 'paymentLedger/entry-001')));
+
+    const ctxFin = asStaff('staff-fin', 'FINANCE_ANALYST');
+    await assertSucceeds(getDoc(doc(ctxFin.firestore(), 'paymentLedger/entry-001')));
+
+    const ctxFan = asFan('fan-alice');
+    await assertFails(getDoc(doc(ctxFan.firestore(), 'paymentLedger/entry-001')));
   });
 
   test('❌ No client can read paymentTransactions', async () => {

@@ -558,7 +558,35 @@ service cloud.firestore {
     // ══════════════════════════════════════════════════════════════════════════
 
     match /paymentLedger/{entryId} {
-      allow read, write: if false;
+      allow read: if isFinanceStaff() || isSuperAdmin();
+      allow write: if false; // Server-only append
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // FINANCIAL RECONCILIATIONS — /financialReconciliations/{reconId} (Phase 18)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /financialReconciliations/{reconId} {
+      allow read: if isFinanceStaff() || isSuperAdmin();
+      allow write: if false; // Server-only via reconciliationService
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // FINANCIAL EXPORTS — /financialExports/{exportId} (Phase 18)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /financialExports/{exportId} {
+      allow read: if (isSignedIn() && resource.data.requestedByUid == uid()) || isFinanceStaff() || isSuperAdmin();
+      allow write: if false; // Server-only via generateFinancialExport
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // PLATFORM FEE RULES — /platformFeeRules/{ruleId} (Phase 18)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /platformFeeRules/{ruleId} {
+      allow read: if isFinanceStaff() || isSuperAdmin();
+      allow write: if false; // Server-only via platformFeeCallables
     }
 
     // ══════════════════════════════════════════════════════════════════════════

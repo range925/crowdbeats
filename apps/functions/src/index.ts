@@ -381,3 +381,9 @@ export {
   getAdminCampaigns,
   getCampaignContributors,
 } from './campaign/campaignSyncCallables.js';
+
+// ─── Financial Oversight & Reconciliation Callables (Phase 18) ───────────────
+export {
+  generateFinancialExportCallable,
+  getFinancialLedgerSummaryCallable,
+} from './financial/financialExportService.js';

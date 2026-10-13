@@ -160,8 +160,8 @@ describe('Phase 17 — Frontend Security, Fraud and Compliance Suite', () => {
   // 4. FRAUD & SECURITY CONTRACTS INTEGRITY
   // ════════════════════════════════════════════════════════════════════════════
   describe('Cross-Platform Security and Fraud Contract Parity', () => {
-    it('synchronizes contracts version with Phase 17 milestone', () => {
-      expect(CONTRACTS_VERSION).toBe('0.30.0-security-fraud-compliance');
+    it('synchronizes contracts version with Phase 17+ milestone', () => {
+      expect(CONTRACTS_VERSION).toMatch(/^0\.(30|31)\./);
     });
 
     it('validates storage media bounds and whitelist contracts', () => {
