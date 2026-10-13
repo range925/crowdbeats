@@ -470,6 +470,10 @@ service cloud.firestore {
         allow read: if isSponsorAdmin(orgId) || isSuperAdmin();
         allow create, update, delete: if false;
       }
+
+      match /shortlists/{recipientId} {
+        allow read, write: if isSponsorMember(orgId);
+      }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -607,10 +611,36 @@ service cloud.firestore {
     match /sponsorships/{sponsorshipId} {
       allow read: if isSignedIn() &&
         (resource.data.recipientId == uid() ||
+         (resource.data.get('recipientType', '') == 'band' && isBandMember(resource.data.recipientId)) ||
          isSponsorMember(resource.data.orgId) ||
          hasPlatformRole('PARTNERSHIPS') ||
+         isUserSupportStaff() ||
          isSuperAdmin());
       allow create, update, delete: if false;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // SPONSOR OPPORTUNITIES — /sponsorOpportunities/{opportunityId} (Phase 13)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /sponsorOpportunities/{opportunityId} {
+      allow read: if isSignedIn();
+      allow write: if isSponsorAdmin(request.resource.data.get('orgId', resource.data.get('orgId', '')));
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // SPONSOR APPLICATIONS — /sponsorApplications/{applicationId} (Phase 13)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    match /sponsorApplications/{applicationId} {
+      allow read: if isSignedIn() &&
+        (resource.data.applicantId == uid() ||
+         (resource.data.get('applicantType', '') == 'band' && isBandMember(resource.data.applicantId)) ||
+         isSponsorMember(resource.data.orgId) ||
+         hasPlatformRole('PARTNERSHIPS') ||
+         isUserSupportStaff() ||
+         isSuperAdmin());
+      allow create, update, delete: if false; // Server-managed only
     }
 
     // ══════════════════════════════════════════════════════════════════════════

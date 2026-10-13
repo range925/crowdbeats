@@ -348,3 +348,20 @@ export {
   sendBandThankYouNoteCallable,
   getBandActivityCallable,
 } from './band/bandCrmCallables.js';
+
+// ─── Sponsor Relationship Management Callables (Phase 13) ─────────────────────
+export {
+  addToSponsorShortlist,
+  removeFromSponsorShortlist,
+  getSponsorShortlist,
+  createSponsorOpportunity,
+  getSponsorOpportunities,
+  submitSponsorshipApplication,
+  reviewSponsorshipApplication,
+  getSponsorApplications,
+  proposeSponsorshipDeal,
+  signSponsorshipContract,
+  updateSponsorshipDeliverable,
+  getSponsorshipDeals,
+  getSponsorshipDealDetails,
+} from './sponsor/sponsorCrmCallables.js';

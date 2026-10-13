@@ -58,16 +58,33 @@ const TALENT_DIRECTORY: Talent[] = [
   },
 ];
 
+import { useOptionalAuth } from '@/lib/hooks/useAuth';
+import { useSponsorShortlist } from '@/lib/sponsor/sponsorCrm';
+
 export default function SponsorDiscoveryPage() {
+  const auth = useOptionalAuth();
+  const orgId = (auth?.user as any)?.orgId || (auth?.user as any)?.sponsorOrgId || 'org_redbull';
+  const { items: shortlistItems, add: addToShortlist, remove: removeFromShortlist } = useSponsorShortlist(orgId);
+
   const [filterGenre, setFilterGenre] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [shortlistedIds, setShortlistedIds] = useState<string[]>([]);
 
-  const toggleShortlist = (id: string) => {
-    if (shortlistedIds.includes(id)) {
-      setShortlistedIds(shortlistedIds.filter((item) => item !== id));
+  const shortlistedIds = shortlistItems.map((item) => item.recipientId);
+
+  const toggleShortlist = async (t: Talent) => {
+    if (shortlistedIds.includes(t.id)) {
+      await removeFromShortlist(t.id);
     } else {
-      setShortlistedIds([...shortlistedIds, id]);
+      await addToShortlist({
+        recipientId: t.id,
+        recipientType: t.type,
+        recipientName: t.name,
+        genre: t.genre,
+        city: t.city,
+        followerCohort: t.followerCohort,
+        engagementRating: t.engagementRating,
+        avgGigTipCents: t.avgGigTipCents,
+      });
     }
   };
 
@@ -170,7 +187,7 @@ export default function SponsorDiscoveryPage() {
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: 8 }}>
                       <button
-                        onClick={() => toggleShortlist(t.id)}
+                        onClick={() => toggleShortlist(t)}
                         style={{
                           background: isShortlisted ? 'var(--accent-secondary)' : 'var(--surface-raised)',
                           color: isShortlisted ? '#fff' : 'var(--text-secondary)',

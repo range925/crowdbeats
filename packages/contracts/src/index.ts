@@ -132,6 +132,9 @@ export * from './creator/creatorCrmContracts';
 // ─── Band CRM & Member Management (Phase 12) ──────────────────────────────
 export * from './band/bandCrmContracts';
 
-export const CONTRACTS_VERSION = '0.25.0-band-crm' as const;
+// ─── Sponsor Relationship Management (Phase 13) ───────────────────────────
+export * from './sponsorship/sponsorCrmContracts';
+
+export const CONTRACTS_VERSION = '0.26.0-sponsor-crm' as const;
 
 
