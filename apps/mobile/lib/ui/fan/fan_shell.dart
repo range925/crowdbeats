@@ -147,7 +147,7 @@ class _FanShellState extends ConsumerState<FanShell> {
             children: [
               Icon(
                 isSelected ? activeIcon : icon,
-                color: isSelected ? CbColors.purpleLight : CbColors.textMuted,
+                color: isSelected ? CbColors.primary : CbColors.textMuted,
                 size: 22,
               ),
               const SizedBox(height: 3),

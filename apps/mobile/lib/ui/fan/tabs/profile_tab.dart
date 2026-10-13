@@ -817,41 +817,47 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
         ),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: const Color(0xFF151722),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0x1AFFFFFF)),
           ),
-          child: Column(
-            children: [
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: CbColors.purpleLight,
-                title: const Text('Live Show Notifications', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                subtitle: const Text('Alert when followed artists go live', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                value: _liveAlerts,
-                onChanged: (val) => setState(() => _liveAlerts = val),
+          child: Material(
+            color: const Color(0xFF151722),
+            borderRadius: BorderRadius.circular(16),
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: CbColors.purpleLight,
+                    title: const Text('Live Show Notifications', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Alert when followed artists go live', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    value: _liveAlerts,
+                    onChanged: (val) => setState(() => _liveAlerts = val),
+                  ),
+                  const Divider(color: Color(0x1AFFFFFF), height: 1),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: CbColors.purpleLight,
+                    title: const Text('Nearby Stage Radius', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Discover performances within 5 miles', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    value: _nearbyAlerts,
+                    onChanged: (val) => setState(() => _nearbyAlerts = val),
+                  ),
+                  const Divider(color: Color(0x1AFFFFFF), height: 1),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: CbColors.purpleLight,
+                    title: const Text('Tip Receipts via Email', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Send transaction invoices to your inbox', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    value: _emailReceipts,
+                    onChanged: (val) => setState(() => _emailReceipts = val),
+                  ),
+                ],
               ),
-              const Divider(color: Color(0x1AFFFFFF), height: 1),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: CbColors.purpleLight,
-                title: const Text('Nearby Stage Radius', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                subtitle: const Text('Discover performances within 5 miles', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                value: _nearbyAlerts,
-                onChanged: (val) => setState(() => _nearbyAlerts = val),
-              ),
-              const Divider(color: Color(0x1AFFFFFF), height: 1),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: CbColors.purpleLight,
-                title: const Text('Tip Receipts via Email', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                subtitle: const Text('Send transaction invoices to your inbox', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                value: _emailReceipts,
-                onChanged: (val) => setState(() => _emailReceipts = val),
-              ),
-            ],
+            ),
           ),
         ),
       ],
@@ -871,11 +877,14 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF151722),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0x1AFFFFFF)),
           ),
-          child: Column(
+          child: Material(
+            color: const Color(0xFF151722),
+            borderRadius: BorderRadius.circular(16),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
             children: [
               ListTile(
                 leading: const Icon(Icons.settings_outlined, color: Colors.white70),
@@ -904,6 +913,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
                 },
               ),
             ],
+          ),
           ),
         ),
       ],

@@ -104,10 +104,17 @@ class _CreatorShellState extends ConsumerState<CreatorShell> {
             padding: const EdgeInsets.only(right: 16, left: 4),
             child: CircleAvatar(
               radius: 16,
-              backgroundColor: CbColors.purpleDim,
+              backgroundColor: CbColors.surfaceContainerHigh,
               child: Text(
-                contextState.isSolo ? 'EC' : 'ME',
-                style: const TextStyle(color: CbColors.purpleLight, fontSize: 11, fontWeight: FontWeight.bold),
+                contextState.activeContext.name.isNotEmpty
+                    ? contextState.activeContext.name
+                        .split(' ')
+                        .map((e) => e.isNotEmpty ? e[0] : '')
+                        .take(2)
+                        .join()
+                        .toUpperCase()
+                    : (contextState.isSolo ? 'SM' : 'BD'),
+                style: const TextStyle(color: CbColors.primary, fontSize: 11, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -151,7 +158,7 @@ class _CreatorShellState extends ConsumerState<CreatorShell> {
           onTap: _onTabSelected,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.transparent,
-          selectedItemColor: CbColors.purpleLight,
+          selectedItemColor: CbColors.primary,
           unselectedItemColor: CbColors.textMuted,
           selectedFontSize: 11,
           unselectedFontSize: 11,

@@ -130,6 +130,35 @@ class CbColors {
   static const Color brandAquaMint      = Color(0xFF2DD4BF); // "Live Now" badge text, live stage dot
   static const Color brandObsidian      = Color(0xFF131315); // Default dark canvas
 
+  // ── Obsidian & Clarity Tokens (Stitch Authority 15796146082333643164) ────────
+  static const Color surface                  = Color(0xFF0E1116); // Root obsidian canvas
+  static const Color surfaceDim               = Color(0xFF0B0D11);
+  static const Color surfaceBright            = Color(0xFF21262D);
+  static const Color surfaceContainerLowest   = Color(0xFF080A0D);
+  static const Color surfaceContainerLow      = Color(0xFF12161D);
+  static const Color surfaceContainer         = Color(0xFF161B22); // Grouped Card Container (#161B22)
+  static const Color surfaceContainerHigh     = Color(0xFF1C2128); // Elevated Row / Icon Box (#1C2128)
+  static const Color surfaceContainerHighest  = Color(0xFF272C35);
+  static const Color onSurface                = Color(0xFFF0F6FC); // High contrast text (White)
+  static const Color onSurfaceVariant         = Color(0xFF8B949E); // Muted metadata & labels
+  static const Color outline                  = Color(0xFF30363D); // Border strokes
+  static const Color outlineVariant           = Color(0x14FFFFFF); // 8% white hairline divider
+  static const Color primary                  = Color(0xFF8B5CF6); // Restrained Electric Purple
+  static const Color onPrimary                = Color(0xFFFFFFFF);
+  static const Color primaryContainer         = Color(0xFF6D28D9);
+  static const Color onPrimaryContainer       = Color(0xFFEDE9FE);
+  static const Color primaryHover             = Color(0xFF7C3AED);
+  static const Color primaryActive            = Color(0xFF6D28D9);
+  static const Color success                  = Color(0xFF10B981); // Emerald Live indicators & valid splits
+  static const Color onSuccess                = Color(0xFFFFFFFF);
+  static const Color successContainer         = Color(0x2610B981); // 15% opacity container
+  static const Color error                    = Color(0xFFEF4444); // Red Destructive / Error
+  static const Color onError                  = Color(0xFFFFFFFF);
+  static const Color errorContainer           = Color(0x26EF4444);
+  static const Color warning                  = Color(0xFFF59E0B); // Amber / Warning
+  static const Color onWarning                = Color(0xFF000000);
+  static const Color secondary                = Color(0xFF00D8C4); // Cyan / Stage telemetry
+  static const Color onSecondary              = Color(0xFF00201C);
 
   // ── Gradients ──────────────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(

@@ -1,4 +1,4 @@
-﻿// Crowdbeats V2 — Reusable Settings Row & Section Components
+// Crowdbeats V2 — Reusable Settings Row & Section Components
 //
 // Compliant with Stitch Project 5326179813018056505
 // Provides accessible >=56px touch targets, leading theme icon containers,
@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
+import 'cb_grouped_card.dart';
 
 class CbSettingsSection extends StatelessWidget {
   const CbSettingsSection({
@@ -14,37 +15,45 @@ class CbSettingsSection extends StatelessWidget {
     required this.title,
     required this.children,
     this.showTopDivider = true,
+    this.grouped = false,
   });
 
   final String title;
   final List<Widget> children;
   final bool showTopDivider;
+  final bool grouped;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (showTopDivider) ...[
+        if (showTopDivider && !grouped) ...[
           const SizedBox(height: 16),
           const Divider(color: CbColors.borderSubtle, height: 1),
           const SizedBox(height: 16),
         ] else
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Text(
             title.toUpperCase(),
             style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
+              color: CbColors.onSurfaceVariant,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
             ),
           ),
         ),
-        const SizedBox(height: 4),
-        ...children,
+        const SizedBox(height: 6),
+        if (grouped)
+          CbGroupedCard.divided(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            children: children,
+          )
+        else
+          ...children,
       ],
     );
   }
@@ -56,8 +65,8 @@ class CbSettingsRow extends StatelessWidget {
     required this.title,
     this.subtitle,
     required this.icon,
-    this.iconColor = CbColors.purpleLight,
-    this.iconBgColor = const Color(0xFF1E2032),
+    this.iconColor = CbColors.primary,
+    this.iconBgColor = CbColors.surfaceContainerHigh,
     this.valueText,
     this.statusBadge,
     this.statusBadgeColor,
@@ -86,12 +95,17 @@ class CbSettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: isSwitch ? () => onSwitchChanged?.call(!switchValue) : onTap,
-        splashColor: CbColors.purpleDim,
-        highlightColor: const Color(0x107C3AED),
+    return Semantics(
+      button: !isSwitch && onTap != null,
+      toggled: isSwitch ? switchValue : null,
+      label: subtitle != null ? '$title, $subtitle' : title,
+      value: valueText ?? (isSwitch ? (switchValue ? 'On' : 'Off') : null),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isSwitch ? () => onSwitchChanged?.call(!switchValue) : onTap,
+          splashColor: CbColors.purpleDim,
+          highlightColor: const Color(0x107C3AED),
         child: Container(
           constraints: const BoxConstraints(minHeight: 56),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -202,6 +216,7 @@ class CbSettingsRow extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

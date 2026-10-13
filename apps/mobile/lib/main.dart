@@ -288,8 +288,8 @@ GoRouter _buildRouter(Ref ref) {
       GoRoute(path: '/creator/analytics', builder: (_, _) => const CreatorAnalyticsScreen()),
       GoRoute(path: '/artist',        builder: (_, _) => const CreatorShell()),
       GoRoute(path: '/musician',      builder: (_, _) => const CreatorShell()),
-      GoRoute(path: '/band_member',   builder: (_, _) => const BandShell()),
-      GoRoute(path: '/band',          builder: (_, _) => const BandShell()),
+      GoRoute(path: '/band_member',   builder: (_, _) => const CreatorShell()),
+      GoRoute(path: '/band',          builder: (_, _) => const CreatorShell()),
       GoRoute(path: '/venue_manager', builder: (_, _) => const _PersonaDashboard(persona: 'Venue',   icon: '🏟️')),
       GoRoute(path: '/sponsor_rep',   builder: (_, _) => const SponsorShell()),
       GoRoute(path: '/sponsor',       builder: (_, _) => const SponsorShell()),
@@ -322,10 +322,13 @@ class CrowdbeatsV2App extends ConsumerWidget {
       themeMode:                  themeMode,
       routerConfig:               router,
       builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        final effectiveScale = (mq.textScaler.scale(1.0) * a11y.fontScale).clamp(0.8, 2.5);
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(a11y.fontScale),
-            boldText: a11y.highContrastMode,
+          data: mq.copyWith(
+            textScaler: TextScaler.linear(effectiveScale),
+            boldText: a11y.highContrastMode || mq.boldText,
+            disableAnimations: a11y.reduceMotion || mq.disableAnimations,
           ),
           child: Stack(
             children: [

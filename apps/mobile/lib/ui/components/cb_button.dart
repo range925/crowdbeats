@@ -67,8 +67,8 @@ class _CbButtonState extends State<CbButton>
     return switch (widget.variant) {
       CbButtonVariant.primary => isDark
           ? (
-              CbColors.brandCoralPink,
-              const Color(0xFF131315),
+              CbColors.primary,
+              Colors.white,
               Colors.transparent,
             )
           : (
@@ -79,7 +79,7 @@ class _CbButtonState extends State<CbButton>
       CbButtonVariant.secondary => (
           Colors.transparent,
           isDark ? CbColors.accentSecondary : CbColors.accentPrimary,
-          isDark ? CbColors.brandElectricViolet : CbColors.accentPrimary,
+          isDark ? CbColors.primary : CbColors.accentPrimary,
         ),
       CbButtonVariant.ghost => (
           Colors.transparent,
@@ -120,7 +120,7 @@ class _CbButtonState extends State<CbButton>
           const SizedBox(width: CbSpacing.s2),
         Text(
           widget.isLoading ? 'Loading…' : widget.label,
-          style: GoogleFonts.plusJakartaSans(
+          style: GoogleFonts.dmSans(
             fontSize: _fontSize,
             fontWeight: FontWeight.w600,
             color: fg,

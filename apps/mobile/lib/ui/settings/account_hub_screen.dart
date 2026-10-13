@@ -202,6 +202,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── B. YOUR CROWDBEATS ────────────────────────────────────────────────
               CbSettingsSection(
                 title: 'Your Crowdbeats',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Personas & Profiles',
@@ -234,6 +235,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── C. MONEY & PAYMENTS ───────────────────────────────────────────────
               CbSettingsSection(
                 title: 'Money & Payments',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Payment Methods',
@@ -285,6 +287,7 @@ class AccountHubScreen extends ConsumerWidget {
               if (isMusician) ...[
                 CbSettingsSection(
                   title: 'Artist & Band Tools',
+                  grouped: true,
                   children: [
                     CbSettingsRow(
                       title: 'Live Performance Settings',
@@ -314,6 +317,7 @@ class AccountHubScreen extends ConsumerWidget {
               if (isSponsor) ...[
                 CbSettingsSection(
                   title: 'Sponsor Organization',
+                  grouped: true,
                   children: [
                     CbSettingsRow(
                       title: 'Organization Profile',
@@ -329,6 +333,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── F. ACCOUNT & SECURITY ─────────────────────────────────────────────
               CbSettingsSection(
                 title: 'Account & Security',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Personal Information',
@@ -350,6 +355,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── G. PREFERENCES ───────────────────────────────────────────────────
               CbSettingsSection(
                 title: 'Preferences',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Appearance & Accessibility',
@@ -378,6 +384,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── H. TRUST, SAFETY & SUPPORT ────────────────────────────────────────
               CbSettingsSection(
                 title: 'Trust & Safety',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Safety Hub & Support Desk',
@@ -399,6 +406,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── I. LEGAL & PRIVACY POLICY ─────────────────────────────────────────
               CbSettingsSection(
                 title: 'Legal & Privacy Policy',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Privacy Policy',
@@ -429,6 +437,7 @@ class AccountHubScreen extends ConsumerWidget {
               // ── J. SESSION & DANGER ZONE ──────────────────────────────────────────
               CbSettingsSection(
                 title: 'Session',
+                grouped: true,
                 children: [
                   CbSettingsRow(
                     title: 'Sign Out',
@@ -459,7 +468,6 @@ class AccountHubScreen extends ConsumerWidget {
                       }
                     },
                   ),
-                  const SizedBox(height: 12),
                   CbSettingsRow(
                     title: 'Account Status & Deletion…',
                     subtitle: 'Permanent deletion workflow with compliance safeguards',

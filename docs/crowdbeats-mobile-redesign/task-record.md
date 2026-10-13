@@ -480,3 +480,63 @@ Tests: each feature owner adds tests in **new** files named after their area. Ch
 * **Checkpoint Tag:** `redesign-mobile-cp3`.
 * **Ready for Phase 4:** Flutter Architecture, Theme System implementation (`CbColors`, `CbTypography`), Shell routing (`FanShell`, `CreatorShell`), and screen refactoring.
 
+---
+
+## 16. Phase 4 Gate Report & Shared Foundations Verification
+
+**Phase:** Phase 4 (Shared Flutter Foundations & Architecture)  
+**Owners:** Flutter Architecture Specialist, Theme/Accessibility Specialist, Coordinator  
+**Status:** **PASSED**  
+**Checkpoint Tag:** `redesign-mobile-cp4`  
+**Date Completed:** October 12, 2026  
+
+---
+
+### 16.1 Deliverables & Architecture Implementations
+
+1. **Semantic Color & Surface Architecture (`apps/mobile/lib/ui/theme/cb_colors.dart`):**
+   - Implemented ratified Stitch Obsidian & Clarity tokens: `surface` (`#0E1116`), `surfaceContainer` (`#161B22`), `surfaceContainerHigh` (`#1C2128`), `outline` (`#21262D`), and `outlineVariant` (`#30363D`).
+   - Retained and stabilized primary action accent `CbColors.primary` = Electric Purple (`#8B5CF6`) and semantic status colors (`#10B981` emerald live/success, `#EF4444` error).
+   - Preserved legacy Direction B aliases (`brandObsidian`, `brandElectricViolet`, `darkCanvas`, `darkCard`) to guarantee zero regressions across pre-existing widget test suites.
+
+2. **DM Sans Typography & Tabular Numerics (`apps/mobile/lib/ui/theme/cb_typography.dart` & `cb_theme.dart`):**
+   - Configured `GoogleFonts.dmSansTextTheme()` as the authoritative mobile type family for both dark and light theme definitions.
+   - Built `CbTypography.numericStat()` with explicit tabular figures (`FontFeature.tabularFigures()`) to prevent horizontal layout shift during live tip streaming and countdown timers.
+   - Integrated semantic `AppBarTheme` with DM Sans headline styling across dark and light configurations.
+
+3. **Grouped Card & Hairline Divided List Pattern (`apps/mobile/lib/ui/components/cb_grouped_card.dart` & `cb_settings_row.dart`):**
+   - Created `CbGroupedCard` and `CbGroupedCard.divided` implementing the Uber/Lyft design system reference (Reference Board 3 and Stitch Screen `d6dd2f8f53fc4c19bb730886d774998a`).
+   - Enhanced `CbSettingsSection` to support `grouped: true`, automatically nesting list row children in a hairline-divided container with 16dp horizontal margin, 12dp border radius, and subtle dividers (`CbColors.outlineVariant`).
+   - Refactored `AccountHubScreen` (`apps/mobile/lib/ui/settings/account_hub_screen.dart`) across all 8 settings sections to utilize grouped cards with semantic touch targets.
+
+4. **Persona Shell Navigation Consolidation (`apps/mobile/lib/main.dart`, `fan_shell.dart`, `creator_shell.dart`):**
+   - **`OD-IA2` Retirement of `BandShell`:** Retired standalone `BandShell` into the unified `CreatorShell` with dynamic `CbContextSwitcherPill` (`Solo` vs `Band`), eliminating route slug collisions on `/band/:slug` and ensuring consistent tab state preservation across both artist modalities.
+   - **Dynamic Creator Avatar:** Updated avatar initials in `CreatorShell` to dynamically calculate initials from `activeContext.name` (e.g., "The Midnight Echoes" -> "TM", "Elena Cruz" -> "EC") rather than static strings.
+   - **`FanShell` Accessibility & Accents:** Updated `FanShell` bottom navigation tab indicators to use `CbColors.primary` (`#8B5CF6`) and explicit `Semantics` labels for all 3 Guest and 5 Fan destinations.
+
+5. **Universal Accessibility, Safe Area & Animation Controls (`apps/mobile/lib/main.dart`):**
+   - **OS + App Text Scaling Multiplication:** Replaced scalar override with multiplicative scaling `(mq.textScaler.scale(1.0) * a11y.fontScale).clamp(0.8, 2.5)` in `main.dart`, respecting both OS-level accessibility font settings and user in-app preferences.
+   - **Reduced Motion Forwarding:** Connected `disableAnimations` to Flutter's `MediaQueryData.disableAnimations`, ensuring animations gracefully collapse for users with vestibular or motion sensitivity.
+
+---
+
+### 16.2 Automated Test Execution & Verification Evidence
+
+| Test Suite / Tool | Command | Result | Notes |
+| :--- | :--- | :--- | :--- |
+| **Static Analysis** | `flutter analyze --no-pub` | **PASS (0 issues)** | "No issues found! (ran in 8.1s)" across all 218 Dart files in `apps/mobile`. |
+| **Phase 4 Foundations Suite** | `flutter test --no-pub test/phase4_foundations_test.dart` | **PASS (9 / 9)** | Verified `CbGroupedCard.divided`, `CbSettingsSection(grouped: true)`, `CbSettingsRow` semantics, `CbButton` Electric Purple 48dp touch floor, `FanShell` (3-tab guest / 5-tab fan), `CreatorShell` context pill, and 2.0x text scaling. |
+| **Theme & Token Persistence** | `flutter test --no-pub test/cb_theme_tokens_test.dart` | **PASS (7 / 7)** | Validated `CbColors`, `CbThemeExtension` dark/light contracts, and cold-start `SharedPreferences` persistence. |
+| **Components & Layout Suite** | `flutter test --no-pub test/cb_components_suite_test.dart` | **PASS (12 / 12)** | Verified `CbButton`, `CbFormField`, `CbTipSheet`, and `CbSafeScaffold` keyboard dismiss and 320dp viewport layouts. |
+| **Full Mobile Test Suite** | `flutter test --no-pub` | **PASS (482 / 482)** | All 482 tests passed (+19 tests beyond Phase 1 baseline) with zero regressions across auth, location, tipping, settings, and creator pipelines. |
+
+---
+
+### 16.3 Phase 4 Gate Sign-Off
+
+* **Phase 4 Gate:** **PASSED** (Shared Flutter foundations, tokens, components, and shells fully implemented and verified).
+* **Isolation Maintained:** Zero changes to `apps/web` or root `.stitch/`.
+* **Checkpoint Tag:** `redesign-mobile-cp4`.
+* **Ready for Phase 5:** Screen-by-screen feature refactoring per `coverage.csv`.
+
+

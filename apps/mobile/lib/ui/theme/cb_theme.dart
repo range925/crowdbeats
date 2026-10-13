@@ -208,7 +208,7 @@ class CbTheme {
 
   static ThemeData dark() {
     final base = ThemeData.dark(useMaterial3: true);
-    final textTheme = GoogleFonts.plusJakartaSansTextTheme(base.textTheme).apply(
+    final textTheme = GoogleFonts.dmSansTextTheme(base.textTheme).apply(
       bodyColor:    CbColors.textPrimary,
       displayColor: CbColors.textPrimary,
     );
@@ -233,14 +233,14 @@ class CbTheme {
       ),
 
       textTheme: textTheme,
-      primaryTextTheme: GoogleFonts.plusJakartaSansTextTheme(base.primaryTextTheme),
+      primaryTextTheme: GoogleFonts.dmSansTextTheme(base.primaryTextTheme),
 
       appBarTheme: AppBarTheme(
         backgroundColor:  CbColors.surfaceRaised,
         foregroundColor:  CbColors.textPrimary,
         elevation:        0,
         centerTitle:      true,
-        titleTextStyle:   GoogleFonts.plusJakartaSans(
+        titleTextStyle:   GoogleFonts.dmSans(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: CbColors.textPrimary,
@@ -426,7 +426,7 @@ class CbTheme {
     const lightBackground = Color(0xFFF9FAFB);
     const lightBorder = Color(0xFFE5E7EB);
 
-    final textTheme = GoogleFonts.plusJakartaSansTextTheme(base.textTheme).apply(
+    final textTheme = GoogleFonts.dmSansTextTheme(base.textTheme).apply(
       bodyColor: lightTextPrimary,
       displayColor: lightTextPrimary,
     );
@@ -449,13 +449,13 @@ class CbTheme {
         outline: lightBorder,
       ),
       textTheme: textTheme,
-      primaryTextTheme: GoogleFonts.plusJakartaSansTextTheme(base.primaryTextTheme),
+      primaryTextTheme: GoogleFonts.dmSansTextTheme(base.primaryTextTheme),
       appBarTheme: AppBarTheme(
         backgroundColor: lightSurface,
         foregroundColor: lightTextPrimary,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.plusJakartaSans(
+        titleTextStyle: GoogleFonts.dmSans(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: lightTextPrimary,
