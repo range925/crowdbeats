@@ -58,6 +58,7 @@ import 'ui/settings/legal_disclosures_screen.dart';
 import 'ui/settings/account_deletion_screen.dart';
 import 'ui/settings/accessibility_appearance_screen.dart';
 import 'ui/preview/fan_mobile_preview_hub.dart';
+import 'ui/fan/social_messaging_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ui/sponsor/sponsor_shell.dart';
 import 'ui/components/cb_privacy_consent_banner.dart';
@@ -145,8 +146,9 @@ String? cbAuthRedirect(CbAuthState authState, GoRouterState state) {
       return loc == '/splash' ? null : null; // Allow unauthenticated browsing immediately
     case CbAuthStatus.unauthenticated:
       if (loc.startsWith('/auth') || loc == '/splash') return null;
-      // Protect account and creator/sponsor management dashboards
+      // Protect account, messages, and creator/sponsor management dashboards
       if (loc.startsWith('/account') ||
+          loc.startsWith('/messages') ||
           loc == '/artist' ||
           loc == '/musician' ||
           loc == '/creator' ||
@@ -243,6 +245,23 @@ GoRouter _buildRouter(Ref ref) {
       GoRoute(path: '/creator/media',                 builder: (_, _) => const CreatorMediaScreen()),
       GoRoute(path: '/creator/balances',              builder: (_, _) => const CreatorBalancesScreen()),
       GoRoute(path: '/creator/fans',                  builder: (_, _) => const CreatorFansScreen()),
+      GoRoute(
+        path: '/messages',
+        builder: (_, state) {
+          final recipientId = state.uri.queryParameters['recipientId'];
+          final recipientType = state.uri.queryParameters['recipientType'];
+          final recipientName = state.uri.queryParameters['recipientName'];
+          return SocialMessagingScreen(
+            initialRecipientId: recipientId,
+            initialRecipientType: recipientType,
+            initialRecipientName: recipientName,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/creator/messages',
+        builder: (_, _) => const SocialMessagingScreen(),
+      ),
       // Public Discovery Routes (accessible without auth)
       GoRoute(
         path: '/artist/:slug',

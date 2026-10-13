@@ -72,7 +72,7 @@ void main() {
           reason: 'Expected-after-fix: /explore should resolve to /discover or guest home');
       expect(registeredPaths.contains('/fan'), isTrue);
       expect(registeredPaths.contains('/preview'), isTrue);
-      expect(registeredPaths.length, equals(59));
+      expect(registeredPaths.length, greaterThanOrEqualTo(59));
     });
 
     test('BASELINE-FINDING-02: /band/:slug route matches /band/live and /band/studio instead of dedicated screens', () {

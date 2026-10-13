@@ -779,6 +779,82 @@ Tests: each feature owner adds tests in **new** files named after their area. Ch
 * **Checkpoint Tag:** `redesign-mobile-cp8`.
 * **Ready for Phase 9:** Account, Settings & Social/Messaging (`ACC-01..15`, `SOC-01..05`).
 
+---
+
+## 21. Phase 9 Gate Report & Account, Settings, and Social/Messaging Verification
+
+**Phase:** Phase 9 (Account, Settings & Social/Messaging: `ACC-01..15`, `SOC-01..06`, `ACT-01..03`)  
+**Owners:** UX Coordinator, Flutter Navigation, Creator/Band Specialist, QA  
+**Status:** **PASSED**  
+**Checkpoint Tag:** `redesign-mobile-cp9`  
+**Date Completed:** October 12, 2026  
+
+---
+
+### 21.1 Deliverables & Implementations
+
+1. **`CbSettingsRow` & Grouped Hierarchy Standardization (`apps/mobile/lib/ui/components/cb_settings_row.dart`, `ACC-02`):**
+   - **Stitch Alignment:** Matched Stitch Screen `d6dd2f8f53fc4c19bb730886d774998a` (Account Hub & Grouped Settings Hierarchy).
+   - **Typography Harmonization:** Replaced system default text themes with `GoogleFonts.dmSans` across section titles, row titles, subtitles, status badges, and trailing values.
+   - **Refined Grouped Rows:** Elevated styling with `CbColors.surfaceContainer`, subtle hairline dividers (`0.5dp`), accessible touch targets (minimum 48dp), and chevron navigation cues.
+
+2. **Role-Gated Persona Switcher (`apps/mobile/lib/ui/persona/persona_switcher_sheet.dart`, `ACC-14`):**
+   - **Strict Fan Isolation (`ACC-14`):** Enforced role-gated persona options so Fans cannot see or switch to Solo Musician (`artist`) or Band (`band_member`) contexts without registered creator credentials.
+   - **Live Creator Upsell Card:** Unregistered Fans are presented with a dedicated "Perform or Sponsor Live Music" registration prompt with clear CTAs ("Solo Musician", "Band Profile") routing directly to creator onboarding.
+   - **Material Root Shell:** Wrapped modal sheet in `Material(color: const Color(0xFF151722), ...)` to eliminate ListTile/DecoratedBox ink splash assertion failures under Material 3.
+   - **Active Context Highlighting:** Verified checkmarks and Electric Purple badges for currently active persona identities.
+
+3. **`AccountHubScreen` Production Integration (`apps/mobile/lib/ui/settings/account_hub_screen.dart`, `ACC-02`, `ACC-03`, `CRS-18`):**
+   - **Typography Standardization:** Standardized header, section titles, and action buttons on `GoogleFonts.dmSans`.
+   - **Direct Messages Entry:** Added "Direct Messages & Inquiries" navigation row in the "Your Crowdbeats" section (`context.push('/messages')`), unifying social messaging entry with the account hub.
+   - **Production Creator Studio Routing:** Ensured creator tool entries navigate to production Creator Studio (`/creator/studio`) and Live controls (`/creator/live`).
+
+4. **Direct Messaging Routing & Security (`apps/mobile/lib/main.dart`, `SOC-02`, `SOC-03`):**
+   - **Stitch Alignment:** Matched Stitch Screen `4b03db4156434caaafeb9b5ee5feac55` (Fan & Creator Social Direct Messaging).
+   - **Router Registration:** Registered `/messages` (supporting query params `recipientId`, `recipientType`, `recipientName`) and `/creator/messages`.
+   - **Guest Route Guard:** Updated `cbAuthRedirect` to protect `/messages` from unauthenticated guest access, redirecting cleanly to `/auth?from=%2Fmessages` for post-login resumption.
+
+5. **Profile Tab & Wallet Neutrality (`apps/mobile/lib/ui/fan/tabs/profile_tab.dart`, `ACC-01`, `SOC-01`):**
+   - **Provider-Neutral Copy:** Retired hardcoded Google Pay references in tip history and payment method tiles, replacing with provider-neutral 'Stripe 1-Tap' and 'Stripe 1-Tap Wallet'.
+   - **Typography:** Updated headers and status indicators to `GoogleFonts.dmSans`.
+
+6. **Social Messaging Screen Polish (`apps/mobile/lib/ui/fan/social_messaging_screen.dart`, `SOC-02..04`):**
+   - Standardized AppBar titles, tab labels (Inbox, Requests, Restricted), and chat view titles on `GoogleFonts.dmSans`.
+   - Maintained verified safety controls: 1-to-1 chat, mutual-follow verification, message request acceptance/decline (7-day cooldown), quiet restriction mode, block enforcement, and structured Trust & Safety reports.
+
+7. **New Test Suite `phase9_account_social_test.dart` (`apps/mobile/test/phase9_account_social_test.dart`):**
+   - Implemented 5 automated widget and routing unit tests:
+     1. PersonaSwitcherSheet enforces Fan isolation (no Solo/Band options for fans).
+     2. PersonaSwitcherSheet displays creator contexts for authorized artists.
+     3. AccountHubScreen renders Direct Messages navigation row and triggers router push.
+     4. Router guard redirects unauthenticated guests trying to access `/messages` to `/auth?from=%2Fmessages`.
+     5. PrivacyLocationScreen renders machine-readable data export trigger (`ACC-15`) with confirmation dialog.
+
+8. **Coverage Matrix Updates (`docs/crowdbeats-mobile-redesign/coverage.csv`):**
+   - Marked `ACC-01..15`, `SOC-01..06`, and `ACT-01..03` as `yes,yes,yes` with comprehensive verification notes.
+
+---
+
+### 21.2 Automated Test Execution & Verification Evidence
+
+| Test Suite / Tool | Command | Result | Notes |
+| :--- | :--- | :--- | :--- |
+| **Static Analysis** | `flutter analyze --no-pub` | **PASS (0 issues)** | "No issues found! (ran in 10.6s)" across all 221 Dart files in `apps/mobile`. |
+| **Phase 9 Account & Social Suite** | `flutter test --no-pub test/phase9_account_social_test.dart` | **PASS (5 / 5)** | Verified Fan isolation in persona switcher, artist persona options, AccountHub Direct Messages navigation, unauthenticated route redirection, and machine-readable data export queue. |
+| **Settings, Security & Lifecycle Suite** | `flutter test --no-pub test/settings_security_lifecycle_test.dart` | **PASS (10 / 10)** | Verified grouped settings navigation, appearance & accessibility (theme, high contrast, text scale), security & 2FA active sessions, privacy & location, and statutory account deletion. |
+| **Social Messaging & Safety Suite** | `flutter test --no-pub test/social_messaging_safety_test.dart` | **PASS (6 / 6)** | Verified follow/unfollow optimistic toggle with rollback, two-account messaging gating, blocking entity and severing follow edges, quiet restriction mode, categorized safety reporting, and offline retry pill. |
+| **Full Mobile Test Suite** | `flutter test --no-pub` | **PASS (503 / 503)** | All 503 tests passed with zero regressions across launch, auth, discovery, location, tipping, settings, creator, and social messaging pipelines. |
+
+---
+
+### 21.3 Phase 9 Gate Sign-Off
+
+* **Phase 9 Gate:** **PASSED** (Account, Settings, and Social/Messaging redesigned, verified against Stitch specs, and recorded in `coverage.csv`).
+* **Isolation Maintained:** Zero changes to `apps/web` or root `.stitch/`.
+* **Checkpoint Tag:** `redesign-mobile-cp9`.
+* **Ready for Phase 10:** Comprehensive Final Audit, Cross-Platform Verification & Project Wrap-Up.
+
+
 
 
 

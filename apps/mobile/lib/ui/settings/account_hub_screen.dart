@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../state/auth_state.dart';
 import '../theme/cb_colors.dart';
 import '../components/cb_settings_row.dart';
@@ -41,9 +42,9 @@ class AccountHubScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: CbColors.bgApp,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Account Settings',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
         ),
         backgroundColor: CbColors.bgApp,
         elevation: 0,
@@ -80,7 +81,7 @@ class AccountHubScreen extends ConsumerWidget {
                         backgroundColor: const Color(0xFF151722),
                         child: Text(
                           displayName.isNotEmpty ? displayName[0].toUpperCase() : 'C',
-                          style: const TextStyle(
+                          style: GoogleFonts.dmSans(
                             color: Colors.white,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -100,7 +101,7 @@ class AccountHubScreen extends ConsumerWidget {
                               Flexible(
                                 child: Text(
                                   displayName,
-                                  style: const TextStyle(
+                                  style: GoogleFonts.dmSans(
                                     color: Colors.white,
                                     fontSize: 19,
                                     fontWeight: FontWeight.bold,
@@ -120,7 +121,7 @@ class AccountHubScreen extends ConsumerWidget {
                           const SizedBox(height: 3),
                           Text(
                             email,
-                            style: const TextStyle(
+                            style: GoogleFonts.dmSans(
                               color: CbColors.textSecondary,
                               fontSize: 12,
                             ),
@@ -138,7 +139,7 @@ class AccountHubScreen extends ConsumerWidget {
                                 ),
                                 child: Text(
                                   _formatPersona(persona),
-                                  style: const TextStyle(
+                                  style: GoogleFonts.dmSans(
                                     color: CbColors.purpleLight,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -146,9 +147,9 @@ class AccountHubScreen extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 '• Member since 2024',
-                                style: TextStyle(color: Colors.white38, fontSize: 11),
+                                style: GoogleFonts.dmSans(color: Colors.white38, fontSize: 11),
                               ),
                             ],
                           ),
@@ -167,7 +168,7 @@ class AccountHubScreen extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.swap_horiz, size: 18, color: CbColors.purpleLight),
-                        label: const Text('Switch Persona', style: TextStyle(fontSize: 13)),
+                        label: Text('Switch Persona', style: GoogleFonts.dmSans(fontSize: 13)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white,
                           side: const BorderSide(color: CbColors.borderSubtle),
@@ -185,7 +186,7 @@ class AccountHubScreen extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.edit_outlined, size: 18, color: Colors.white70),
-                        label: const Text('Edit Profile', style: TextStyle(fontSize: 13)),
+                        label: Text('Edit Profile', style: GoogleFonts.dmSans(fontSize: 13)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white,
                           side: const BorderSide(color: CbColors.borderSubtle),
@@ -214,6 +215,13 @@ class AccountHubScreen extends ConsumerWidget {
                       backgroundColor: Colors.transparent,
                       builder: (_) => const PersonaSwitcherSheet(),
                     ),
+                  ),
+                  CbSettingsRow(
+                    title: 'Direct Messages & Inquiries',
+                    subtitle: 'Chat with performers, stage requests, and patron inquiries',
+                    icon: Icons.chat_bubble_outline,
+                    iconColor: CbColors.purpleLight,
+                    onTap: () => context.push('/messages'),
                   ),
                   CbSettingsRow(
                     title: 'Saved Artists & Bands',
@@ -261,14 +269,14 @@ class AccountHubScreen extends ConsumerWidget {
                       iconColor: CbColors.liveGreen,
                       statusBadge: 'Active',
                       statusBadgeColor: CbColors.liveGreen,
-                      onTap: () => context.push('/artist'),
+                      onTap: () => context.push('/creator/studio'),
                     ),
                     CbSettingsRow(
                       title: 'Band Payment Splits',
                       subtitle: 'Automated revenue-split percentages among members',
                       icon: Icons.pie_chart_outline,
                       iconColor: CbColors.gpsBlue,
-                      onTap: () => context.push('/band_member'),
+                      onTap: () => context.push('/creator/studio'),
                     ),
                   ],
                   if (isSponsor) ...[
@@ -294,21 +302,21 @@ class AccountHubScreen extends ConsumerWidget {
                       subtitle: 'Geofence radius, default stage preset, and broadcast alerts',
                       icon: Icons.sensors,
                       iconColor: CbColors.liveGreen,
-                      onTap: () => context.push('/artist'),
+                      onTap: () => context.push('/creator/live'),
                     ),
                     CbSettingsRow(
                       title: 'QR Tip Code Settings',
                       subtitle: 'Custom branded QR code and printable stand PDF exporter',
                       icon: Icons.qr_code_2,
                       iconColor: CbColors.purpleLight,
-                      onTap: () => context.push('/artist'),
+                      onTap: () => context.push('/creator/studio'),
                     ),
                     CbSettingsRow(
                       title: 'Band Roster & Roles',
                       subtitle: 'Manage members, permissions, and invitations',
                       icon: Icons.group_work_outlined,
                       iconColor: CbColors.gpsBlue,
-                      onTap: () => context.push('/band_member'),
+                      onTap: () => context.push('/creator/studio'),
                     ),
                   ],
                 ),

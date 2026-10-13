@@ -633,9 +633,9 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
 
   Widget _buildTipHistorySection() {
     final history = [
-      (artist: 'Maya Lin', venue: 'The Echo Lounge', amount: '\$20.00', date: 'Today, 8:45 PM', method: 'Google Pay'),
+      (artist: 'Maya Lin', venue: 'The Echo Lounge', amount: '\$20.00', date: 'Today, 8:45 PM', method: 'Stripe 1-Tap'),
       (artist: 'The Velvet Waves', venue: 'Beachside Pavilion', amount: '\$15.00', date: 'Yesterday', method: 'Visa •••• 4242'),
-      (artist: 'Echo Pulse', venue: 'Underground Sound', amount: '\$10.00', date: 'Aug 24', method: 'Google Pay'),
+      (artist: 'Echo Pulse', venue: 'Underground Sound', amount: '\$10.00', date: 'Aug 24', method: 'Stripe 1-Tap'),
       (artist: 'Neon Sunset', venue: 'Sunset Rooftop', amount: '\$20.00', date: 'Aug 21', method: 'Mastercard •••• 8812'),
     ];
 
@@ -754,7 +754,7 @@ class _ProfileTabState extends ConsumerState<ProfileTab> {
             children: [
               _buildPaymentMethodRow(
                 icon: Icons.account_balance_wallet,
-                title: 'Google Pay',
+                title: 'Stripe 1-Tap Wallet',
                 subtitle: 'Fast 1-tap checkout enabled',
                 isDefault: true,
               ),

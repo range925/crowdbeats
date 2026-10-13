@@ -5,6 +5,7 @@
 // subtitles, value chips, status badges, switches, and trailing navigation chevrons.
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/cb_colors.dart';
 import '../theme/cb_spacing.dart';
 import 'cb_grouped_card.dart';
@@ -38,7 +39,7 @@ class CbSettingsSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Text(
             title.toUpperCase(),
-            style: const TextStyle(
+            style: GoogleFonts.dmSans(
               color: CbColors.onSurfaceVariant,
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -139,7 +140,7 @@ class CbSettingsRow extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
+                      style: GoogleFonts.dmSans(
                         color: isDestructive ? CbColors.errorRed : CbColors.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -149,7 +150,7 @@ class CbSettingsRow extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle!,
-                        style: const TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: CbColors.textSecondary,
                           fontSize: 12,
                           height: 1.3,
@@ -175,7 +176,7 @@ class CbSettingsRow extends StatelessWidget {
                   ),
                   child: Text(
                     statusBadge!,
-                    style: TextStyle(
+                    style: GoogleFonts.dmSans(
                       color: statusBadgeColor ?? CbColors.liveGreen,
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -189,7 +190,7 @@ class CbSettingsRow extends StatelessWidget {
               if (valueText != null) ...[
                 Text(
                   valueText!,
-                  style: const TextStyle(
+                  style: GoogleFonts.dmSans(
                     color: CbColors.textSecondary,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,

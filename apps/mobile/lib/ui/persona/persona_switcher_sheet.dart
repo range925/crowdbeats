@@ -1,36 +1,53 @@
 // Crowdbeats V2 — Persona Switcher Bottom Sheet
 //
-// Allows seamless switching between all active personas (Fan, Musician, Band, Venue, Sponsor).
+// Role-gated context switcher adhering to persona permission boundaries:
+// Fans only see Fan persona + creator onboarding pathway (cannot switch to unauthorized creator roles).
+// Creators can switch between Solo Musician, Band, and Fan modes.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../state/auth_state.dart';
 import '../../ui/theme/cb_colors.dart';
 
-const _personaInfo = {
+const _allPersonaInfo = {
   'fan':           (icon: '❤️',  label: 'Fan',     route: '/fan',           description: 'Discover live music & tip artists'),
-  'artist':        (icon: '🎤',  label: 'Musician', route: '/artist',        description: 'Live performance dashboard & tips'),
-  'band_member':   (icon: '🎸',  label: 'Band',     route: '/band_member',   description: 'Band tip splits & live stages'),
-  'venue_manager': (icon: '🏟️', label: 'Venue',    route: '/venue_manager', description: 'Stage management & analytics'),
+  'artist':        (icon: '🎤',  label: 'Solo Musician', route: '/artist',        description: 'Live performance dashboard & tips'),
+  'band_member':   (icon: '🎸',  label: 'Band Member',     route: '/band_member',   description: 'Band tip splits & live stages'),
+  'venue_manager': (icon: '🏟️', label: 'Venue Manager',    route: '/venue_manager', description: 'Stage management & analytics'),
   'sponsor_rep':   (icon: '💼',  label: 'Sponsor',  route: '/sponsor_rep',   description: 'Campaigns & local promotions'),
 };
 
 class PersonaSwitcherSheet extends ConsumerWidget {
   const PersonaSwitcherSheet({super.key});
 
+  List<String> _getPermittedPersonas(String current) {
+    if (current == 'artist' || current == 'band_member') {
+      return const ['artist', 'band_member', 'fan'];
+    } else if (current == 'sponsor_rep') {
+      return const ['sponsor_rep', 'fan'];
+    } else if (current == 'venue_manager') {
+      return const ['venue_manager', 'fan'];
+    } else if (current == 'admin') {
+      return const ['fan', 'artist', 'band_member', 'venue_manager', 'sponsor_rep'];
+    }
+    // Fan default: only permitted in Fan persona
+    return const ['fan'];
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authStateProvider);
     final currentPersona = auth.personaType ?? 'fan';
+    final permittedKeys = _getPermittedPersonas(currentPersona);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: const BoxDecoration(
-        color: Color(0xFF151722),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: SafeArea(
+    return Material(
+      color: const Color(0xFF151722),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,9 +69,9 @@ class PersonaSwitcherSheet extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Switch Persona',
-                  style: TextStyle(
+                  style: GoogleFonts.dmSans(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -66,17 +83,18 @@ class PersonaSwitcherSheet extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
-              'Switch between fan discovery and creator management dashboards:',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
+              currentPersona == 'fan'
+                  ? 'Your active identity on Crowdbeats:'
+                  : 'Switch between authorized creator and discovery roles:',
+              style: GoogleFonts.dmSans(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
             ),
             const SizedBox(height: 16),
 
-            // Persona List
-            ..._personaInfo.entries.map((entry) {
-              final key = entry.key;
-              final info = entry.value;
+            // Permitted Persona List
+            ...permittedKeys.map((key) {
+              final info = _allPersonaInfo[key]!;
               final isActive = key == currentPersona;
 
               return Padding(
@@ -111,7 +129,7 @@ class PersonaSwitcherSheet extends ConsumerWidget {
                                 children: [
                                   Text(
                                     info.label,
-                                    style: TextStyle(
+                                    style: GoogleFonts.dmSans(
                                       color: Colors.white,
                                       fontSize: 15,
                                       fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
@@ -125,9 +143,13 @@ class PersonaSwitcherSheet extends ConsumerWidget {
                                         color: CbColors.purpleMain,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'ACTIVE',
-                                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
+                                        style: GoogleFonts.dmSans(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w900,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -136,7 +158,10 @@ class PersonaSwitcherSheet extends ConsumerWidget {
                               const SizedBox(height: 2),
                               Text(
                                 info.description,
-                                style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 12),
+                                style: GoogleFonts.dmSans(
+                                  color: Colors.white.withValues(alpha: 0.55),
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
@@ -153,6 +178,87 @@ class PersonaSwitcherSheet extends ConsumerWidget {
               );
             }),
 
+            // If Fan only: show creator onboarding registration card
+            if (currentPersona == 'fan') ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1D28),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0x1AFFFFFF)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.music_note, color: CbColors.purpleLight, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Perform or Sponsor Live Music',
+                          style: GoogleFonts.dmSans(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Ready to broadcast live stages, accept tips, or manage band splits? Set up your Creator profile.',
+                      style: GoogleFonts.dmSans(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 12,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: CbColors.purpleLight,
+                              side: const BorderSide(color: CbColors.purpleLight),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              context.push('/onboarding/artist');
+                            },
+                            child: Text(
+                              'Solo Musician',
+                              style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: CbColors.tealGas,
+                              side: const BorderSide(color: CbColors.tealGas),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              context.push('/onboarding/band');
+                            },
+                            child: Text(
+                              'Band Profile',
+                              style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 12),
             const Divider(color: Color(0x1AFFFFFF)),
             const SizedBox(height: 8),
@@ -162,7 +268,14 @@ class PersonaSwitcherSheet extends ConsumerWidget {
               dense: true,
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.logout, color: Color(0xFFEF4444), size: 20),
-              title: const Text('Sign out of all personas', style: TextStyle(color: Color(0xFFEF4444), fontSize: 14, fontWeight: FontWeight.w600)),
+              title: Text(
+                'Sign out of account',
+                style: GoogleFonts.dmSans(
+                  color: const Color(0xFFEF4444),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               onTap: () {
                 Navigator.of(context).pop();
                 ref.read(authNotifierProvider.notifier).signOut();
@@ -171,6 +284,7 @@ class PersonaSwitcherSheet extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

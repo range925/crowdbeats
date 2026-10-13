@@ -9,6 +9,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/services/social_service.dart';
 import '../../state/auth_state.dart';
@@ -423,13 +424,18 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
     return Scaffold(
       backgroundColor: CbColors.bgApp,
       appBar: AppBar(
-        title: const Text('Direct Messages', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(
+          'Direct Messages',
+          style: GoogleFonts.dmSans(fontWeight: FontWeight.w800),
+        ),
         backgroundColor: CbColors.surfaceBase,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: CbColors.purpleLight,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white54,
+          labelStyle: GoogleFonts.dmSans(fontWeight: FontWeight.w600, fontSize: 13),
+          unselectedLabelStyle: GoogleFonts.dmSans(fontWeight: FontWeight.w500, fontSize: 13),
           tabs: [
             Tab(
               child: Row(
@@ -588,14 +594,17 @@ class _SocialMessagingScreenState extends ConsumerState<SocialMessagingScreen>
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            Text(
+              name,
+              style: GoogleFonts.dmSans(fontWeight: FontWeight.w800, fontSize: 16),
+            ),
             Text(
               isBlocked
                   ? 'Blocked'
                   : isRestricted
                       ? 'Restricted Mode'
                       : 'End-to-End Moderated',
-              style: TextStyle(
+              style: GoogleFonts.dmSans(
                 color: isBlocked
                     ? CbColors.statusError
                     : isRestricted
