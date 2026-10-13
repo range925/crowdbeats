@@ -147,14 +147,14 @@ export function PrivacyConsentWidget() {
             maxWidth: 1080,
             margin: '0 auto',
             zIndex: 9999,
-            backgroundColor: 'rgba(13, 15, 23, 0.97)',
+            backgroundColor: 'rgba(255, 255, 255, 0.96)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             borderRadius: 20,
-            border: '1px solid rgba(168, 85, 247, 0.4)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 32px rgba(124, 58, 237, 0.25)',
+            border: '1px solid rgba(124, 58, 237, 0.22)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.12), 0 0 24px rgba(124, 58, 237, 0.10)',
             padding: 'clamp(18px, 3vw, 24px) clamp(20px, 3.5vw, 32px)',
-            color: '#FFFFFF',
+            color: '#1D1D1F',
             animation: 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
@@ -174,18 +174,18 @@ export function PrivacyConsentWidget() {
                   style={{
                     padding: '3px 8px',
                     borderRadius: 6,
-                    backgroundColor: 'rgba(124, 58, 237, 0.2)',
-                    border: '1px solid rgba(168, 85, 247, 0.5)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
+                    border: '1px solid rgba(124, 58, 237, 0.25)',
                     fontSize: 11,
                     fontWeight: 800,
-                    color: '#D8B4FE',
+                    color: '#7C3AED',
                     letterSpacing: '0.04em',
                     textTransform: 'uppercase',
                   }}
                 >
                   ⚖️ CCPA § 1798.100 &amp; GDPR Art. 15 Notice
                 </span>
-                <span style={{ fontSize: 12, color: '#10B981', fontWeight: 700 }}>
+                <span style={{ fontSize: 12, color: '#059669', fontWeight: 700 }}>
                   ● Zero Tracking Active Prior To Consent
                 </span>
               </div>
@@ -195,28 +195,28 @@ export function PrivacyConsentWidget() {
                   fontSize: 'clamp(15px, 2vw, 17px)',
                   fontWeight: 800,
                   margin: '0 0 6px',
-                  color: '#FFFFFF',
+                  color: '#1D1D1F',
                   letterSpacing: '-0.01em',
                 }}
               >
                 Your Privacy Rights &amp; Statutory Consent Choice
               </h2>
-              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#CBD5E1', lineHeight: 1.55 }}>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#4B5563', lineHeight: 1.55 }}>
                 Under California Civil Code § 1798.100 and GDPR Article 15, you have the right to know what personal data is collected before collection begins. Crowdbeats is 100% free to explore. We certify <strong>zero sale or cross-context behavioral sharing</strong> of your data. You may accept optional performance telemetry, or limit strictly to essential security tokens.
               </p>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 12 }}>
-                <span style={{ color: '#94A3B8' }}>• Necessary: Session &amp; Stripe tokenization</span>
-                <span style={{ color: '#94A3B8' }}>• Analytics: Blocked until consent</span>
+                <span style={{ color: '#6B7280' }}>• Necessary: Session &amp; Stripe tokenization</span>
+                <span style={{ color: '#6B7280' }}>• Analytics: Blocked until consent</span>
                 <Link
                   href="/legal/privacy"
-                  style={{ color: '#38BDF8', fontWeight: 600, textDecoration: 'underline' }}
+                  style={{ color: '#7C3AED', fontWeight: 600, textDecoration: 'underline' }}
                 >
                   Full Privacy Policy ↗
                 </Link>
                 <Link
                   href="/legal/terms"
-                  style={{ color: '#38BDF8', fontWeight: 600, textDecoration: 'underline' }}
+                  style={{ color: '#7C3AED', fontWeight: 600, textDecoration: 'underline' }}
                 >
                   Terms of Service ↗
                 </Link>
@@ -239,9 +239,9 @@ export function PrivacyConsentWidget() {
                 style={{
                   padding: '10px 18px',
                   borderRadius: 10,
-                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  color: '#CBD5E1',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #CBD5E1',
+                  color: '#334155',
                   fontSize: 13,
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -258,9 +258,9 @@ export function PrivacyConsentWidget() {
                 style={{
                   padding: '10px 16px',
                   borderRadius: 10,
-                  backgroundColor: 'transparent',
-                  border: '1px solid rgba(168, 85, 247, 0.4)',
-                  color: '#D8B4FE',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid rgba(124, 58, 237, 0.3)',
+                  color: '#7C3AED',
                   fontSize: 13,
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -283,7 +283,7 @@ export function PrivacyConsentWidget() {
                   fontWeight: 800,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
-                  boxShadow: '0 4px 18px rgba(124, 58, 237, 0.5)',
+                  boxShadow: '0 4px 18px rgba(124, 58, 237, 0.35)',
                 }}
               >
                 Accept All &amp; Agree
@@ -303,8 +303,9 @@ export function PrivacyConsentWidget() {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(16px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
             zIndex: 10000,
             display: 'flex',
             alignItems: 'center',
@@ -315,26 +316,26 @@ export function PrivacyConsentWidget() {
         >
           <div
             style={{
-              backgroundColor: '#0D0F17',
+              backgroundColor: '#FFFFFF',
               borderRadius: 24,
-              border: '1px solid rgba(168, 85, 247, 0.35)',
-              boxShadow: '0 24px 70px rgba(0, 0, 0, 0.9)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.18)',
               maxWidth: 720,
               width: '100%',
               maxHeight: '90vh',
               overflowY: 'auto',
               padding: 'clamp(24px, 4vw, 36px)',
-              color: '#FFFFFF',
+              color: '#1D1D1F',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
               <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#A855F7', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#7C3AED', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
                   Statutory Privacy Compliance
                 </div>
-                <h3 id="privacy-modal-title" style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 800, margin: 0 }}>
+                <h3 id="privacy-modal-title" style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 800, margin: 0, color: '#1D1D1F' }}>
                   CCPA § 1798.100 &amp; GDPR Art. 15 Governance
                 </h3>
               </div>
@@ -344,7 +345,7 @@ export function PrivacyConsentWidget() {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#94A3B8',
+                  color: '#64748B',
                   fontSize: 22,
                   cursor: 'pointer',
                   padding: 4,
@@ -356,25 +357,25 @@ export function PrivacyConsentWidget() {
               </button>
             </div>
 
-            <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.6, margin: '0 0 24px' }}>
+            <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.6, margin: '0 0 24px' }}>
               We enforce California Consumer Privacy Act (CCPA / CPRA § 1798.100) right to know and European Union GDPR Article 15 access guarantees. You have absolute control over your personal information.
             </p>
 
             {/* Category 1: Strictly Necessary (Locked) */}
-            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 14, padding: '16px 20px', border: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: 14 }}>
+            <div style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: '16px 20px', border: '1px solid #E2E8F0', marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF' }}>1. Strictly Necessary &amp; Security Tokens</span>
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#10B981', padding: '2px 8px', borderRadius: 20, backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>ALWAYS ACTIVE</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#1D1D1F' }}>1. Strictly Necessary &amp; Security Tokens</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#059669', padding: '2px 8px', borderRadius: 20, backgroundColor: 'rgba(5, 150, 105, 0.12)' }}>ALWAYS ACTIVE</span>
               </div>
-              <p style={{ fontSize: 12, color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12, color: '#64748B', margin: 0, lineHeight: 1.5 }}>
                 Encrypted session authentication, CSRF defense, and PCI-DSS Level 1 tokenized Stripe processing. Required for the platform to function. Cannot be disabled.
               </p>
             </div>
 
             {/* Category 2: Performance & Analytics (Toggle) */}
-            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 14, padding: '16px 20px', border: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: 14 }}>
+            <div style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: '16px 20px', border: '1px solid #E2E8F0', marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF' }}>2. Anonymous Performance &amp; Analytics</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#1D1D1F' }}>2. Anonymous Performance &amp; Analytics</span>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -384,15 +385,15 @@ export function PrivacyConsentWidget() {
                   />
                 </label>
               </div>
-              <p style={{ fontSize: 12, color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12, color: '#64748B', margin: 0, lineHeight: 1.5 }}>
                 Aggregated stage view counts and Web Vitals metrics. Completely blocked until you check this box. Never tied to your financial identity.
               </p>
             </div>
 
             {/* Category 3: Ephemeral Geolocation (Toggle) */}
-            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 14, padding: '16px 20px', border: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: 14 }}>
+            <div style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: '16px 20px', border: '1px solid #E2E8F0', marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF' }}>3. Ephemeral Live Stage Geolocation</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#1D1D1F' }}>3. Ephemeral Live Stage Geolocation</span>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -402,20 +403,20 @@ export function PrivacyConsentWidget() {
                   />
                 </label>
               </div>
-              <p style={{ fontSize: 12, color: '#94A3B8', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12, color: '#64748B', margin: 0, lineHeight: 1.5 }}>
                 Calculates walking distance to active stages in your city. Evaluated strictly on your local device — never stored on Crowdbeats servers.
               </p>
             </div>
 
             {/* Statutory CCPA Certification Badge */}
-            <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)', borderRadius: 14, padding: '16px 20px', border: '1px solid rgba(16, 185, 129, 0.25)', marginBottom: 24 }}>
+            <div style={{ backgroundColor: '#F0FDF4', borderRadius: 14, padding: '16px 20px', border: '1px solid #BBF7D0', marginBottom: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <span style={{ fontSize: 16 }}>✅</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: '#10B981' }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>
                   CCPA § 1798.120 Certification: Zero Sale or Sharing
                 </span>
               </div>
-              <p style={{ fontSize: 12, color: '#CBD5E1', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12, color: '#166534', margin: 0, lineHeight: 1.5 }}>
                 Crowdbeats LLC certifies that we do NOT sell personal data, nor do we share it with third parties for cross-context behavioral advertising. Financial records are held for 7 years solely pursuant to IRS IRC § 6001.
               </p>
             </div>
@@ -429,9 +430,9 @@ export function PrivacyConsentWidget() {
                   minWidth: 200,
                   padding: '10px 14px',
                   borderRadius: 10,
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#38BDF8',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #CBD5E1',
+                  color: '#2563EB',
                   fontSize: 12,
                   fontWeight: 700,
                   textDecoration: 'none',
@@ -447,9 +448,9 @@ export function PrivacyConsentWidget() {
                   minWidth: 200,
                   padding: '10px 14px',
                   borderRadius: 10,
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#D8B4FE',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #CBD5E1',
+                  color: '#7C3AED',
                   fontSize: 12,
                   fontWeight: 700,
                   textDecoration: 'none',
@@ -468,9 +469,9 @@ export function PrivacyConsentWidget() {
                 style={{
                   padding: '10px 18px',
                   borderRadius: 10,
-                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  color: '#CBD5E1',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#334155',
                   fontSize: 13,
                   fontWeight: 700,
                   cursor: 'pointer',

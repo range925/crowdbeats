@@ -88,8 +88,8 @@ export const CbFooter: React.FC = () => {
     {
       title: 'TRUST & REPORTING',
       links: [
-        { label: 'Submit DMCA Notice Form →', href: '/legal/copyright-report', highlightColor: '#EC4899' },
-        { label: 'Report Abuse & Safety →', href: '/legal/report-abuse', highlightColor: '#EF4444' },
+        { label: 'Submit DMCA Notice Form →', href: '/legal/copyright-report', highlightColor: isLight ? '#BE185D' : '#EC4899' },
+        { label: 'Report Abuse & Safety →', href: '/legal/report-abuse', highlightColor: isLight ? '#B91C1C' : '#EF4444' },
         { label: 'dmca@crowdbeats.ai', href: 'mailto:dmca@crowdbeats.ai', isEmail: true },
         { label: 'legal@crowdbeats.ai', href: 'mailto:legal@crowdbeats.ai', isEmail: true },
         { label: 'Law Enforcement Guidelines', href: '/legal/law-enforcement' },

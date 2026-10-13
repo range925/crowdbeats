@@ -15,61 +15,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { MapTheme } from '@/lib/maps/types';
 
-// Server-side default: dark (matches Crowdbeats default)
-const DEFAULT_THEME: MapTheme = 'dark';
+// Server-side and client default: light (matches Crowdbeats web light-mode policy)
+const DEFAULT_THEME: MapTheme = 'light';
 
 export interface MapThemeState {
   /** Active theme: 'dark' | 'light' */
   theme: MapTheme;
-  /** Manually set a theme override (ignores system preference). Pass null to restore system. */
+  /** Manually set a theme override (ignores system preference). Pass null to restore default. */
   setTheme: (t: MapTheme | null) => void;
-  /** True when theme follows OS preference (no manual override). */
+  /** True when theme follows default preference (no manual override). */
   isSystem: boolean;
 }
 
 export function useMapTheme(initialOverride?: MapTheme | null): MapThemeState {
-  // Start with dark (SSR-safe default) until we can read system preference
-  const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(true);
   const [override, setOverride] = useState<MapTheme | null>(initialOverride ?? null);
-  const [hasMounted, setHasMounted] = useState(false);
-
-  // Detect system preference (client-side only)
-  useEffect(() => {
-    setHasMounted(true);
-    if (typeof window === 'undefined') return;
-
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    setSystemPrefersDark(mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => setSystemPrefersDark(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   const setTheme = useCallback((t: MapTheme | null) => {
     setOverride(t);
   }, []);
 
-  // Before hydration: use dark (prevents SSR mismatch)
-  const theme: MapTheme = !hasMounted
-    ? DEFAULT_THEME
-    : (override ?? (systemPrefersDark ? 'dark' : 'light'));
+  const theme: MapTheme = override ?? DEFAULT_THEME;
 
   return { theme, setTheme, isSystem: override === null };
 }
 
 /**
- * useSystemTheme — lightweight version that only reads OS preference.
- * Does not support manual override.
+ * useSystemTheme — returns web-standardized light theme.
  */
 export function useSystemTheme(): MapTheme {
-  const [prefersDark, setPrefersDark] = useState(true);
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    setPrefersDark(mq.matches);
-    const h = (e: MediaQueryListEvent) => setPrefersDark(e.matches);
-    mq.addEventListener('change', h);
-    return () => mq.removeEventListener('change', h);
-  }, []);
-  return prefersDark ? 'dark' : 'light';
+  return 'light';
 }
