@@ -625,6 +625,65 @@ describe('/auditEvents/{eventId}', () => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
+// CRM EVENTS
+// ══════════════════════════════════════════════════════════════════════════════
+
+describe('/crmEvents/{eventId}', () => {
+  beforeEach(async () => {
+    await seedDoc('crmEvents/crm-001', {
+      eventId: 'crm-001',
+      source: 'admin',
+      action: 'CRM_INTERNAL_NOTE_ADDED',
+      actorUid: 'staff-mod',
+      actorRole: 'CONTENT_MODERATOR',
+      targetId: 'fan-alice',
+      targetType: 'user',
+      processingStatus: 'COMPLETED',
+      timestamp: '2026-01-01T00:00:00Z',
+      createdAt: '2026-01-01T00:00:00Z',
+    });
+  });
+
+  test('✅ CUSTOMER_SUPPORT can read CRM events', async () => {
+    const ctx = asStaff('staff-support', 'CUSTOMER_SUPPORT');
+    await assertSucceeds(getDoc(doc(ctx.firestore(), 'crmEvents/crm-001')));
+  });
+
+  test('✅ SUPER_ADMIN can read CRM events', async () => {
+    const ctx = asStaff('staff-root', 'SUPER_ADMIN');
+    await assertSucceeds(getDoc(doc(ctx.firestore(), 'crmEvents/crm-001')));
+  });
+
+  test('❌ Regular user cannot read CRM events', async () => {
+    const ctx = asFan('fan-alice');
+    await assertFails(getDoc(doc(ctx.firestore(), 'crmEvents/crm-001')));
+  });
+
+  test('❌ Unauthenticated user cannot read CRM events', async () => {
+    const ctx = unauthed();
+    await assertFails(getDoc(doc(ctx.firestore(), 'crmEvents/crm-001')));
+  });
+
+  test('❌ Direct client writes (create/update/delete) are denied even for SUPER_ADMIN', async () => {
+    const ctx = asStaff('staff-root', 'SUPER_ADMIN');
+    await assertFails(
+      setDoc(doc(ctx.firestore(), 'crmEvents/crm-new'), {
+        eventId: 'crm-new',
+        action: 'CRM_NOTE_ADDED',
+      }),
+    );
+    await assertFails(
+      updateDoc(doc(ctx.firestore(), 'crmEvents/crm-001'), {
+        action: 'TAMPERED',
+      }),
+    );
+    await assertFails(
+      deleteDoc(doc(ctx.firestore(), 'crmEvents/crm-001')),
+    );
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
 // STAFF PRIVILEGE ESCALATION TESTS
 // ══════════════════════════════════════════════════════════════════════════════
 

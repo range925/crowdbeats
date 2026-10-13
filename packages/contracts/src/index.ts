@@ -114,6 +114,8 @@ export * from './social/index';
 // ─── Camera-Triggered Nearby Performer Tipping ─────────────────────────────
 export * from './camera/index';
 
-export const CONTRACTS_VERSION = '0.18.0-camera-tipping' as const;
+// ─── Shared CRM Event & Data Foundation (Phase 6) ─────────────────────────
+export * from './crm/crmContracts';
 
+export const CONTRACTS_VERSION = '0.19.0-shared-crm' as const;
 

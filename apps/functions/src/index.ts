@@ -296,3 +296,12 @@ export {
 export {
   getNearbyLivePerformers,
 } from './session/nearbyPerformerCallables.js';
+
+// ─── Shared CRM Event & Data Foundation Callables (Phase 6) ──────────────────
+export {
+  getCrmCustomerProfileCallable,
+  recordCrmEventCallable,
+  getCrmRelationshipsCallable,
+  getCrmFinancialReferencesCallable,
+  addCrmInternalNoteCallable,
+} from './crm/crmCallables.js';

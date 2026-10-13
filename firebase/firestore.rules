@@ -9,7 +9,7 @@ rules_version = '2';
 // 2. No client-writable balance, ledger, payout, or audit fields
 // 3. Role self-assignment is impossible (roles sourced from Firestore by server only)
 // 4. Server-only collections: /paymentLedger, /paymentTransactions, /payouts,
-//    /idempotencyKeys, /auditEvents, /fraudSignals
+//    /idempotencyKeys, /auditEvents, /crmEvents, /fraudSignals
 // 5. All financial totals (totalTipsReceivedCents etc.) are server-maintained
 // 6. No rule relies solely on user-provided data for role authorization
 // 7. Type checking enforced on all writable fields
@@ -775,6 +775,11 @@ service cloud.firestore {
     match /auditEvents/{eventId} {
       allow read: if hasPlatformRole('COMPLIANCE_OFFICER') || isSuperAdmin();
       allow create, update, delete: if false;
+    }
+
+    match /crmEvents/{eventId} {
+      allow read: if isUserSupportStaff() || isSuperAdmin();
+      allow write: if false;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
